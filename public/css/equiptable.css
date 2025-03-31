@@ -1,0 +1,143 @@
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Table Styling */
+.table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #6b7280;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table tbody td {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+/* Badge Styling (for Role and Status) */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+}
+
+/* Role Badges */
+.badge-maintainer {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.badge-subscriber {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+
+.badge-author {
+    background-color: #fefce8;
+    color: #ca8a04;
+}
+
+.badge-admin {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Status Badges */
+.badge-active {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-pending {
+    background-color: #fef9c3;
+    color: #d97706;
+}
+
+.badge-inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+    color: #fff;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #6d28d9;
+    border-color: #6d28d9;
+}
+
+
+.btn-danger {
+    background-color: #f87171;
+    border-color: #f87171;
+    color: #fff;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #ef4444;
+    border-color: #ef4444;
+}
+
+/* Action Buttons (Icons) */
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    color: #6b7280;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+}
+
+.btn-icon:hover {
+    color: #374151;
+}
+
+/* Responsive Table */
+.table-responsive {
+    border-radius: 0 0 12px 12px;
+    overflow-x: auto;
+}
