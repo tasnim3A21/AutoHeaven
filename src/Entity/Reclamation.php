@@ -3,122 +3,121 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
-use App\Entity\User;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Messagerie;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity]
 class Reclamation
 {
-
     #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
-    private int $id_rec;
+    private ?int $id_rec = null;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "reclamations")]
-    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private User $id;
+    #[ORM\Column(type: "integer")]
+    private ?int $id = null; // Clé étrangère vers user(id)
 
     #[ORM\Column(type: "string", length: 50)]
-    private string $titre;
+    private ?string $titre = null;
 
     #[ORM\Column(type: "text")]
-    private string $contenu;
+    private ?string $contenu = null;
 
-    #[ORM\Column(type: "string")]
-    private string $status;
+    #[ORM\Column(type: "string", options: ["default" => "en_attente"])]
+    private ?string $status = 'en_attente';
 
     #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $datecreation;
-
-    public function getId_rec()
-    {
-        return $this->id_rec;
-    }
-
-    public function setId_rec($value)
-    {
-        $this->id_rec = $value;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($value)
-    {
-        $this->id = $value;
-    }
-
-    public function getTitre()
-    {
-        return $this->titre;
-    }
-
-    public function setTitre($value)
-    {
-        $this->titre = $value;
-    }
-
-    public function getContenu()
-    {
-        return $this->contenu;
-    }
-
-    public function setContenu($value)
-    {
-        $this->contenu = $value;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setStatus($value)
-    {
-        $this->status = $value;
-    }
-
-    public function getDatecreation()
-    {
-        return $this->datecreation;
-    }
-
-    public function setDatecreation($value)
-    {
-        $this->datecreation = $value;
-    }
+    private ?\DateTimeInterface $datecreation = null;
 
     #[ORM\OneToMany(mappedBy: "id_rec", targetEntity: Messagerie::class)]
     private Collection $messageries;
 
-        public function getMessageries(): Collection
-        {
-            return $this->messageries;
+    public function __construct()
+    {
+        $this->messageries = new ArrayCollection();
+    }
+
+    public function getIdRec(): ?int
+    {
+        return $this->id_rec;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(?string $titre): self
+    {
+        $this->titre = $titre;
+        return $this;
+    }
+
+    public function getContenu(): ?string
+    {
+        return $this->contenu;
+    }
+
+    public function setContenu(?string $contenu): self
+    {
+        $this->contenu = $contenu;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getDatecreation(): ?\DateTimeInterface
+    {
+        return $this->datecreation;
+    }
+
+    public function setDatecreation(?\DateTimeInterface $datecreation): self
+    {
+        $this->datecreation = $datecreation;
+        return $this;
+    }
+
+    public function getMessageries(): Collection
+    {
+        return $this->messageries;
+    }
+
+    public function addMessagerie(Messagerie $messagerie): self
+    {
+        if (!$this->messageries->contains($messagerie)) {
+            $this->messageries[] = $messagerie;
+            $messagerie->setIdRec($this);
         }
-    
-        public function addMessagerie(Messagerie $messagerie): self
-        {
-            if (!$this->messageries->contains($messagerie)) {
-                $this->messageries[] = $messagerie;
-                $messagerie->setId_rec($this);
+        return $this;
+    }
+
+    public function removeMessagerie(Messagerie $messagerie): self
+    {
+        if ($this->messageries->removeElement($messagerie)) {
+            if ($messagerie->getIdRec() === $this) {
+                $messagerie->setIdRec(null);
             }
-    
-            return $this;
         }
-    
-        public function removeMessagerie(Messagerie $messagerie): self
-        {
-            if ($this->messageries->removeElement($messagerie)) {
-                // set the owning side to null (unless already changed)
-                if ($messagerie->getId_rec() === $this) {
-                    $messagerie->setId_rec(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
 }

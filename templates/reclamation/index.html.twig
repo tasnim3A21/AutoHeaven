@@ -3,5 +3,21 @@
 {% block title %}Reclamation{% endblock %}
 
 {% block content %}
-ici l'affichage de reclamation
+    <h1>Passer une réclamation</h1>
+
+    {{ form_start(reclamationForm) }}
+        <div>
+            {{ form_label(reclamationForm.titre, 'Objet') }}
+            {{ form_widget(reclamationForm.titre) }}
+            {{ form_errors(reclamationForm.titre) }}
+        </div>
+
+        <div>
+            {{ form_label(reclamationForm.contenu, 'Votre réclamation') }}
+            {{ form_widget(reclamationForm.contenu) }}
+            {{ form_errors(reclamationForm.contenu) }}
+        </div>
+
+        <button type="submit">Envoyer</button>
+    {{ form_end(reclamationForm) }}
 {% endblock %}
