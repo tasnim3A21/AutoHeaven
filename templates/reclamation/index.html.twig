@@ -18,7 +18,7 @@
                 <div class="textarea-container">
                     {{ form_widget(reclamationForm.contenu) }}
                     <label for="form_imageFile" class="image-upload-label">
-                        <img src="{{ asset('images/jointe.png') }}" alt="Joindre une image" class="image-upload-icon">
+                        <img src="{{ asset('images/img.png') }}" alt="Joindre une image" class="image-upload-icon">
                     </label>
                     {{ form_widget(reclamationForm.imageFile, {'attr': {'id': 'form_imageFile'}}) }}
                 </div>
@@ -92,7 +92,7 @@
         .form-textarea {
             resize: vertical;
             min-height: 100px;
-            padding-right: 40px; /* Laisser de l'espace pour l'icône */
+            padding-right: 50px; /* Laisser plus d'espace pour l'icône agrandie */
         }
 
         .form-input:focus,
@@ -118,8 +118,8 @@
         }
 
         .image-upload-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px; /* Agrandir l'icône */
+            height: 32px;
             vertical-align: middle;
         }
 

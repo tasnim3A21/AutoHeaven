@@ -62,6 +62,15 @@
                 max-width: 200px;
             }
 
+            /* Style pour l'image */
+            .reclamation-image {
+                max-width: 50px;
+                max-height: 50px;
+                object-fit: cover;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
             /* Style pour le bouton "en_attente" et "repondu" */
             .status-btn {
                 padding: 6px 12px;
@@ -411,6 +420,7 @@
                     <option value="3">Email</option>
                     <option value="4">Titre</option>
                     <option value="5">Contenu</option>
+                    <option value="6">Image</option> <!-- Nouvelle option -->
                     <option value="7" selected>Date de création</option>
                 </select>
             </div>
@@ -432,6 +442,7 @@
                     <th>Email</th>
                     <th>Titre</th>
                     <th>Contenu</th>
+                    <th>Image</th> <!-- Nouvelle colonne -->
                     <th>Statut</th>
                     <th>Date de création</th>
                     <th>Actions</th>
@@ -446,6 +457,15 @@
                         <td data-label="Email">{{ reclamation.email }}</td>
                         <td data-label="Titre">{{ reclamation.titre }}</td>
                         <td data-label="Contenu">{{ reclamation.contenu }}</td>
+                        <td data-label="Image">
+                            {% if reclamation.image %}
+                                <a href="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" target="_blank">
+                                    <img src="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" alt="Image de la réclamation" class="reclamation-image">
+                                </a>
+                            {% else %}
+                                Aucune image
+                            {% endif %}
+                        </td>
                         <td data-label="Statut">
                             <button class="status-btn {{ reclamation.status == 'en_attente' ? 'en-attente' : 'repondu' }}" 
                                     data-id="{{ reclamation.id_rec }}"
@@ -490,9 +510,9 @@
                     },
                     "pageLength": 5, // Nombre d'éléments par page
                     "lengthMenu": [5, 10, 25, 50], // Options de pagination
-                    "order": [[7, "desc"]], // Trier par "Date de création" (colonne 8) en ordre décroissant par défaut
+                    "order": [[8, "desc"]], // Trier par "Date de création" (colonne 9) en ordre décroissant par défaut
                     "columnDefs": [
-                        { "orderable": false, "targets": [6, 8] } // Désactiver le tri sur les colonnes "Statut" et "Actions"
+                        { "orderable": false, "targets": [6, 7, 9] } // Désactiver le tri sur les colonnes "Image", "Statut" et "Actions"
                     ],
                     "searching": true, // Activer la recherche
                     "paging": true, // Activer la pagination

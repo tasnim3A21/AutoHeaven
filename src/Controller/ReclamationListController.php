@@ -42,6 +42,7 @@ final class ReclamationListController extends AbstractController
                 'status' => $reclamation->getStatus(),
                 'datecreation' => $reclamation->getDatecreation(),
                 'messageries' => $reclamation->getMessageries(),
+                'image' => $reclamation->getImage(), // Ajouter le champ image
                 'nom' => $userData['nom'] ?? 'Inconnu',
                 'prenom' => $userData['prenom'] ?? 'Inconnu',
                 'tel' => $userData['tel'] ?? 'N/A',
