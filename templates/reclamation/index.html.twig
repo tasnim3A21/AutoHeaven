@@ -8,36 +8,36 @@
 
         {{ form_start(reclamationForm, {'attr': {'id': 'reclamationForm'}}) }}
             <div class="form-group">
-                <label for="reclamation_titre_select" class="form-label">Objet</label>
-                <select id="reclamation_titre_select" name="reclamation_titre_select" class="form-input">
-                    <option value="Accessoires manquants">Accessoires manquants</option>
-                    <option value="Erreur sur la facture">Erreur sur la facture</option>
-                    <option value="Retard de livraison">Retard de livraison</option>
-                    <option value="Panne électronique">Panne électronique</option>
-                    <option value="Problème de transmission">Problème de transmission</option>
-                    <option value="Autre">Autre</option>
-                </select>
-                <!-- Champ texte caché par défaut, affiché si "Autre" est sélectionné -->
-                <div id="customTitreContainer" style="display: none; margin-top: 10px;">
-                    {{ form_widget(reclamationForm.titre, {'attr': {'class': 'form-input', 'placeholder': 'Précisez l\'objet de votre réclamation'}}) }}
-                    {{ form_errors(reclamationForm.titre) }}
-                </div>
+                {{ form_label(reclamationForm.titre, 'Objet', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(reclamationForm.titre) }}
+                {{ form_errors(reclamationForm.titre) }}
             </div>
 
             <div class="form-group">
                 {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(reclamationForm.contenu, {'attr': {'class': 'form-textarea', 'rows': '5'}}) }}
+                <div class="textarea-container">
+                    {{ form_widget(reclamationForm.contenu) }}
+                    <label for="form_imageFile" class="image-upload-label">
+                        <img src="{{ asset('images/jointe.png') }}" alt="Joindre une image" class="image-upload-icon">
+                    </label>
+                    {{ form_widget(reclamationForm.imageFile, {'attr': {'id': 'form_imageFile'}}) }}
+                </div>
                 {{ form_errors(reclamationForm.contenu) }}
+                {{ form_errors(reclamationForm.imageFile) }}
+                <span id="imageFileName" class="image-file-name"></span>
             </div>
 
             <div class="button-container">
                 <button type="submit" class="btn-submit">Envoyer</button>
             </div>
-        {{ form_end(reclamationForm, {'render_rest': false}) }}
+        {{ form_end(reclamationForm) }}
 
         <!-- Message de confirmation -->
         <div id="successMessage" class="success-message" style="display: none;">
             Réclamation envoyée avec succès !
+        </div>
+        <div id="errorMessage" class="error-message" style="display: none;">
+            Une erreur est survenue.
         </div>
     </div>
 
@@ -92,6 +92,7 @@
         .form-textarea {
             resize: vertical;
             min-height: 100px;
+            padding-right: 40px; /* Laisser de l'espace pour l'icône */
         }
 
         .form-input:focus,
@@ -99,6 +100,39 @@
             border-color: #dc3545;
             box-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
             outline: none;
+        }
+
+        /* Conteneur pour le textarea et l'icône */
+        .textarea-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .image-upload-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .image-upload-icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+
+        .image-file-name {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Cacher le champ input file */
+        input[type="file"] {
+            display: none;
         }
 
         /* Erreurs */
@@ -163,6 +197,23 @@
             opacity: 1;
         }
 
+        /* Message d'erreur */
+        .error-message {
+            text-align: center;
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
         /* Responsive */
         @media screen and (max-width: 768px) {
             .reclamation-container {
@@ -189,34 +240,35 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('reclamationForm');
-            const titreSelect = document.getElementById('reclamation_titre_select');
-            const customTitreContainer = document.getElementById('customTitreContainer');
-            const titreInput = form.querySelector('input[name="reclamation[titre]"]');
-            const contenuInput = form.querySelector('textarea[name="reclamation[contenu]"]');
+            const titreInput = form.querySelector('input[name="form[titre]"]');
+            const contenuInput = form.querySelector('textarea[name="form[contenu]"]');
+            const imageFileInput = form.querySelector('#form_imageFile');
+            const imageFileName = form.querySelector('#imageFileName');
+            const imageUploadLabel = form.querySelector('.image-upload-label');
             const submitButton = form.querySelector('.btn-submit');
             const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
 
-            // Gérer l'affichage du champ texte "Objet" en fonction de la sélection
-            titreSelect.addEventListener('change', function () {
-                if (this.value === 'Autre') {
-                    customTitreContainer.style.display = 'block';
-                    titreInput.value = ''; // Vider le champ texte
+            // Ajouter un événement de débogage pour vérifier si le clic sur l'icône est détecté
+            imageUploadLabel.addEventListener('click', function () {
+                console.log('Icône cliquée, déclenchement de l\'input file...');
+                imageFileInput.click(); // Forcer l'ouverture de la fenêtre de sélection
+            });
+
+            // Afficher le nom du fichier sélectionné
+            imageFileInput.addEventListener('change', function () {
+                console.log('Fichier sélectionné :', this.files);
+                if (this.files.length > 0) {
+                    imageFileName.textContent = this.files[0].name;
                 } else {
-                    customTitreContainer.style.display = 'none';
-                    titreInput.value = this.value; // Remplir le champ caché avec la valeur sélectionnée
+                    imageFileName.textContent = '';
                 }
             });
 
-            // Initialiser l'état du champ texte au chargement de la page
-            if (titreSelect.value === 'Autre') {
-                customTitreContainer.style.display = 'block';
-            } else {
-                customTitreContainer.style.display = 'none';
-                titreInput.value = titreSelect.value;
-            }
-
-            // Validation côté client
+            // Validation côté client et soumission
             form.addEventListener('submit', function (e) {
+                e.preventDefault(); // Empêcher la soumission par défaut
+
                 let hasError = false;
 
                 // Réinitialiser les messages d'erreur
@@ -224,16 +276,7 @@
                 existingErrors.forEach(error => error.remove());
 
                 // Vérifier le champ "Objet"
-                if (titreSelect.value === 'Autre' && !titreInput.value.trim()) {
-                    hasError = true;
-                    const error = document.createElement('div');
-                    error.className = 'form-error';
-                    error.style.color = '#dc3545';
-                    error.style.fontSize = '12px';
-                    error.style.marginTop = '5px';
-                    error.textContent = 'Veuillez préciser l\'objet de votre réclamation.';
-                    customTitreContainer.appendChild(error);
-                } else if (!titreSelect.value) {
+                if (!titreInput.value.trim()) {
                     hasError = true;
                     const error = document.createElement('div');
                     error.className = 'form-error';
@@ -241,7 +284,7 @@
                     error.style.fontSize = '12px';
                     error.style.marginTop = '5px';
                     error.textContent = 'Le champ Objet est requis.';
-                    titreSelect.parentNode.appendChild(error);
+                    titreInput.parentNode.appendChild(error);
                 }
 
                 // Vérifier le champ "Votre réclamation"
@@ -257,7 +300,6 @@
                 }
 
                 if (hasError) {
-                    e.preventDefault();
                     return;
                 }
 
@@ -273,21 +315,19 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erreur réseau : ' + response.status);
-                    }
-                    return response.text();
-                })
+                .then(response => response.json())
                 .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Erreur lors de l\'envoi de la réclamation.');
+                    }
+
                     // Afficher le message de confirmation
                     successMessage.style.display = 'block';
                     successMessage.classList.add('show');
 
                     // Réinitialiser le formulaire
                     form.reset();
-                    customTitreContainer.style.display = 'none'; // Cacher le champ texte après réinitialisation
-                    titreSelect.value = 'Accessoires manquants'; // Réinitialiser le menu déroulant
+                    imageFileName.textContent = ''; // Réinitialiser le nom du fichier
 
                     // Réactiver le bouton
                     submitButton.disabled = false;
@@ -303,13 +343,20 @@
                 })
                 .catch(error => {
                     console.error('Erreur lors de la soumission :', error);
-                    alert('Une erreur est survenue lors de l\'envoi de la réclamation.');
+                    errorMessage.textContent = error.message || 'Une erreur est survenue lors de l\'envoi de la réclamation.';
+                    errorMessage.style.display = 'block';
+                    errorMessage.classList.add('show');
                     submitButton.disabled = false;
                     submitButton.textContent = 'Envoyer';
-                });
 
-                // Empêcher la soumission par défaut
-                e.preventDefault();
+                    // Cacher le message d'erreur après 3 secondes
+                    setTimeout(() => {
+                        errorMessage.classList.remove('show');
+                        setTimeout(() => {
+                            errorMessage.style.display = 'none';
+                        }, 300);
+                    }, 3000);
+                });
             });
         });
     </script>
