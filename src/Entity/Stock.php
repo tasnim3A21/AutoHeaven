@@ -12,6 +12,7 @@ class Stock
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
+    #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
     private int $id_s;
 
         #[ORM\ManyToOne(targetEntity: Equipement::class, inversedBy: "stocks")]
@@ -19,9 +20,13 @@ class Stock
     private Equipement $id;
 
     #[ORM\Column(type: "integer")]
+    #[ORM\Assert\NotBlank(message: "Quantité est obligatoire.")]
+  
     private int $quantite;
 
     #[ORM\Column(type: "float")]
+    #[ORM\Assert\NotBlank(message: "Prix de vente est obligatoire.")]
+   
     private float $prixvente;
 
     public function getId_s()

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panier{% endblock %}
+{% block spinner %} {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Shopping Cart</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Sub Total</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for panier in paniers %}
+                    {% set equipement = panier.id_e %}
+                    {% set stock = equipement.stocks|first %}
+                    <tr>
+                        <td>
+                            <img src="{{ equipement.image }}" alt="{{ equipement.nom }}" style="width: 50px; height: 50px;">
+                            {{ equipement.nom }}
+                        </td>
+                        <td>${{ stock.prixvente|number_format(2) }}</td>
+                        <td>
+                            <input type="number" value="{{ panier.quantite }}" min="1" class="quantity-input" data-id="{{ panier.id_p }}">
+                        </td>
+                        <td>${{ (stock.prixvente * panier.quantite)|number_format(2) }}</td>
+                        <td>
+                            <a href="{{ path('app_remove_from_cart', {'id': panier.id_p}) }}" class="btn btn-danger btn-sm">x</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">Your cart is empty.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="coupon-section">
+            <label for="coupon">Coupon:</label>
+            <input type="text" id="coupon" placeholder="Enter coupon code">
+            <button class="btn btn-warning">Apply Code</button>
+            <button class="btn btn-warning float-right">Update Cart</button>
+        </div>
+
+        <div class="cart-summary">
+            <h3>Subtotal</h3>
+            <p>Subtotal: ${{ subtotal|number_format(2) }}</p>
+            <p>Shipping Address: {{ user.adresse }}</p>
+            <h3>Total: ${{ subtotal|number_format(2) }}</h3>
+            <a href="#" class="btn btn-warning">Checkout</a>
+        </div>
+    </div>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .quantity-input {
+            width: 60px;
+        }
+        .coupon-section {
+            margin: 20px 0;
+        }
+        .cart-summary {
+            text-align: right;
+        }
+        .btn-warning {
+            background-color: #f0ad4e;
+            border-color: #f0ad4e;
+            color: #fff;
+        }
+        .float-right {
+            float: right;
+        }
+    </style>
+{% endblock %}

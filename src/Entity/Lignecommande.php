@@ -12,6 +12,7 @@ class Lignecommande
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
+    #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
     private int $id_l;
 
     #[ORM\Column(type: "integer")]

@@ -1,7 +1,151 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Equipement{% endblock %}
+{% block title %}Equipements{% endblock %}
 
 {% block content %}
-equipemet
+<style>
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff; /* White background to match the image */
+}
+
+.equipments-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.equipments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+    gap: 20px;
+}
+
+.equipment-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px; /* Increased padding to make the card taller */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 300px; /* Increased minimum height to make the card taller */
+    text-align: left; /* Align text to the left */
+}
+
+.equipment-image {
+    width: 100%;
+    height: auto; /* Prevent cropping, allow natural height */
+    max-height: 150px; /* Limit max height to keep proportions */
+    object-fit: contain; /* Ensure the entire image is visible */
+    margin-bottom: 10px;
+}
+
+.star-rating {
+    color: #ff5722; /* Orange color for stars */
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-align: center; /* Center the stars */
+}
+
+.equipment-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a0dab; /* Blue color for the name */
+    margin: 5px 0;
+    text-align: left; /* Left-aligned title */
+    vertical-align: middle; /* Center vertically within its space */
+}
+
+.price-button-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    gap: 10px; /* Reduced gap between price and button */
+}
+
+.equipment-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e91e63; /* Pink color for the price */
+    margin: 0;
+}
+
+.add-to-cart-btn {
+    background-color: #ff5722; /* Orange color for the button */
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block; /* Keep button as a small rounded button */
+}
+
+.add-to-cart-btn:hover {
+    background-color: #e64a19;
+}
+
+@media (max-width: 768px) {
+    .equipments-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .equipment-card {
+        padding: 15px;
+        min-height: 250px; /* Adjusted for smaller screens */
+    }
+
+    .equipment-image {
+        max-height: 120px;
+    }
+
+    .equipment-name {
+        font-size: 14px;
+    }
+
+    .equipment-price {
+        font-size: 14px;
+    }
+
+    .add-to-cart-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .price-button-row {
+        gap: 8px; /* Slightly smaller gap on smaller screens */
+    }
+}
+</style>
+    <section class="equipments-section">
+        <h2 class="section-title">Our Equipments</h2>
+        <div class="equipments-grid">
+            {% for equipement in equipements %}
+                {% set stock = stocks|filter(s => s.id == equipement)|first %}
+             <div class="equipment-card" onclick="window.location.href='{{ path('app_equipement_detail', {'id': equipement.id}) }}'" style="cursor: pointer;">
+    <img src="{{ asset(equipement.image) }}" alt="{{ equipement.nom }}" class="equipment-image">
+    <div class="star-rating">★★★★★</div>
+    <h3 class="equipment-name">{{ equipement.nom }}</h3>
+    <div class="price-button-row">
+        <p class="equipment-price">${{ stock ? stock.prixvente|number_format(2) : 'N/A' }}</p>
+        <a href="{{ path('app_equipement_detail', {'id': equipement.id}) }}" class="add-to-cart-btn">Add To Cart</a>
+    </div>
+</div>
+            {% endfor %}
+        </div>
+    </section>
 {% endblock %}
