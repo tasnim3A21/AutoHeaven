@@ -1,0 +1,27 @@
+{# templates/payment/success.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+
+{% block title %}Payment Successful{% endblock %}
+{% block spinner %} {% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="alert alert-success">
+            <h2>Payment Successful!</h2>
+            <p>Thank you for your order. Your order number is: {{ commande.id_com }}</p>
+            <p>We've sent a confirmation email to your registered email address.</p>
+        </div>
+        
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <p>Order Date: {{ commande.date_com|date('Y-m-d H:i') }}</p>
+            <p>Total Amount: ${{ commande.montant_total|number_format(2) }}</p>
+            <p>Status: {{ commande.status }}</p>
+        </div>
+        
+        <a href="{{ path('app_equipement') }}" class="btn btn-primary">Continue Shopping</a>
+    </div>
+{% endblock %}

@@ -26,9 +26,12 @@
                             {{ equipement.nom }}
                         </td>
                         <td>${{ stock.prixvente|number_format(2) }}</td>
-                        <td>
-                            <input type="number" value="{{ panier.quantite }}" min="1" class="quantity-input" data-id="{{ panier.id_p }}">
-                        </td>
+                       <td>
+    <form action="{{ path('app_update_quantity', {'id': panier.id_p}) }}" method="POST" class="quantity-form">
+        <input type="number" name="quantity" value="{{ panier.quantite }}" min="1" class="quantity-input" data-id="{{ panier.id_p }}">
+        <button type="submit" style="display: none;"></button>
+    </form>
+</td>
                         <td>${{ (stock.prixvente * panier.quantite)|number_format(2) }}</td>
                         <td>
                             <a href="{{ path('app_remove_from_cart', {'id': panier.id_p}) }}" class="btn btn-danger btn-sm">x</a>
@@ -49,14 +52,25 @@
             <button class="btn btn-warning float-right">Update Cart</button>
         </div>
 
-        <div class="cart-summary">
-            <h3>Subtotal</h3>
-            <p>Subtotal: ${{ subtotal|number_format(2) }}</p>
-            <p>Shipping Address: {{ user.adresse }}</p>
-            <h3>Total: ${{ subtotal|number_format(2) }}</h3>
-            <a href="#" class="btn btn-warning">Checkout</a>
-        </div>
+      <div class="cart-summary">
+    <h3>Subtotal</h3>
+    <p>Subtotal: ${{ subtotal|number_format(2) }}</p>
+    <p>Shipping Address: {{ user.adresse }}</p>
+    <h3>Total: ${{ subtotal|number_format(2) }}</h3>
+    <a href="{{ path('app_checkout') }}" class="btn btn-warning">Checkout</a>
+</div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+});
+</script>
 
     <style>
         .container {
