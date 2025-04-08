@@ -1,0 +1,240 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Liste des Commandes{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/commandes.css') }}">
+
+    <div class="container mt-5">
+        <div class="card shadow-sm rounded-3 border-0">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Liste des Commandes</h5>
+                <div>
+                    <a href="{{ path('app_commande_export') }}" class="btn btn-sm btn-secondary mr-2">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </a>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown">
+                            Filtres <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item {{ currentFilter == 'all' ? 'active' : '' }}" 
+                               href="{{ path('app_commande') }}">Toutes</a>
+                            <a class="dropdown-item {{ currentFilter == 'en attente' ? 'active' : '' }}" 
+                               href="{{ path('app_commande_filter', {'status': 'en attente'}) }}">En attente</a>
+                            <a class="dropdown-item {{ currentFilter == 'confirmé' ? 'active' : '' }}" 
+                               href="{{ path('app_commande_filter', {'status': 'confirmé'}) }}">Confirmées</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="input-group">
+                        <input type="text" 
+                               id="searchInput" 
+                               class="form-control" 
+                               placeholder="Rechercher par nom, téléphone ou référence..."
+                               autocomplete="off">
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle" id="commandesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#ID</th>
+                                <th>Client</th>
+                                <th>Contact</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for commande in commandes %}
+                                <tr class="{{ commande.status == 'en attente' ? 'table-warning' : '' }} {{ commande.isNew ? 'new-order' : '' }}">
+                                    <td>CMD-{{ commande.idCom }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ asset('uploads/profiles/' ~ commande.id.photoProfile) }}" 
+                                                 class="rounded-circle mr-2" 
+                                                 width="30" height="30" 
+                                                 alt="{{ commande.id.nom }}"
+                                                 onerror="this.src='{{ asset('images/default-profile.png') }}'">
+                                            {{ commande.id.nom }} {{ commande.id.prenom }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>{{ commande.id.tel }}</div>
+                                        <small class="text-muted">{{ commande.id.email }}</small>
+                                    </td>
+                                    <td>
+                                        {{ commande.dateCom|date('d/m/Y') }}
+                                        <small class="text-muted d-block">{{ commande.dateCom|date('H:i') }}</small>
+                                    </td>
+                                    <td class="font-weight-bold">{{ commande.montantTotal|number_format(2) }} €</td>
+                                    <td>
+                                        <span class="badge badge-{{ 
+                                            commande.status == 'confirmé' ? 'success' : 
+                                            (commande.status == 'annulé' ? 'danger' : 'warning') 
+                                        }}">
+                                            {{ commande.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-info view-details" 
+                                                    data-id="{{ commande.idCom }}"
+                                                    data-toggle="modal" 
+                                                    data-target="#detailsModal">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            
+                                            {% if commande.status == 'en attente' %}
+                                                <a href="{{ path('app_commande_confirm', {'id': commande.idCom}) }}" 
+                                                   class="btn btn-success"
+                                                   title="Confirmer"
+                                                   onclick="return confirm('Confirmer cette commande ?')">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                            {% endif %}
+                                            
+                                            <a href="{{ path('app_commande_invoice', {'id': commande.idCom}) }}" 
+                                               class="btn btn-secondary"
+                                               title="Facture">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                                        <p class="text-muted">Aucune commande trouvée</p>
+                                        <a href="{{ path('app_commande') }}" class="btn btn-primary">
+                                            <i class="fas fa-sync-alt"></i> Réinitialiser les filtres
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if commandes|length > 0 %}
+                    <nav aria-label="Pagination">
+                        {{ knp_pagination_render(commandes) }}
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails de la commande -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Détails de la commande</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="detailsModalBody">
+                    <!-- Le contenu sera chargé via AJAX -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Recherche améliorée
+            $('#searchInput').on('keyup', function() {
+                const value = $(this).val().toLowerCase();
+                $('#commandesTable tbody tr').each(function() {
+                    const rowText = $(this).text().toLowerCase();
+                    $(this).toggle(rowText.indexOf(value) > -1);
+                });
+            });
+
+            // Détails de la commande avec cache
+            const detailsCache = {};
+            $('.view-details').on('click', function() {
+                const commandeId = $(this).data('id');
+                const modalBody = $('#detailsModalBody');
+                
+                modalBody.html(`
+                    <div class="text-center py-4">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="mt-2">Chargement des détails...</p>
+                    </div>
+                `);
+                
+                if (detailsCache[commandeId]) {
+                    modalBody.html(detailsCache[commandeId]);
+                } else {
+                    $.get(`/commande/details/${commandeId}`)
+                        .done(function(data) {
+                            detailsCache[commandeId] = data;
+                            modalBody.html(data);
+                        })
+                        .fail(function() {
+                            modalBody.html(`
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle"></i> 
+                                    Erreur lors du chargement des détails
+                                </div>
+                            `);
+                        });
+                }
+            });
+
+            // Notification pour nouvelles commandes
+            const newOrdersBadge = $(`<span id="newOrdersBadge" class="badge badge-pill badge-danger d-none ml-2"></span>`);
+            $('.dropdown-toggle').after(newOrdersBadge);
+
+            // Actualisation automatique pour les nouvelles commandes
+            function checkNewOrders() {
+                $.get('/commande/check-new')
+                    .done(function(data) {
+                        if (data.count > 0) {
+                            newOrdersBadge.text(data.count).removeClass('d-none');
+                            
+                            // Jouer un son de notification
+                            if (data.count > 0) {
+                                const audio = new Audio('{{ asset('sounds/notification.mp3') }}');
+                                audio.play().catch(e => console.log("Audio play failed:", e));
+                            }
+                        } else {
+                            newOrdersBadge.addClass('d-none');
+                        }
+                    })
+                    .always(function() {
+                        setTimeout(checkNewOrders, 30000); // Vérifier toutes les 30 secondes
+                    });
+            }
+
+            // Démarrer la vérification
+            checkNewOrders();
+        });
+    </script>
+{% endblock %}

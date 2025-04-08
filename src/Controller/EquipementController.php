@@ -29,7 +29,7 @@ final class EquipementController extends AbstractController
         ]);
     }
 
-    #[Route('/equipements/{id}', name: 'app_equipement_detail', methods: ['GET'])]
+    #[Route('/equipement/{id}', name: 'app_equipement_detail', methods: ['GET'])]
     public function detail(int $id, EntityManagerInterface $entityManager): Response
     {
         $equipement = $entityManager->getRepository(Equipement::class)->find($id);
