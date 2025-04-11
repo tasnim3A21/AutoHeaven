@@ -1,7 +1,5 @@
 <?php
-
 // src/Controller/ReclamationController.php
-
 namespace App\Controller;
 
 use App\Entity\Reclamation;
@@ -49,7 +47,7 @@ final class ReclamationController extends AbstractController
             ])
             ->add('imageFile', FileType::class, [
                 'label' => false,
-                'mapped' => true,
+                'mapped' => false, // Ne pas mapper directement à l'entité
                 'required' => false,
                 'attr' => [
                     'id' => 'form_imageFile', // S'assurer que l'ID correspond
@@ -61,36 +59,35 @@ final class ReclamationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                // Gérer l'upload de l'image
-                $imageFile = $reclamation->getImageFile();
-                if ($imageFile) {
-                    // Générer un nom unique pour le fichier
-                    $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+            // Gérer l'upload de l'image AVANT la validation du formulaire
+            $imageFile = $form->get('imageFile')->getData(); // Récupérer l'objet UploadedFile depuis le formulaire
+            if ($imageFile) {
+                // Générer un nom unique pour le fichier
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
-                    // Déplacer le fichier dans le répertoire public/uploads/reclamations
-                    try {
-                        $imageFile->move(
-                            $this->getParameter('kernel.project_dir') . '/public/uploads/reclamations',
-                            $newFilename
-                        );
-                    } catch (\Exception $e) {
-                        if ($request->isXmlHttpRequest()) {
-                            return new JsonResponse([
-                                'success' => false,
-                                'message' => 'Erreur lors de l\'upload de l\'image : ' . $e->getMessage()
-                            ], 500);
-                        }
-                        $this->addFlash('error', 'Erreur lors de l\'upload de l\'image : ' . $e->getMessage());
-                        return $this->render('reclamation/index.html.twig', [
-                            'reclamationForm' => $form->createView(),
-                        ]);
-                    }
-
-                    // Stocker le nom du fichier dans l'entité
+                // Déplacer le fichier dans le répertoire public/uploads/reclamations
+                try {
+                    $imageFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads/reclamations',
+                        $newFilename
+                    );
+                    // Stocker le nom du fichier dans l'entité avant la validation
                     $reclamation->setImage($newFilename);
+                } catch (\Exception $e) {
+                    if ($request->isXmlHttpRequest()) {
+                        return new JsonResponse([
+                            'success' => false,
+                            'message' => 'Erreur lors de l\'upload de l\'image : ' . $e->getMessage()
+                        ], 500);
+                    }
+                    $this->addFlash('error', 'Erreur lors de l\'upload de l\'image : ' . $e->getMessage());
+                    return $this->render('reclamation/index.html.twig', [
+                        'reclamationForm' => $form->createView(),
+                    ]);
                 }
+            }
 
+            if ($form->isValid()) {
                 // Enregistrer dans la base de données
                 try {
                     $this->entityManager->persist($reclamation);

@@ -3,14 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Messagerie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "AUTO")]
-    #[ORM\Column(type: "integer", name: "id_m")] // Spécifier le nom de la colonne
-    private ?int $id_m = null; // Renommé de id à id_m
+    #[ORM\Column(type: "integer", name: "id_m")]
+    private ?int $id_m = null;
 
     #[ORM\ManyToOne(targetEntity: Reclamation::class, inversedBy: "messageries")]
     #[ORM\JoinColumn(name: "id_rec", referencedColumnName: "id_rec", onDelete: "CASCADE")]
@@ -19,7 +20,8 @@ class Messagerie
     #[ORM\Column(type: "integer", nullable: true)]
     private ?int $id_user = null;
 
-    #[ORM\Column(type: "text")]
+    #[ORM\Column(type: "text", nullable: false)]
+    #[Assert\NotBlank(message: "Le message ne peut pas être vide.")]
     private ?string $message = null;
 
     #[ORM\Column(type: "datetime")]

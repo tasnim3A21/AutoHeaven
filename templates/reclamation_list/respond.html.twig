@@ -3,149 +3,290 @@
     <i class="fas fa-envelope response-icon"></i>
     <h2>Répondre à la réclamation</h2>
     <div class="reclamation-details">
-        <p><strong>Titre :</strong> {{ reclamation.titre }}</p>
-        <p><strong>Objet :</strong> {{ reclamation.contenu }}</p>
+        <div class="form-group">
+            <label class="form-label">Titre de la réclamation</label>
+            <p class="plain-text">{{ form.titre.vars.value | default('Non défini') }}</p>
+            <input type="hidden" id="hidden-titre" name="messagerie[titre]" value="{{ form.titre.vars.value | default('') }}">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Objet de la réclamation</label>
+            <p class="plain-text">{{ form.contenu.vars.value | default('Non défini') }}</p>
+            <input type="hidden" id="hidden-contenu" name="messagerie[contenu]" value="{{ form.contenu.vars.value | default('') }}">
+        </div>
     </div>
 
-    {{ form_start(form) }}
+    {{ form_start(form, {'attr': {'class': 'respond-form', 'id': 'respondForm', 'novalidate': 'novalidate'}}) }}
         <div class="form-group">
             {{ form_label(form.message, 'Votre réponse', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.message, {'attr': {'class': 'form-textarea', 'rows': '3'}}) }}
-            {{ form_errors(form.message) }}
+            {{ form_widget(form.message, {'attr': {'class': 'form-textarea', 'rows': '3', 'required': 'required'}}) }}
+            {% if form_errors(form.message) %}
+                <div class="error-message">{{ form_errors(form.message) }}</div>
+            {% endif %}
+            <div class="error-message" id="custom-error" style="display: none;"></div>
         </div>
         <div class="button-container">
-            <button type="submit" class="btn-submit" id="unique-submit-button">Envoyer</button>
+            {{ form_widget(form.submit, {'attr': {'class': 'btn-submit'}}) }}
         </div>
-    {{ form_end(form, {'render_rest': false}) }}
+        {{ form_rest(form) }} <!-- Inclut le token CSRF -->
+    {{ form_end(form) }}
 </div>
 
 <style>
-    .modal-content {
-        background-color: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        max-width: 600px;
-        margin: 0 auto;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        text-align: center;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        position: relative;
+    .modal-content { 
+        background-color: #fff; 
+        padding: 25px; 
+        border-radius: 8px; 
+        max-width: 600px; 
+        margin: 0 auto; 
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+        text-align: center; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        position: relative; 
     }
-
-    .modal-content .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 18px;
-        color: #666;
-        cursor: pointer;
+    .modal-content .close-btn { 
+        position: absolute; 
+        top: 10px; 
+        right: 10px; 
+        background: none; 
+        border: none; 
+        font-size: 18px; 
+        color: #666; 
+        cursor: pointer; 
     }
-
-    .modal-content .close-btn:hover {
-        color: #333;
+    .modal-content .close-btn:hover { 
+        color: #333; 
     }
-
-    .response-icon {
-        font-size: 40px;
-        color: #dc3545;
-        margin-bottom: 15px;
+    .response-icon { 
+        font-size: 40px; 
+        color: #dc3545; 
+        margin-bottom: 15px; 
     }
-
-    .modal-content h2 {
-        margin-top: 0;
-        color: #333;
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 20px;
+    .modal-content h2 { 
+        margin-top: 0; 
+        color: #333; 
+        font-size: 20px; 
+        font-weight: 600; 
+        margin-bottom: 20px; 
     }
-
-    .reclamation-details {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 5px;
-        text-align: left;
-        margin-bottom: 25px;
-        border: 1px solid #e0e0e0;
+    .reclamation-details { 
+        background-color: #f8f9fa; 
+        padding: 15px; 
+        border-radius: 5px; 
+        text-align: left; 
+        margin-bottom: 25px; 
+        border: 1px solid #e0e0e0; 
     }
-
-    .reclamation-details p {
-        margin: 8px 0;
-        color: #555;
+    .reclamation-details .form-group { 
+        margin-bottom: 10px; 
+    }
+    .form-group { 
+        margin-bottom: 20px; 
+        text-align: left; 
+    }
+    .form-label { 
+        display: block; 
+        margin-bottom: 8px; 
+        font-weight: 600; 
+        color: #333; 
+        font-size: 14px; 
+        text-transform: uppercase; 
+    }
+    .plain-text {
+        margin: 0;
         font-size: 14px;
-    }
-
-    .reclamation-details p strong {
         color: #333;
-        font-weight: 600;
+        line-height: 1.5;
+        overflow-wrap: break-word; /* Modern replacement for word-wrap */
     }
-
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
+    .form-textarea { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #ddd; 
+        border-radius: 5px; 
+        font-size: 14px; 
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); 
+        transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+        resize: vertical; 
     }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #333;
-        font-size: 14px;
-        text-transform: uppercase;
+    .form-textarea:focus { 
+        border-color: #dc3545; 
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.3); 
+        outline: none; 
     }
-
-    .form-textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        resize: vertical;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    .form-textarea.error { 
+        border-color: #dc3545; 
     }
-
-    .form-textarea:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
-        outline: none;
+    .error-message { 
+        color: #dc3545 !important; 
+        font-size: 14px; 
+        margin-top: 2px; 
     }
-
-    .button-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
+    .button-container { 
+        display: flex; 
+        justify-content: center; 
+        margin-top: 20px; 
     }
-
-    .btn-submit {
-        background-color: #dc3545;
-        color: #fff;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        position: relative;
+    .btn-submit { 
+        background-color: #dc3545; 
+        color: #fff; 
+        padding: 10px 20px; 
+        border: none; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        font-size: 14px; 
+        transition: all 0.3s ease; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
     }
-
-    .btn-submit:hover {
-        background-color: #c82333;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* S'assurer qu'il n'y a pas de pseudo-élément ou de duplication */
-    .btn-submit::before,
-    .btn-submit::after {
-        content: none !important;
-        display: none !important;
-    }
-
-    /* Ciblage spécifique pour le bouton unique */
-    #unique-submit-button {
-        display: block !important;
+    .btn-submit:hover { 
+        background-color: #c82333; 
+        transform: translateY(-2px); 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     }
 </style>
+
+<script>
+// Variables globales pour stocker les valeurs initiales
+let globalTitreValue = '';
+let globalContenuValue = '';
+
+function initializeFormValidation() {
+    const form = document.getElementById('respondForm');
+    if (!form) {
+        console.error("Le formulaire avec l'ID 'respondForm' n'a pas été trouvé dans le DOM.");
+        return;
+    }
+
+    const messageInput = form.querySelector('textarea[name="messagerie[message]"]');
+    const errorMessage = document.getElementById('custom-error');
+    const hiddenTitreInput = document.getElementById('hidden-titre');
+    const hiddenContenuInput = document.getElementById('hidden-contenu');
+
+    if (!messageInput || !errorMessage || !hiddenTitreInput || !hiddenContenuInput) {
+        console.error("Les éléments 'messageInput', 'errorMessage', 'hiddenTitreInput' ou 'hiddenContenuInput' n'ont pas été trouvés.");
+        return;
+    }
+
+    // Récupérer les valeurs initiales des champs cachés et les stocker globalement
+    globalTitreValue = hiddenTitreInput.value;
+    globalContenuValue = hiddenContenuInput.value;
+
+    console.log('Valeur initiale globale du champ titre:', globalTitreValue);
+    console.log('Valeur initiale globale du champ contenu:', globalContenuValue);
+
+    // Ajouter un MutationObserver pour détecter les modifications du DOM
+    const modalContent = document.querySelector('.modal-content');
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            console.log('DOM modifié:', mutation);
+            // Restaurer les valeurs des champs cachés si le DOM est modifié
+            const newHiddenTitreInput = document.getElementById('hidden-titre');
+            const newHiddenContenuInput = document.getElementById('hidden-contenu');
+            if (newHiddenTitreInput) newHiddenTitreInput.value = globalTitreValue;
+            if (newHiddenContenuInput) newHiddenContenuInput.value = globalContenuValue;
+            console.log('Valeurs restaurées après modification du DOM - Titre:', newHiddenTitreInput ? newHiddenTitreInput.value : 'Non trouvé');
+            console.log('Valeurs restaurées après modification du DOM - Contenu:', newHiddenContenuInput ? newHiddenContenuInput.value : 'Non trouvé');
+        });
+    });
+    observer.observe(modalContent, { childList: true, subtree: true, attributes: true });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Empêche la soumission par défaut pour gérer via AJAX
+
+        const messageValue = messageInput.value.trim();
+
+        // Contrôle de saisie
+        if (!messageValue) {
+            messageInput.classList.add('error');
+            errorMessage.textContent = 'Le message ne peut pas être vide.';
+            errorMessage.style.display = 'block';
+            console.log('Après validation échouée - Titre (caché):', hiddenTitreInput.value);
+            console.log('Après validation échouée - Contenu (caché):', hiddenContenuInput.value);
+            return;
+        }
+
+        if (messageValue.length < 10) {
+            messageInput.classList.add('error');
+            errorMessage.textContent = 'Le message doit contenir au moins 10 caractères.';
+            errorMessage.style.display = 'block';
+            console.log('Après validation échouée - Titre (caché):', hiddenTitreInput.value);
+            console.log('Après validation échouée - Contenu (caché):', hiddenContenuInput.value);
+            return;
+        }
+
+        if (!/\S/.test(messageValue)) {
+            messageInput.classList.add('error');
+            errorMessage.textContent = 'Le message ne peut pas contenir uniquement des espaces.';
+            errorMessage.style.display = 'block';
+            console.log('Après validation échouée - Titre (caché):', hiddenTitreInput.value);
+            console.log('Après validation échouée - Contenu (caché):', hiddenContenuInput.value);
+            return;
+        }
+
+        // Réinitialiser l'erreur avant la soumission
+        messageInput.classList.remove('error');
+        errorMessage.style.display = 'none';
+
+        // Soumission AJAX
+        const formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                messageInput.classList.add('error');
+                errorMessage.textContent = data.errors[0] || 'Une erreur est survenue.';
+                errorMessage.style.display = 'block';
+                hiddenTitreInput.value = globalTitreValue;
+                hiddenContenuInput.value = globalContenuValue;
+                console.log('Après erreur serveur - Titre (caché):', hiddenTitreInput.value);
+                console.log('Après erreur serveur - Contenu (caché):', hiddenContenuInput.value);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur AJAX:', error);
+            messageInput.classList.add('error');
+            errorMessage.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+            errorMessage.style.display = 'block';
+            hiddenTitreInput.value = globalTitreValue;
+            hiddenContenuInput.value = globalContenuValue;
+            console.log('Après erreur AJAX - Titre (caché):', hiddenTitreInput.value);
+            console.log('Après erreur AJAX - Contenu (caché):', hiddenContenuInput.value);
+        });
+    });
+
+    // Réinitialiser l'erreur lorsqu'on commence à taper
+    messageInput.addEventListener('input', function () {
+        const messageValue = messageInput.value.trim();
+        if (messageValue.length >= 10 && /\S/.test(messageValue)) {
+            messageInput.classList.remove('error');
+            errorMessage.style.display = 'none';
+        }
+    });
+
+    // Empêcher la réinitialisation du formulaire
+    form.addEventListener('reset', function (e) {
+        e.preventDefault();
+        console.log('Tentative de réinitialisation du formulaire bloquée.');
+        hiddenTitreInput.value = globalTitreValue;
+        hiddenContenuInput.value = globalContenuValue;
+    });
+}
+
+// Exécuter la fonction après le chargement du DOM
+document.addEventListener('DOMContentLoaded', function () {
+    initializeFormValidation();
+});
+
+// Si le contenu est chargé dynamiquement (par exemple, dans une modale)
+document.addEventListener('modalLoaded', function () {
+    initializeFormValidation();
+});
+</script>

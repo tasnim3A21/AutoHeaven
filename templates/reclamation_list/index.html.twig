@@ -6,410 +6,71 @@
     <h1>Liste des Réclamations</h1>
 
     {% if reclamations|length > 0 %}
-        <!-- Inclure les ressources de DataTables -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-        <!-- Inclure Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <style>
-            /* Styles pour le tableau */
-            .reclamation-table {
-                width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 14px;
-                background-color: #fff;
-                border-radius: 10px;
-                overflow: hidden;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            }
-
-            .reclamation-table thead {
-                background-color: #dc3545;
-                color: #fff;
-            }
-
-            .reclamation-table th,
-            .reclamation-table td {
-                padding: 15px;
-                text-align: left;
-                border-bottom: 1px solid #e0e0e0;
-            }
-
-            .reclamation-table th {
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .reclamation-table tbody tr {
-                transition: background-color 0.3s ease;
-            }
-
-            .reclamation-table tbody tr:hover {
-                background-color: #f5f7fa;
-            }
-
-            .reclamation-table tbody tr:nth-child(even) {
-                background-color: #fafafa;
-            }
-
-            .reclamation-table td {
-                word-wrap: break-word;
-                max-width: 200px;
-            }
-
-            /* Style pour l'image */
-            .reclamation-image {
-                max-width: 50px;
-                max-height: 50px;
-                object-fit: cover;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-            /* Style pour le bouton "en_attente" et "repondu" */
-            .status-btn {
-                padding: 6px 12px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 12px;
-                color: #fff;
-                transition: background-color 0.3s ease;
-            }
-
-            .status-btn.en-attente {
-                background-color: #d60707; /* Orange */
-            }
-
-            .status-btn.en-attente:hover {
-                background-color: #938c8c; /* Orange plus foncé au survol */
-            }
-
-            .status-btn.repondu {
-                background-color: #28a745;
-                cursor: default;
-            }
-
-            /* Style pour l'icône de suppression */
-            .delete-icon {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 5px;
-                color: #000; /* Noir */
-                font-size: 16px;
-                transition: color 0.3s ease;
-            }
-
-            .delete-icon:hover {
-                color: #333; /* Gris foncé au survol */
-            }
-
-            /* Styles pour le modal */
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background: none !important; /* Supprimer tout arrière-plan */
-                justify-content: center;
-                align-items: center;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .modal.show {
-                display: flex;
-                opacity: 1;
-            }
-
-            .modal-content {
-                background-color: #fff;
-                padding: 25px;
-                border-radius: 8px;
-                max-width: 600px;
-                width: 90%;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-                transform: translateY(-50px);
-                transition: transform 0.3s ease;
-                position: relative;
-                text-align: center;
-            }
-
-            .modal.show .modal-content {
-                transform: translateY(0);
-            }
-
-            .modal-content .close-btn {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                background: none;
-                border: none;
-                font-size: 18px;
-                color: #666;
-                cursor: pointer;
-            }
-
-            .modal-content .close-btn:hover {
-                color: #333;
-            }
-
-            .modal-content .delete-icon-modal {
-                font-size: 40px;
-                color: #dc3545;
-                margin-bottom: 15px;
-            }
-
-            .modal-content .response-icon {
-                font-size: 40px;
-                color: #dc3545;
-                margin-bottom: 15px;
-            }
-
-            .modal-content h2 {
-                margin-top: 0;
-                color: #333;
-                font-size: 20px;
-                font-weight: 600;
-                margin-bottom: 20px;
-            }
-
-            .modal-content p {
-                color: #666;
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
-
-            .reclamation-details {
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 5px;
-                text-align: left;
-                margin-bottom: 25px;
-                border: 1px solid #e0e0e0;
-            }
-
-            .reclamation-details p {
-                margin: 8px 0;
-                color: #555;
-                font-size: 14px;
-            }
-
-            .reclamation-details p strong {
-                color: #333;
-                font-weight: 600;
-            }
-
-            .form-group {
-                margin-bottom: 20px;
-                text-align: left;
-            }
-
-            .form-label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 600;
-                color: #333;
-                font-size: 14px;
-                text-transform: uppercase;
-            }
-
-            .form-textarea {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                font-size: 14px;
-                resize: vertical;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-                transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            }
-
-            .form-textarea:focus {
-                border-color: #dc3545;
-                box-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
-                outline: none;
-            }
-
-            .btn-primary, .btn-confirm, .btn-cancel, .btn-submit {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 14px;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            }
-
-            .btn-primary, .btn-submit {
-                background-color: #dc3545;
-                color: #fff;
-            }
-
-            .btn-primary:hover, .btn-submit:hover {
-                background-color: #c82333;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            .btn-confirm {
-                background-color: #dc3545;
-                color: #fff;
-                margin-right: 10px;
-            }
-
-            .btn-confirm:hover {
-                background-color: #c82333;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            .btn-cancel {
-                background-color: #fff;
-                color: #666;
-                border: 1px solid #ddd;
-            }
-
-            .btn-cancel:hover {
-                background-color: #f5f5f5;
-                color: #333;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            h1 {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                color: #333;
-                margin-bottom: 20px;
-                font-size: 24px;
-                font-weight: 600;
-            }
-
-            /* Style pour la barre de recherche DataTables */
-            .dataTables_wrapper .dataTables_filter {
-                margin-bottom: 20px;
-            }
-
-            .dataTables_wrapper .dataTables_filter input {
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 14px;
-                width: 250px;
-            }
-
-            .dataTables_wrapper .dataTables_filter label {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 14px;
-                color: #333;
-            }
-
-            /* Style pour la pagination */
-            .dataTables_wrapper .dataTables_paginate {
-                margin-top: 20px;
-            }
-
-            .dataTables_wrapper .dataTables_paginate .paginate_button {
-                padding: 8px 12px;
-                margin: 0 2px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                background-color: #fff;
-                color: #333;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-                background-color: #f5f7fa;
-            }
-
-            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-                background-color: #dc3545;
-                color: #fff;
-                border-color: #dc3545;
-            }
-
-            /* Style pour le menu de tri */
-            .sort-options {
-                margin-bottom: 20px;
-                display: flex;
-                gap: 15px;
-                align-items: center;
-            }
-
-            .sort-options label {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 14px;
-                color: #333;
-                margin-right: 5px;
-            }
-
-            .sort-options select {
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 14px;
-                background-color: #fff;
-                cursor: pointer;
-            }
-
+            .reclamation-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+            .reclamation-table thead { background-color: #dc3545; color: #fff; }
+            .reclamation-table th, .reclamation-table td { padding: 15px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+            .reclamation-table th { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+            .reclamation-table tbody tr { transition: background-color 0.3s ease; }
+            .reclamation-table tbody tr:hover { background-color: #f5f7fa; }
+            .reclamation-table tbody tr:nth-child(even) { background-color: #fafafa; }
+            .reclamation-table td { word-wrap: break-word; max-width: 200px; }
+            .reclamation-image { max-width: 50px; max-height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; }
+            .status-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #fff; transition: background-color 0.3s ease; }
+            .status-btn.en-attente { background-color: #d60707; }
+            .status-btn.en-attente:hover { background-color: #938c8c; }
+            .status-btn.repondu { background-color: #28a745; cursor: default; }
+            .delete-icon { background: none; border: none; cursor: pointer; padding: 5px; color: #000; font-size: 16px; transition: color 0.3s ease; }
+            .delete-icon:hover { color: #333; }
+            .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
+            .modal.show { display: flex; opacity: 1; }
+            .modal-content { background-color: #fff; padding: 25px; border-radius: 8px; max-width: 600px; width: 90%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); transform: translateY(-50px); transition: transform 0.3s ease; position: relative; text-align: center; }
+            .modal.show .modal-content { transform: translateY(0); }
+            .modal-content .close-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; color: #666; cursor: pointer; }
+            .modal-content .close-btn:hover { color: #333; }
+            .modal-content .delete-icon-modal, .modal-content .response-icon { font-size: 40px; color: #dc3545; margin-bottom: 15px; }
+            .modal-content h2 { margin-top: 0; color: #333; font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+            .modal-content p { color: #666; font-size: 14px; margin-bottom: 20px; }
+            .reclamation-details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; text-align: left; margin-bottom: 25px; border: 1px solid #e0e0e0; }
+            .reclamation-details p { margin: 8px 0; color: #555; font-size: 14px; }
+            .reclamation-details p strong { color: #333; font-weight: 600; }
+            .form-group { margin-bottom: 20px; text-align: left; }
+            .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; text-transform: uppercase; }
+            .form-textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; resize: vertical; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+            .form-textarea:focus { border-color: #dc3545; box-shadow: 0 0 5px rgba(220, 53, 69, 0.3); outline: none; }
+            .btn-confirm, .btn-cancel, .btn-submit { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+            .btn-submit { background-color: #dc3545; color: #fff; }
+            .btn-submit:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+            .btn-confirm { background-color: #dc3545; color: #fff; margin-right: 10px; }
+            .btn-confirm:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+            .btn-cancel { background-color: #fff; color: #666; border: 1px solid #ddd; }
+            .btn-cancel:hover { background-color: #f5f5f5; color: #333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+            h1 { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; margin-bottom: 20px; font-size: 24px; font-weight: 600; }
+            .dataTables_wrapper .dataTables_filter { margin-bottom: 20px; }
+            .dataTables_wrapper .dataTables_filter input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 250px; }
+            .dataTables_wrapper .dataTables_paginate { margin-top: 20px; }
+            .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 8px 12px; margin: 0 2px; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; color: #333; cursor: pointer; transition: background-color 0.3s ease; }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background-color: #f5f7fa; }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current { background-color: #dc3545; color: #fff; border-color: #dc3545; }
+            .sort-options { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
+            .sort-options label { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #333; margin-right: 5px; }
+            .sort-options select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background-color: #fff; cursor: pointer; }
             @media screen and (max-width: 768px) {
-                .reclamation-table thead {
-                    display: none;
-                }
-
-                .reclamation-table, 
-                .reclamation-table tbody, 
-                .reclamation-table tr, 
-                .reclamation-table td {
-                    display: block;
-                    width: 100%;
-                }
-
-                .reclamation-table tr {
-                    margin-bottom: 15px;
-                    border-bottom: 2px solid #ddd;
-                }
-
-                .reclamation-table td {
-                    text-align: right;
-                    padding-left: 50%;
-                    position: relative;
-                }
-
-                .reclamation-table td:before {
-                    content: attr(data-label);
-                    position: absolute;
-                    left: 15px;
-                    width: 45%;
-                    padding-right: 10px;
-                    font-weight: bold;
-                    text-align: left;
-                    text-transform: uppercase;
-                }
-
-                .dataTables_wrapper .dataTables_filter input {
-                    width: 100%;
-                }
-
-                .sort-options {
-                    flex-direction: column;
-                    align-items: flex-start;
-                }
+                .reclamation-table thead { display: none; }
+                .reclamation-table, .reclamation-table tbody, .reclamation-table tr, .reclamation-table td { display: block; width: 100%; }
+                .reclamation-table tr { margin-bottom: 15px; border-bottom: 2px solid #ddd; }
+                .reclamation-table td { text-align: right; padding-left: 50%; position: relative; }
+                .reclamation-table td:before { content: attr(data-label); position: absolute; left: 15px; width: 45%; padding-right: 10px; font-weight: bold; text-align: left; text-transform: uppercase; }
+                .dataTables_wrapper .dataTables_filter input { width: 100%; }
+                .sort-options { flex-direction: column; align-items: flex-start; }
             }
         </style>
 
-        <!-- Menu de tri -->
         <div class="sort-options">
             <div>
                 <label for="sortColumn">Trier par :</label>
@@ -420,7 +81,7 @@
                     <option value="3">Email</option>
                     <option value="4">Titre</option>
                     <option value="5">Contenu</option>
-                    <option value="6">Image</option> <!-- Nouvelle option -->
+                    <option value="6">Image</option>
                     <option value="7" selected>Date de création</option>
                 </select>
             </div>
@@ -442,7 +103,7 @@
                     <th>Email</th>
                     <th>Titre</th>
                     <th>Contenu</th>
-                    <th>Image</th> <!-- Nouvelle colonne -->
+                    <th>Image</th>
                     <th>Statut</th>
                     <th>Date de création</th>
                     <th>Actions</th>
@@ -484,12 +145,10 @@
             </tbody>
         </table>
 
-        <!-- Modal pour répondre -->
         <div id="respondModal" class="modal">
             <div id="respondModalContent" class="modal-content"></div>
         </div>
 
-        <!-- Modal pour confirmation de suppression -->
         <div id="deleteModal" class="modal">
             <div class="modal-content">
                 <button class="close-btn">×</button>
@@ -503,168 +162,144 @@
 
         <script>
             $(document).ready(function () {
-                // Initialiser DataTables
                 const table = $('#reclamationTable').DataTable({
                     "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+                        "decimal": "",
+                        "emptyTable": "Aucune donnée disponible dans le tableau",
+                        "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+                        "infoEmpty": "Affichage de 0 à 0 sur 0 entrées",
+                        "infoFiltered": "(filtré de _MAX_ entrées au total)",
+                        "infoPostFix": "",
+                        "thousands": ",",
+                        "lengthMenu": "Afficher _MENU_ entrées",
+                        "loadingRecords": "Chargement...",
+                        "processing": "Traitement...",
+                        "search": "Rechercher :",
+                        "zeroRecords": "Aucun enregistrement correspondant trouvé",
+                        "paginate": {
+                            "first": "Premier",
+                            "last": "Dernier",
+                            "next": "Suivant",
+                            "previous": "Précédent"
+                        },
+                        "aria": {
+                            "sortAscending": ": activer pour trier la colonne par ordre croissant",
+                            "sortDescending": ": activer pour trier la colonne par ordre décroissant"
+                        }
                     },
-                    "pageLength": 5, // Nombre d'éléments par page
-                    "lengthMenu": [5, 10, 25, 50], // Options de pagination
-                    "order": [[8, "desc"]], // Trier par "Date de création" (colonne 9) en ordre décroissant par défaut
-                    "columnDefs": [
-                        { "orderable": false, "targets": [6, 7, 9] } // Désactiver le tri sur les colonnes "Image", "Statut" et "Actions"
-                    ],
-                    "searching": true, // Activer la recherche
-                    "paging": true, // Activer la pagination
-                    "info": true // Afficher les informations
+                    "pageLength": 5,
+                    "lengthMenu": [5, 10, 25, 50],
+                    "order": [[8, "desc"]],
+                    "columnDefs": [{ "orderable": false, "targets": [6, 7, 9] }],
+                    "searching": true,
+                    "paging": true,
+                    "info": true
                 });
 
-                // Gestion du tri personnalisé via les menus déroulants
                 $('#sortColumn, #sortOrder').on('change', function () {
                     const column = $('#sortColumn').val();
                     const order = $('#sortOrder').val();
                     table.order([column, order]).draw();
                 });
 
-                // Gestion du modal pour répondre (déclenché par le bouton "En attente")
-                const statusButtons = document.querySelectorAll('.status-btn.en-attente');
-                const respondModal = document.getElementById('respondModal');
-                const respondModalContent = document.getElementById('respondModalContent');
+                // Gestion du modal de réponse
+                $(document).on('click', '.status-btn.en-attente', function (e) {
+                    e.preventDefault(); // Empêche le comportement par défaut
+                    const idRec = $(this).data('id');
+                    const url = '{{ path('app_reclamation_respond', {'id_rec': '__ID__'}) }}'.replace('__ID__', idRec);
 
-                statusButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        const idRec = this.getAttribute('data-id');
-                        const url = '{{ path('app_reclamation_respond', {'id_rec': '__ID__'}) }}'.replace('__ID__', idRec);
+                    console.log('URL générée :', url); // Débogage
 
-                        fetch(url, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        success: function (data) {
+                            console.log('Réponse reçue avec succès'); // Débogage
+                            $('#respondModalContent').html(data);
+                            $('#respondModal').addClass('show');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Erreur AJAX :', xhr.status, xhr.statusText, xhr.responseText);
+                            alert('Erreur lors du chargement du formulaire : ' + xhr.status + ' - ' + xhr.statusText + '\nDétails : ' + xhr.responseText);
+                        }
+                    });
+                });
+
+                // Gestion de la soumission du formulaire dans le modal
+                $(document).on('submit', '#respondModal form', function (e) {
+                    e.preventDefault(); // Empêche l'ouverture d'une nouvelle page
+                    const form = $(this);
+                    const formData = new FormData(this);
+                    const idRec = $('.status-btn.en-attente:focus').data('id') || form.closest('tr')?.find('.status-btn').data('id');
+                    const statusButton = $(`.status-btn[data-id="${idRec}"]`);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.success) {
+                                statusButton.text('Répondu')
+                                    .removeClass('en-attente')
+                                    .addClass('repondu')
+                                    .prop('disabled', true);
+                                $('#respondModal').removeClass('show');
+                            } else {
+                                alert('Erreur : ' + (response.message || 'Erreur inconnue') + 
+                                      (response.errors ? '\nDétails : ' + response.errors.join(', ') : ''));
                             }
-                        })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('Erreur réseau : ' + response.status);
-                                }
-                                return response.text();
-                            })
-                            .then(data => {
-                                respondModalContent.innerHTML = data;
-                                respondModal.classList.add('show');
-
-                                // Définir la fonction de fermeture
-                                const closeModal = () => {
-                                    respondModal.classList.remove('show');
-                                    setTimeout(() => {
-                                        respondModalContent.innerHTML = ''; // Nettoyer le contenu après la fermeture
-                                    }, 300); // Attendre la fin de l'animation
-                                };
-
-                                // Attacher l'événement au bouton de fermeture
-                                const closeBtn = respondModalContent.querySelector('.close-btn');
-                                if (closeBtn) {
-                                    closeBtn.addEventListener('click', closeModal);
-                                } else {
-                                    console.error('Bouton de fermeture non trouvé dans le modal de réponse');
-                                }
-
-                                // Gérer la soumission du formulaire
-                                const form = respondModalContent.querySelector('form');
-                                if (form) {
-                                    form.addEventListener('submit', function (e) {
-                                        e.preventDefault();
-                                        const formData = new FormData(form);
-
-                                        fetch(form.action, {
-                                            method: 'POST',
-                                            body: formData,
-                                            headers: {
-                                                'X-Requested-With': 'XMLHttpRequest'
-                                            }
-                                        })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                throw new Error('Erreur réseau : ' + response.status);
-                                            }
-                                            return response.text();
-                                        })
-                                        .then(data => {
-                                            closeModal();
-                                            location.reload();
-                                        })
-                                        .catch(error => {
-                                            console.error('Erreur lors de la soumission :', error);
-                                        });
-                                    });
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Erreur lors du chargement du formulaire :', error);
-                            });
+                        },
+                        error: function (xhr) {
+                            console.error('Erreur AJAX :', xhr.responseText);
+                            alert('Erreur lors de l\'envoi de la réponse : ' + xhr.status + ' - ' + xhr.statusText);
+                        }
                     });
                 });
 
-                // Gestion du modal pour supprimer
-                const deleteButtons = document.querySelectorAll('.delete-icon');
-                const deleteModal = document.getElementById('deleteModal');
-                const confirmDeleteBtn = document.getElementById('confirmDelete');
-                const cancelDeleteBtn = document.getElementById('cancelDelete');
-                const closeBtn = deleteModal.querySelector('.close-btn');
-                let currentIdRec = null;
-
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function () {
-                        currentIdRec = this.getAttribute('data-id');
-                        deleteModal.classList.add('show');
-                    });
+                // Fermeture du modal de réponse
+                $(document).on('click', '#respondModal .close-btn', function () {
+                    $('#respondModal').removeClass('show');
+                    setTimeout(() => $('#respondModalContent').empty(), 300);
                 });
 
-                confirmDeleteBtn.addEventListener('click', function () {
-                    if (currentIdRec) {
-                        const url = '{{ path('app_reclamation_delete', {'id_rec': '__ID__'}) }}'.replace('__ID__', currentIdRec);
-                        fetch(url, {
+                // Gestion du modal de suppression
+                $(document).on('click', '.delete-icon', function () {
+                    const idRec = $(this).data('id');
+                    $('#deleteModal').addClass('show');
+
+                    $('#confirmDelete').off('click').on('click', function () {
+                        const url = '{{ path('app_reclamation_delete', {'id_rec': '__ID__'}) }}'.replace('__ID__', idRec);
+                        $.ajax({
+                            url: url,
                             method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response.success) {
+                                    table.row($(`tr:has(button[data-id="${idRec}"])`)).remove().draw();
+                                    $('#deleteModal').removeClass('show');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Erreur lors de la suppression :', error);
                             }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Erreur réseau : ' + response.status);
-                            }
-                            return response.text();
-                        })
-                        .then(data => {
-                            deleteModal.classList.remove('show');
-                            location.reload();
-                        })
-                        .catch(error => {
-                            console.error('Erreur lors de la suppression :', error);
                         });
-                    }
+                    });
+
+                    $('#cancelDelete, #deleteModal .close-btn').on('click', function () {
+                        $('#deleteModal').removeClass('show');
+                    });
                 });
 
-                cancelDeleteBtn.addEventListener('click', function () {
-                    deleteModal.classList.remove('show');
-                    currentIdRec = null;
-                });
-
-                closeBtn.addEventListener('click', function () {
-                    deleteModal.classList.remove('show');
-                    currentIdRec = null;
-                });
-
-                // Fermer les modals en cliquant à l'extérieur
-                respondModal.addEventListener('click', function (e) {
-                    if (e.target === respondModal) {
-                        respondModal.classList.remove('show');
-                        respondModalContent.innerHTML = '';
-                    }
-                });
-
-                deleteModal.addEventListener('click', function (e) {
-                    if (e.target === deleteModal) {
-                        deleteModal.classList.remove('show');
-                        currentIdRec = null;
+                // Fermeture des modals en cliquant à l'extérieur
+                $('.modal').on('click', function (e) {
+                    if (e.target === this) {
+                        $(this).removeClass('show');
+                        $('#respondModalContent').empty();
                     }
                 });
             });

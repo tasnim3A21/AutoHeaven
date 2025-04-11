@@ -6,7 +6,7 @@
     <div class="reclamation-container">
         <h1>Passer une réclamation</h1>
 
-        {{ form_start(reclamationForm, {'attr': {'id': 'reclamationForm'}}) }}
+        {{ form_start(reclamationForm, {'attr': {'id': 'reclamationForm', 'novalidate': 'novalidate'}}) }}
             <div class="form-group">
                 {{ form_label(reclamationForm.titre, 'Objet', {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(reclamationForm.titre) }}
@@ -271,7 +271,7 @@
 
                 let hasError = false;
 
-                // Réinitialiser les messages d'erreur
+                // Réinitialiser les messages d'erreur personnalisés
                 const existingErrors = form.querySelectorAll('.form-error');
                 existingErrors.forEach(error => error.remove());
 
@@ -285,6 +285,24 @@
                     error.style.marginTop = '5px';
                     error.textContent = 'Le champ Objet est requis.';
                     titreInput.parentNode.appendChild(error);
+                } else if (titreInput.value.length < 5) {
+                    hasError = true;
+                    const error = document.createElement('div');
+                    error.className = 'form-error';
+                    error.style.color = '#dc3545';
+                    error.style.fontSize = '12px';
+                    error.style.marginTop = '5px';
+                    error.textContent = 'Le titre doit contenir au moins 5 caractères.';
+                    titreInput.parentNode.appendChild(error);
+                } else if (titreInput.value.length > 50) {
+                    hasError = true;
+                    const error = document.createElement('div');
+                    error.className = 'form-error';
+                    error.style.color = '#dc3545';
+                    error.style.fontSize = '12px';
+                    error.style.marginTop = '5px';
+                    error.textContent = 'Le titre ne peut pas dépasser 50 caractères.';
+                    titreInput.parentNode.appendChild(error);
                 }
 
                 // Vérifier le champ "Votre réclamation"
@@ -297,8 +315,18 @@
                     error.style.marginTop = '5px';
                     error.textContent = 'Le champ Votre réclamation est requis.';
                     contenuInput.parentNode.appendChild(error);
+                } else if (contenuInput.value.length < 10) {
+                    hasError = true;
+                    const error = document.createElement('div');
+                    error.className = 'form-error';
+                    error.style.color = '#dc3545';
+                    error.style.fontSize = '12px';
+                    error.style.marginTop = '5px';
+                    error.textContent = 'Le contenu doit contenir au moins 10 caractères.';
+                    contenuInput.parentNode.appendChild(error);
                 }
 
+                // Si erreur côté client, ne pas soumettre
                 if (hasError) {
                     return;
                 }
