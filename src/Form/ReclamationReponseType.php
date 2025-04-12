@@ -20,14 +20,14 @@ class ReclamationReponseType extends AbstractType
             ->add('titre', HiddenType::class, [
                 'label' => 'Titre de la réclamation',
                 'required' => false,
-                'mapped' => false, // Ne pas lier à l'entité Messagerie
+                'mapped' => false,
                 'data' => $options['reclamation_titre'] ?? 'Non défini',
             ])
             // Champ contenu (caché, pour préserver la valeur)
             ->add('contenu', HiddenType::class, [
                 'label' => 'Objet de la réclamation',
                 'required' => false,
-                'mapped' => false, // Ne pas lier à l'entité Messagerie
+                'mapped' => false,
                 'data' => $options['reclamation_contenu'] ?? 'Non défini',
             ])
             // Champ message (modifiable)
@@ -35,7 +35,7 @@ class ReclamationReponseType extends AbstractType
                 'label' => 'Votre réponse',
                 'required' => true,
                 'constraints' => [
-                    //new Assert\NotBlank(['message' => 'Le message ne peut pas être vide.']),
+                    new Assert\NotBlank(['message' => 'Le message ne peut pas être vide.']),
                     new Assert\Length([
                         'min' => 10,
                         'minMessage' => 'Le message doit contenir au moins 10 caractères.',

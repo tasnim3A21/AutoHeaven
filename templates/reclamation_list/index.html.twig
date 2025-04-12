@@ -12,86 +12,435 @@
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <style>
-            .reclamation-table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-            .reclamation-table thead { background-color: #dc3545; color: #fff; }
-            .reclamation-table th, .reclamation-table td { padding: 15px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-            .reclamation-table th { font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-            .reclamation-table tbody tr { transition: background-color 0.3s ease; }
-            .reclamation-table tbody tr:hover { background-color: #f5f7fa; }
-            .reclamation-table tbody tr:nth-child(even) { background-color: #fafafa; }
-            .reclamation-table td { word-wrap: break-word; max-width: 200px; }
-            .reclamation-image { max-width: 50px; max-height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; }
-            .status-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #fff; transition: background-color 0.3s ease; }
-            .status-btn.en-attente { background-color: #d60707; }
-            .status-btn.en-attente:hover { background-color: #938c8c; }
-            .status-btn.repondu { background-color: #28a745; cursor: default; }
-            .delete-icon { background: none; border: none; cursor: pointer; padding: 5px; color: #000; font-size: 16px; transition: color 0.3s ease; }
-            .delete-icon:hover { color: #333; }
-            .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; }
-            .modal.show { display: flex; opacity: 1; }
-            .modal-content { background-color: #fff; padding: 25px; border-radius: 8px; max-width: 600px; width: 90%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); transform: translateY(-50px); transition: transform 0.3s ease; position: relative; text-align: center; }
-            .modal.show .modal-content { transform: translateY(0); }
-            .modal-content .close-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 18px; color: #666; cursor: pointer; }
-            .modal-content .close-btn:hover { color: #333; }
-            .modal-content .delete-icon-modal, .modal-content .response-icon { font-size: 40px; color: #dc3545; margin-bottom: 15px; }
-            .modal-content h2 { margin-top: 0; color: #333; font-size: 20px; font-weight: 600; margin-bottom: 20px; }
-            .modal-content p { color: #666; font-size: 14px; margin-bottom: 20px; }
-            .reclamation-details { background-color: #f8f9fa; padding: 15px; border-radius: 5px; text-align: left; margin-bottom: 25px; border: 1px solid #e0e0e0; }
-            .reclamation-details p { margin: 8px 0; color: #555; font-size: 14px; }
-            .reclamation-details p strong { color: #333; font-weight: 600; }
-            .form-group { margin-bottom: 20px; text-align: left; }
-            .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; text-transform: uppercase; }
-            .form-textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; resize: vertical; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-            .form-textarea:focus { border-color: #dc3545; box-shadow: 0 0 5px rgba(220, 53, 69, 0.3); outline: none; }
-            .btn-confirm, .btn-cancel, .btn-submit { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-            .btn-submit { background-color: #dc3545; color: #fff; }
-            .btn-submit:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-            .btn-confirm { background-color: #dc3545; color: #fff; margin-right: 10px; }
-            .btn-confirm:hover { background-color: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-            .btn-cancel { background-color: #fff; color: #666; border: 1px solid #ddd; }
-            .btn-cancel:hover { background-color: #f5f5f5; color: #333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-            h1 { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; margin-bottom: 20px; font-size: 24px; font-weight: 600; }
-            .dataTables_wrapper .dataTables_filter { margin-bottom: 20px; }
-            .dataTables_wrapper .dataTables_filter input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; width: 250px; }
-            .dataTables_wrapper .dataTables_paginate { margin-top: 20px; }
-            .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 8px 12px; margin: 0 2px; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; color: #333; cursor: pointer; transition: background-color 0.3s ease; }
-            .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background-color: #f5f7fa; }
-            .dataTables_wrapper .dataTables_paginate .paginate_button.current { background-color: #dc3545; color: #fff; border-color: #dc3545; }
-            .sort-options { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; }
-            .sort-options label { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; color: #333; margin-right: 5px; }
-            .sort-options select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background-color: #fff; cursor: pointer; }
+            .reclamation-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 14px;
+                background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+            .reclamation-table thead {
+                background-color: #dc3545;
+                color: #ffffff;
+            }
+            .reclamation-table th,
+            .reclamation-table td {
+                padding: 15px;
+                text-align: left;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            .reclamation-table th {
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .reclamation-table tbody tr {
+                transition: background-color 0.3s ease;
+            }
+            .reclamation-table tbody tr:hover {
+                background-color: #f5f7fa;
+            }
+            .reclamation-table tbody tr:nth-child(even) {
+                background-color: #fafafa;
+            }
+            .reclamation-table td {
+                word-wrap: break-word;
+                max-width: 200px;
+            }
+            .reclamation-image {
+                max-width: 50px;
+                max-height: 50px;
+                object-fit: cover;
+                border-radius: 4px;
+                border: 1px solid #e0e0e0;
+                transition: transform 0.2s ease;
+            }
+            .reclamation-image:hover {
+                transform: scale(1.05);
+            }
+            .status-btn {
+                display: inline-block;
+                padding: 6px 14px;
+                border: none;
+                border-radius: 6px;
+                font-size: 12px;
+                color: #ffffff;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+                background: linear-gradient(to right, #dc3545, #e4606d);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .status-btn.en-attente:hover {
+                background: linear-gradient(to right, #c82333, #d44d5a);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+            .status-btn.en-attente:focus {
+                outline: none;
+                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+            }
+            .status-btn.repondu {
+                background: linear-gradient(to right, #28a745, #34c759);
+                cursor: default;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .status-btn.repondu:focus {
+                outline: none;
+                box-shadow: 0 0 6px rgba(40, 167, 69, 0.5);
+            }
+            .delete-icon {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #333333;
+                font-size: 16px;
+                padding: 6px;
+                border-radius: 4px;
+                transition: color 0.3s ease, background-color 0.3s ease;
+            }
+            .delete-icon:hover {
+                color: #dc3545;
+                background-color: #f8f9fa;
+            }
+            .delete-icon:focus {
+                outline: none;
+                color: #c82333;
+                background-color: #f8f9fa;
+                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+            }
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .modal.show {
+                display: flex;
+                opacity: 1;
+            }
+            .modal-content {
+                background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+                padding: 20px;
+                border-radius: 8px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                transform: translateY(-50px);
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                position: relative;
+                text-align: center;
+            }
+            .modal.show .modal-content {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            .modal-content .close-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                font-size: 18px;
+                color: #555555;
+                cursor: pointer;
+                transition: color 0.3s ease;
+            }
+            .modal-content .close-btn:hover,
+            .modal-content .close-btn:focus {
+                color: #333333;
+                outline: none;
+            }
+            .modal-content .delete-icon-modal {
+                font-size: 40px;
+                color: #dc3545;
+                margin-bottom: 15px;
+            }
+            .modal-content h2 {
+                margin-top: 0;
+                color: #333333;
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+            .modal-content p {
+                color: #555555;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            .btn-confirm,
+            .btn-cancel {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                cursor: pointer;
+                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .btn-confirm {
+                background: linear-gradient(to right, #dc3545, #e4606d);
+                color: #ffffff;
+                margin-right: 10px;
+            }
+            .btn-confirm:hover {
+                background: linear-gradient(to right, #c82333, #d44d5a);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+            .btn-confirm:focus {
+                outline: none;
+                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+            }
+            .btn-cancel {
+                background: linear-gradient(to right, #ffffff, #f8f9fa);
+                color: #555555;
+                border: 1px solid #e0e0e0;
+            }
+            .btn-cancel:hover {
+                background: linear-gradient(to right, #f8f9fa, #e9ecef);
+                color: #333333;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+            .btn-cancel:focus {
+                outline: none;
+                box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+            }
+            h1 {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #333333;
+                margin-bottom: 20px;
+                font-size: 24px;
+                font-weight: 600;
+            }
+            /* Styles pour la barre de tri et recherche */
+            .sort-options {
+                margin-bottom: 16px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                background: linear-gradient(to right, #ffffff, #f5f7fa);
+                padding: 10px;
+                border: 1px solid #e0e0e0;
+                border-left: 3px solid #dc3545;
+                border-radius: 5px;
+            }
+            .sort-options .sort-group {
+                display: flex !important;
+                gap: 0 !important; /* Aucun espace entre Trier par et Ordre */
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .sort-options .sort-group div {
+                margin: 0 !important;
+                padding: 0 !important;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                min-width: 150px;
+            }
+            .sort-options label {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                color: #333333;
+                margin: 0 !important;
+            }
+            .sort-options select {
+                padding: 7px 24px 7px 10px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                font-size: 13px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(to right, #ffffff, #f9f9f9);
+                cursor: pointer;
+                transition: border-color 0.3s ease, transform 0.2s ease;
+                appearance: none;
+                background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%23333%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E');
+                background-repeat: no-repeat;
+                background-position: right 8px center;
+                margin: 0 !important;
+            }
+            .sort-options select:hover {
+                border-color: #dc3545;
+                background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%23dc3545%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E');
+            }
+            .sort-options select:focus {
+                border-color: #dc3545;
+                transform: scale(1.02);
+                box-shadow: 0 0 6px rgba(220, 53, 69, 0.3);
+                outline: none;
+            }
+            .sort-options .dataTables_filter {
+                flex: 1;
+                display: flex !important;
+                flex-direction: column;
+                gap: 4px;
+                background: none;
+                padding: 0 !important;
+                border: none;
+                border-left: none;
+                border-radius: 0;
+                max-width: 240px;
+                margin: 0 !important;
+            }
+            .sort-options .dataTables_filter label {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                color: #333333;
+                margin: 0 !important;
+            }
+            .sort-options .dataTables_filter input {
+                padding: 7px 10px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                font-size: 13px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(to right, #ffffff, #f9f9f9);
+                width: 100%;
+                transition: border-color 0.3s ease, border-width 0.3s ease, transform 0.2s ease;
+                margin: 0 !important;
+            }
+            .sort-options .dataTables_filter input::placeholder {
+                color: #888888;
+                font-style: italic;
+            }
+            .sort-options .dataTables_filter input:hover {
+                border-color: #dc3545;
+            }
+            .sort-options .dataTables_filter input:focus {
+                border-color: #dc3545;
+                border-width: 2px;
+                transform: scale(1.02);
+                box-shadow: 0 0 6px rgba(220, 53, 69, 0.3);
+                outline: none;
+            }
+            /* Masquer "Afficher 5 entrées" avec une priorité maximale */
+            div.dataTables_wrapper div.dataTables_length {
+                display: none !important;
+            }
+            .dataTables_wrapper .dataTables_paginate {
+                margin-top: 20px;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                padding: 8px 12px;
+                margin: 0 2px;
+                border: 1px solid #e0e0e0;
+                border-radius: 4px;
+                background: linear-gradient(to right, #ffffff, #f8f9fa);
+                color: #333333;
+                cursor: pointer;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: linear-gradient(to right, #f5f7fa, #e9ecef);
+                color: #dc3545;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+                background: linear-gradient(to right, #dc3545, #e4606d);
+                color: #ffffff;
+                border-color: #dc3545;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
+                outline: none;
+                box-shadow: 0 0 4px rgba(220, 53, 69, 0.3);
+            }
             @media screen and (max-width: 768px) {
-                .reclamation-table thead { display: none; }
-                .reclamation-table, .reclamation-table tbody, .reclamation-table tr, .reclamation-table td { display: block; width: 100%; }
-                .reclamation-table tr { margin-bottom: 15px; border-bottom: 2px solid #ddd; }
-                .reclamation-table td { text-align: right; padding-left: 50%; position: relative; }
-                .reclamation-table td:before { content: attr(data-label); position: absolute; left: 15px; width: 45%; padding-right: 10px; font-weight: bold; text-align: left; text-transform: uppercase; }
-                .dataTables_wrapper .dataTables_filter input { width: 100%; }
-                .sort-options { flex-direction: column; align-items: flex-start; }
+                .reclamation-table thead {
+                    display: none;
+                }
+                .reclamation-table,
+                .reclamation-table tbody,
+                .reclamation-table tr,
+                .reclamation-table td {
+                    display: block;
+                    width: 100%;
+                }
+                .reclamation-table tr {
+                    margin-bottom: 15px;
+                    border-bottom: 2px solid #e0e0e0;
+                    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+                }
+                .reclamation-table td {
+                    text-align: right;
+                    padding-left: 50%;
+                    position: relative;
+                }
+                .reclamation-table td:before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 15px;
+                    width: 45%;
+                    padding-right: 10px;
+                    font-weight: 600;
+                    text-align: left;
+                    text-transform: uppercase;
+                    color: #333333;
+                }
+                .sort-options {
+                    flex-direction: column;
+                    align-items: stretch;
+                    padding: 8px;
+                }
+                .sort-options .sort-group {
+                    flex-direction: column;
+                    gap: 8px !important;
+                }
+                .sort-options div {
+                    min-width: 100%;
+                }
+                .sort-options select {
+                    width: 100%;
+                }
+                .sort-options .dataTables_filter {
+                    max-width: 100%;
+                }
+                .sort-options .dataTables_filter input {
+                    width: 100%;
+                }
             }
         </style>
 
         <div class="sort-options">
-            <div>
-                <label for="sortColumn">Trier par :</label>
-                <select id="sortColumn">
-                    <option value="0">Nom</option>
-                    <option value="1">Prénom</option>
-                    <option value="2">Téléphone</option>
-                    <option value="3">Email</option>
-                    <option value="4">Titre</option>
-                    <option value="5">Contenu</option>
-                    <option value="6">Image</option>
-                    <option value="7" selected>Date de création</option>
-                </select>
+            <div class="sort-group">
+                <div>
+                    <label for="sortColumn">Trier par :</label>
+                    <select id="sortColumn">
+                        <option value="0">Nom</option>
+                        <option value="1">Prénom</option>
+                        <option value="2">Téléphone</option>
+                        <option value="3">Email</option>
+                        <option value="4">Titre</option>
+                        <option value="5">Contenu</option>
+                        <option value="6">Image</option>
+                        <option value="7" selected>Date de création</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sortOrder">Ordre :</label>
+                    <select id="sortOrder">
+                        <option value="asc">Croissant</option>
+                        <option value="desc" selected>Décroissant</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <label for="sortOrder">Ordre :</label>
-                <select id="sortOrder">
-                    <option value="asc">Croissant</option>
-                    <option value="desc" selected>Décroissant</option>
-                </select>
-            </div>
+            <!-- La zone de recherche sera déplacée ici par JavaScript -->
         </div>
 
         <table class="reclamation-table" id="reclamationTable">
@@ -120,19 +469,23 @@
                         <td data-label="Contenu">{{ reclamation.contenu }}</td>
                         <td data-label="Image">
                             {% if reclamation.image %}
-                                <a href="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" target="_blank">
-                                    <img src="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" alt="Image de la réclamation" class="reclamation-image">
+                                <a href="{{ asset('Uploads/reclamations/' ~ reclamation.image) }}" target="_blank">
+                                    <img src="{{ asset('Uploads/reclamations/' ~ reclamation.image) }}" alt="Image de la réclamation" class="reclamation-image">
                                 </a>
                             {% else %}
                                 Aucune image
                             {% endif %}
                         </td>
                         <td data-label="Statut">
-                            <button class="status-btn {{ reclamation.status == 'en_attente' ? 'en-attente' : 'repondu' }}" 
-                                    data-id="{{ reclamation.id_rec }}"
-                                    {% if reclamation.status != 'en_attente' %}disabled{% endif %}>
-                                {{ reclamation.status == 'en_attente' ? 'En attente' : 'Répondu' }}
-                            </button>
+                            {% if reclamation.status == 'en_attente' %}
+                                <a href="{{ path('app_reclamation_respond', {'id_rec': reclamation.id_rec}) }}" class="status-btn en-attente">
+                                    En attente
+                                </a>
+                            {% else %}
+                                <button class="status-btn repondu" disabled>
+                                    Répondu
+                                </button>
+                            {% endif %}
                         </td>
                         <td data-label="Date de création">{{ reclamation.datecreation|date('Y-m-d H:i:s') }}</td>
                         <td data-label="Actions">
@@ -144,10 +497,6 @@
                 {% endfor %}
             </tbody>
         </table>
-
-        <div id="respondModal" class="modal">
-            <div id="respondModalContent" class="modal-content"></div>
-        </div>
 
         <div id="deleteModal" class="modal">
             <div class="modal-content">
@@ -196,74 +545,14 @@
                     "info": true
                 });
 
+                // Déplacer la zone de recherche dans .sort-options
+                const $searchFilter = $('.dataTables_filter');
+                $('.sort-options').append($searchFilter);
+
                 $('#sortColumn, #sortOrder').on('change', function () {
                     const column = $('#sortColumn').val();
                     const order = $('#sortOrder').val();
                     table.order([column, order]).draw();
-                });
-
-                // Gestion du modal de réponse
-                $(document).on('click', '.status-btn.en-attente', function (e) {
-                    e.preventDefault(); // Empêche le comportement par défaut
-                    const idRec = $(this).data('id');
-                    const url = '{{ path('app_reclamation_respond', {'id_rec': '__ID__'}) }}'.replace('__ID__', idRec);
-
-                    console.log('URL générée :', url); // Débogage
-
-                    $.ajax({
-                        url: url,
-                        method: 'GET',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                        success: function (data) {
-                            console.log('Réponse reçue avec succès'); // Débogage
-                            $('#respondModalContent').html(data);
-                            $('#respondModal').addClass('show');
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Erreur AJAX :', xhr.status, xhr.statusText, xhr.responseText);
-                            alert('Erreur lors du chargement du formulaire : ' + xhr.status + ' - ' + xhr.statusText + '\nDétails : ' + xhr.responseText);
-                        }
-                    });
-                });
-
-                // Gestion de la soumission du formulaire dans le modal
-                $(document).on('submit', '#respondModal form', function (e) {
-                    e.preventDefault(); // Empêche l'ouverture d'une nouvelle page
-                    const form = $(this);
-                    const formData = new FormData(this);
-                    const idRec = $('.status-btn.en-attente:focus').data('id') || form.closest('tr')?.find('.status-btn').data('id');
-                    const statusButton = $(`.status-btn[data-id="${idRec}"]`);
-
-                    $.ajax({
-                        url: form.attr('action'),
-                        method: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.success) {
-                                statusButton.text('Répondu')
-                                    .removeClass('en-attente')
-                                    .addClass('repondu')
-                                    .prop('disabled', true);
-                                $('#respondModal').removeClass('show');
-                            } else {
-                                alert('Erreur : ' + (response.message || 'Erreur inconnue') + 
-                                      (response.errors ? '\nDétails : ' + response.errors.join(', ') : ''));
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Erreur AJAX :', xhr.responseText);
-                            alert('Erreur lors de l\'envoi de la réponse : ' + xhr.status + ' - ' + xhr.statusText);
-                        }
-                    });
-                });
-
-                // Fermeture du modal de réponse
-                $(document).on('click', '#respondModal .close-btn', function () {
-                    $('#respondModal').removeClass('show');
-                    setTimeout(() => $('#respondModalContent').empty(), 300);
                 });
 
                 // Gestion du modal de suppression
@@ -295,16 +584,17 @@
                     });
                 });
 
-                // Fermeture des modals en cliquant à l'extérieur
+                // Fermeture du modal en cliquant à l'extérieur
                 $('.modal').on('click', function (e) {
                     if (e.target === this) {
                         $(this).removeClass('show');
-                        $('#respondModalContent').empty();
                     }
                 });
             });
         </script>
     {% else %}
-        <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #666;">Aucune réclamation trouvée.</p>
+        <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #555555; font-size: 14px; padding: 12px; background: linear-gradient(to right, #ffffff, #f8f9fa); border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            Aucune réclamation trouvée.
+        </p>
     {% endif %}
 {% endblock %}

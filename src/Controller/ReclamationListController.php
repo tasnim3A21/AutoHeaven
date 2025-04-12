@@ -59,12 +59,8 @@ final class ReclamationListController extends AbstractController
     {
         $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
         if (!$reclamation) {
-            return new JsonResponse(['success' => false, 'message' => 'Réclamation non trouvée'], 404);
+            throw $this->createNotFoundException('Réclamation non trouvée');
         }
-
-        // Débogage : Vérifier les valeurs de titre et contenu
-        error_log('Titre de la réclamation: ' . ($reclamation->getTitre() ?? 'NULL'));
-        error_log('Contenu de la réclamation: ' . ($reclamation->getContenu() ?? 'NULL'));
 
         $message = new Messagerie();
         $form = $this->createForm(ReclamationReponseType::class, $message, [
@@ -73,75 +69,57 @@ final class ReclamationListController extends AbstractController
         ]);
         $form->handleRequest($request);
 
-        if ($request->isXmlHttpRequest()) {
-            if ($form->isSubmitted()) {
-                if ($form->isValid()) {
-                    $messageContent = $form->get('message')->getData();
-                    error_log('Message content: ' . ($messageContent ?? 'NULL'));
+        if ($form->isSubmitted()) {
+            error_log('Formulaire soumis pour id_rec=' . $id_rec);
+            if ($form->isValid()) {
+                error_log('Formulaire valide');
 
-                    $message->setIdRec($reclamation);
-                    $message->setMessage($messageContent);
-                    $message->setDatemessage(new \DateTime());
-                    $message->setIdUser(1);
-                    $message->setSender('admin');
-                    $message->setReceiver('client');
-
-                    $reclamation->addMessagerie($message);
-                    $reclamation->setStatus('repondu');
-
-                    $this->entityManager->persist($message);
-                    $this->entityManager->persist($reclamation);
-                    $this->entityManager->flush();
-
-                    return new JsonResponse(['success' => true, 'message' => 'Réponse envoyée avec succès']);
-                } else {
-                    $errors = [];
-                    foreach ($form->getErrors(true) as $error) {
-                        $errors[] = $error->getMessage();
-                    }
-                    error_log('Validation errors: ' . json_encode($errors));
-
-                    // Rendre le formulaire avec les erreurs pour un re-rendu côté client
-                    $formHtml = $this->renderView('reclamation_list/respond.html.twig', [
+                // Vérifier l'utilisateur
+                $userId = 1; // Remplacez par l'ID de l'utilisateur connecté si possible
+                $userExists = $this->entityManager->getConnection()->fetchOne(
+                    'SELECT COUNT(*) FROM user WHERE id = ?',
+                    [$userId]
+                );
+                if (!$userExists) {
+                    error_log('Utilisateur avec id=' . $userId . ' non trouvé');
+                    $this->addFlash('error', 'Utilisateur avec id=' . $userId . ' non trouvé');
+                    return $this->render('reclamation_list/respond.html.twig', [
                         'reclamation' => $reclamation,
                         'form' => $form->createView(),
                     ]);
-
-                    return new JsonResponse([
-                        'success' => false,
-                        'message' => 'Erreur de validation',
-                        'errors' => $errors,
-                        'form' => $formHtml,
-                    ], 400);
                 }
+
+                $message->setIdRec($reclamation);
+                $message->setMessage($form->get('message')->getData());
+                $message->setDatemessage(new \DateTime());
+                $message->setIdUser($userId);
+                $message->setSender('admin');
+                $message->setReceiver('client');
+
+                $reclamation->addMessagerie($message);
+                $reclamation->setStatus('repondu');
+
+                try {
+                    $this->entityManager->persist($message);
+                    $this->entityManager->persist($reclamation);
+                    $this->entityManager->flush();
+                    error_log('Données enregistrées avec succès');
+                    $this->addFlash('success', 'Réponse envoyée avec succès !');
+                    return $this->redirectToRoute('app_reclamation_list');
+                } catch (\Exception $e) {
+                    error_log('Erreur lors de l\'enregistrement : ' . $e->getMessage());
+                    $this->addFlash('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
+                }
+            } else {
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $errors[] = $error->getMessage();
+                }
+                error_log('Formulaire invalide : ' . implode(', ', $errors));
+                $this->addFlash('error', 'Erreur de validation : ' . implode(', ', $errors));
             }
-
-            return $this->render('reclamation_list/respond.html.twig', [
-                'reclamation' => $reclamation,
-                'form' => $form->createView(),
-            ]);
-        }
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $messageContent = $form->get('message')->getData();
-            error_log('Message content (non-AJAX): ' . ($messageContent ?? 'NULL'));
-
-            $message->setIdRec($reclamation);
-            $message->setMessage($messageContent);
-            $message->setDatemessage(new \DateTime());
-            $message->setIdUser(1);
-            $message->setSender('admin');
-            $message->setReceiver('client');
-
-            $reclamation->addMessagerie($message);
-            $reclamation->setStatus('repondu');
-
-            $this->entityManager->persist($message);
-            $this->entityManager->persist($reclamation);
-            $this->entityManager->flush();
-
-            $this->addFlash('success', 'Réponse envoyée avec succès !');
-            return $this->redirectToRoute('app_reclamation_list');
+        } else {
+            error_log('Formulaire non soumis pour id_rec=' . $id_rec);
         }
 
         return $this->render('reclamation_list/respond.html.twig', [
@@ -169,6 +147,6 @@ final class ReclamationListController extends AbstractController
         }
 
         $this->addFlash('success', 'Réclamation supprimée avec succès !');
-        return new Response('Suppression réussie', 200);
+        return $this->redirectToRoute('app_reclamation_list');
     }
 }
