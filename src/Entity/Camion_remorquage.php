@@ -22,7 +22,10 @@ class Camion_remorquage
     #[ORM\Column(type: "string", length: 8)]
     private string $num_tel;
 
+
+
     #[ORM\Column(type: "string")]
+
     private string $statut;
 
     public function getId_cr()

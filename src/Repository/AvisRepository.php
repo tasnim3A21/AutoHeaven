@@ -1,4 +1,6 @@
 <?php
+
+
 namespace App\Repository;
 
 use App\Entity\Avis;
@@ -11,6 +13,7 @@ class AvisRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Avis::class);
     }
+
     // src/Repository/AvisRepository.php
 
     public function getStatsParVoiture()
@@ -27,3 +30,4 @@ class AvisRepository extends ServiceEntityRepository
     
     
 }
+

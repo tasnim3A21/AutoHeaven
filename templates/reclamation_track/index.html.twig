@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suivi des réclamations{% endblock %}
+
+{% block content %}
+    <h1>Suivi de votre réclamation</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.reclamationId) }}
+        <button type="submit">Suivre</button>
+    {{ form_end(form) }}
+
+    {% for message in app.flashes('error') %}
+        <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+
+    {% if reclamation %}
+        <h2>Réclamation #{{ reclamation.idRec }}</h2>
+        <p>Titre : {{ reclamation.titre }}</p>
+        <p>Priorité : {{ reclamation.priority }}</p>
+
+        {% if reclamation.priority == 'high' %}
+            <h3>Chat en direct</h3>
+            <div id="chatMessages"></div>
+            <input type="text" id="chatInput" placeholder="Tapez un message...">
+            <button id="sendMessage">Envoyer</button>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const chatMessages = document.getElementById('chatMessages');
+                    const chatInput = document.getElementById('chatInput');
+                    const sendMessage = document.getElementById('sendMessage');
+                    let ws = new WebSocket('ws://127.0.0.1:8081');
+
+                    ws.onopen = function () {
+                        console.log('Connexion WebSocket établie');
+                    };
+
+                    ws.onmessage = function (event) {
+                        const message = document.createElement('p');
+                        message.textContent = event.data;
+                        chatMessages.appendChild(message);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    };
+
+                    ws.onclose = function () {
+                        console.log('Connexion WebSocket fermée');
+                    };
+
+                    sendMessage.addEventListener('click', function () {
+                        const message = chatInput.value;
+                        if (message && ws.readyState === WebSocket.OPEN) {
+                            ws.send(message);
+                            chatInput.value = '';
+                        }
+                    });
+
+                    chatInput.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') sendMessage.click();
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endif %}
+{% endblock %}

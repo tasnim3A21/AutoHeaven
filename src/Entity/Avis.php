@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\AvisRepository;
@@ -100,4 +101,5 @@ class Avis
         $this->idV = $idV;
         return $this;
     }
+
 }

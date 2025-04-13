@@ -3,15 +3,18 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Categorie;
 use App\Entity\Avis;
+
 use App\Entity\Reservation;
 
 #[ORM\Entity]
 class Voiture
 {
+
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
     private int $id_v;
@@ -19,6 +22,7 @@ class Voiture
     private Collection $avis;
     
     #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: "voitures")]
+
     #[ORM\JoinColumn(name: 'id_c', referencedColumnName: 'id_c', onDelete: 'CASCADE')]
     private Categorie $id_c;
 
@@ -42,6 +46,7 @@ class Voiture
 
     #[ORM\Column(type: "string")]
     private string $disponibilite;
+
 
     #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Avis::class, cascade: ["persist", "remove"])]
     private Collection $aviss;
@@ -103,3 +108,4 @@ class Voiture
     }
     // Méthodes pour Reservation sont aussi ici, comme dans la version précédente
 }
+

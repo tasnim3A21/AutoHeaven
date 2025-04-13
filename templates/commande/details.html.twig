@@ -1,0 +1,161 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Détails de la commande #{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Détails de la commande #CMD-{{ commande.id_com }}</h4>
+                <span class="badge badge-{{ commande.status == 'traitée' ? 'success' : 'warning' }}">
+                    {{ commande.status }}
+                </span>
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-0">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Informations client</h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Nom complet</dt>
+                                    <dd class="col-sm-8">{{ commande.id.nom }} {{ commande.id.prenom }}</dd>
+
+                                    <dt class="col-sm-4">Téléphone</dt>
+                                    <dd class="col-sm-8">{{ commande.id.tel }}</dd>
+
+                                    <dt class="col-sm-4">Email</dt>
+                                    <dd class="col-sm-8">{{ commande.id.email }}</dd>
+
+                                    <dt class="col-sm-4">Adresse</dt>
+                                    <dd class="col-sm-8">{{ commande.id.adresse }}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-0">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Informations commande</h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Date</dt>
+                                    <dd class="col-sm-8">{{ commande.date_com|date('d/m/Y H:i') }}</dd>
+
+                                    <dt class="col-sm-4">Statut</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge badge-{{ commande.status == 'traitée' ? 'success' : 'warning' }}">
+                                            {{ commande.status }}
+                                        </span>
+                                    </dd>
+
+                                    <dt class="col-sm-4">Total</dt>
+                                    <dd class="col-sm-8 font-weight-bold">{{ commande.montant_total|number_format(2) }} €</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Articles commandés</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th class="text-right">Prix unitaire</th>
+                                        <th class="text-center">Quantité</th>
+                                        <th class="text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in commande.lignecommandes %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="flex-shrink-0">
+                                                        <img src="{{ asset(ligne.id_e.image) }}" 
+                                                             alt="{{ ligne.id_e.nom }}" 
+                                                             class="img-fluid rounded"
+                                                             width="50"
+                                                             onerror="this.src='{{ asset('images/default-product.png') }}'">
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="mb-1">{{ ligne.id_e.nom }}</h6>
+                                                        <small class="text-muted">Ref: {{ ligne.id_e.reference }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-right">{{ ligne.prix_unitaire|number_format(2) }} €</td>
+                                            <td class="text-center">{{ ligne.quantite }}</td>
+                                            <td class="text-right">{{ (ligne.prix_unitaire* ligne.quantite)|number_format(2) }} €</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <th colspan="3" class="text-right">Sous-total</th>
+                                        <th class="text-right">{{ commande.montant_total|number_format(2) }} €</th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="3" class="text-right">Livraison</th>
+                                        <th class="text-right">0.00 €</th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="3" class="text-right">Total</th>
+                                        <th class="text-right">{{ commande.montant_total|number_format(2) }} €</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{{ path('app_commande') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+                    </a>
+                    
+                    {% if commande.status == 'en attente' %}
+                        <a href="{{ path('app_commande_confirm', {'id': commande.id_com}) }}" 
+                           class="btn btn-success"
+                           onclick="return confirm('Confirmer cette commande ?')">
+                            <i class="fas fa-check mr-2"></i> Confirmer la commande
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0,0,0,.125);
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+{% endblock %}
