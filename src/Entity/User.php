@@ -6,7 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
 
+
 use App\Entity\Reservation;
+
 
 
 #[ORM\Entity]
@@ -60,6 +62,8 @@ class User
     {
         return $this->id;
     }
+
+
 
     public function setId($value)
     {
@@ -197,6 +201,7 @@ class User
     }
 
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -228,6 +233,7 @@ class User
         }
 
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;
 
@@ -235,8 +241,10 @@ class User
     private Collection $aviss;
 
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
+
 
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]

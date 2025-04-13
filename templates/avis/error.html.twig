@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Une erreur est survenue!</h4>
+            <p>{{ message }}</p>
+            <hr>
+            <p class="mb-0">Vous pouvez retourner à la liste des avis en cliquant sur le lien ci-dessous.</p>
+            <a href="{{ path('app_avis_index') }}" class="btn btn-primary mt-3">Retour à la liste des avis</a>
+        </div>
+    </div>
+{% endblock %}

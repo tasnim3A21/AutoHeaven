@@ -2,124 +2,104 @@
 
 namespace App\Entity;
 
+use App\Repository\AvisRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-use App\Entity\Voiture;
-use Doctrine\Common\Collections\Collection;
-use App\Entity\Mention_j_aime;
-
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: AvisRepository::class)]
 class Avis
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_a;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "aviss")]
-    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private User $id;
-
-        #[ORM\ManyToOne(targetEntity: Voiture::class, inversedBy: "aviss")]
-    #[ORM\JoinColumn(name: 'id_v', referencedColumnName: 'id_v', onDelete: 'CASCADE')]
-    private Voiture $id_v;
-
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private int $note;
 
-    #[ORM\Column(type: "text")]
+    #[ORM\Column(type: 'text')]
     private string $commentaire;
 
-    #[ORM\Column(type: "datetime")]
+    #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $dateavis;
+    
+    
 
-    public function getId_a()
-    {
-        return $this->id_a;
-    }
+    // Changer id_utilisateur en id (qui correspond à la colonne 'id' de la table 'user')
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", nullable: false)]  // ici on utilise la colonne id
+    private User $utilisateur;
 
-    public function setId_a($value)
-    {
-        $this->id_a = $value;
-    }
+    // Relation avec Voiture
+    #[ORM\ManyToOne(targetEntity: Voiture::class)]
+    #[ORM\JoinColumn(name: "id_v", referencedColumnName: "id_v", nullable: false, onDelete: "CASCADE")]
+    private ?Voiture $idV = null;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
-    {
-        $this->id = $value;
-    }
-
-    public function getId_v()
-    {
-        return $this->id_v;
-    }
-
-    public function setId_v($value)
-    {
-        $this->id_v = $value;
-    }
-
-    public function getNote()
+    public function getNote(): int
     {
         return $this->note;
     }
 
-    public function setNote($value)
+    public function setNote(int $note): self
     {
-        $this->note = $value;
+        $this->note = $note;
+        return $this;
     }
 
-    public function getCommentaire()
+    public function getCommentaire(): string
     {
         return $this->commentaire;
     }
 
-    public function setCommentaire($value)
+    public function setCommentaire(string $commentaire): self
     {
-        $this->commentaire = $value;
+        $this->commentaire = $commentaire;
+        return $this;
     }
 
-    public function getDateavis()
+    public function getDateavis(): \DateTimeInterface
     {
         return $this->dateavis;
     }
 
-    public function setDateavis($value)
-    {
-        $this->dateavis = $value;
+    public function setDateavis(\DateTimeInterface $dateavis): self
+{
+    // Ensure the date is a valid DateTimeInterface object
+    if (is_string($dateavis)) {
+        $dateavis = new \DateTime($dateavis);  // Convert string to DateTime if necessary
     }
 
-    #[ORM\OneToMany(mappedBy: "id_a", targetEntity: Mention_j_aime::class)]
-    private Collection $mention_j_aimes;
+    $this->dateavis = $dateavis;
 
-        public function getMention_j_aimes(): Collection
-        {
-            return $this->mention_j_aimes;
-        }
+    return $this;
+}
+
     
-        public function addMention_j_aime(Mention_j_aime $mention_j_aime): self
-        {
-            if (!$this->mention_j_aimes->contains($mention_j_aime)) {
-                $this->mention_j_aimes[] = $mention_j_aime;
-                $mention_j_aime->setId_a($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeMention_j_aime(Mention_j_aime $mention_j_aime): self
-        {
-            if ($this->mention_j_aimes->removeElement($mention_j_aime)) {
-                // set the owning side to null (unless already changed)
-                if ($mention_j_aime->getId_a() === $this) {
-                    $mention_j_aime->setId_a(null);
-                }
-            }
-    
-            return $this;
-        }
+
+    public function getUtilisateur(): User
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(User $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
+    public function getIdV(): ?Voiture
+    {
+        return $this->idV;
+    }
+
+    public function setIdV(?Voiture $idV): self
+    {
+        $this->idV = $idV;
+        return $this;
+    }
+
 }

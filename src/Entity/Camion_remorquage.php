@@ -23,6 +23,7 @@ class Camion_remorquage
     private string $num_tel;
 
 
+
     #[ORM\Column(type: "string")]
 
     private string $statut;
