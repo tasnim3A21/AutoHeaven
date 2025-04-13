@@ -104,35 +104,42 @@ class AvisController extends AbstractController
 
     private function isCommentValid(string $commentaire, ?string &$errorMessage): bool
     {
+        // Vérification existante
         $badWords = ['merde', 'con', 'salope', 'pute', 'connard', 'idiot', 'abruti'];
-
+    
         foreach ($badWords as $badWord) {
             if (stripos($commentaire, $badWord) !== false) {
                 $errorMessage = 'Votre commentaire contient un mot inapproprié.';
                 return false;
             }
         }
-
+    
         if (preg_match('/(.)\1{4,}/', $commentaire)) {
             $errorMessage = 'Votre commentaire semble contenir du spam (répétition de caractères).';
             return false;
         }
-
+    
         if (strlen($commentaire) < 5) {
             $errorMessage = 'Votre commentaire est trop court.';
             return false;
         }
-
+    
         if (strlen($commentaire) > 500) {
             $errorMessage = 'Votre commentaire est trop long.';
             return false;
         }
-
+    
         if (preg_match('/[A-Z]{10,}/', $commentaire)) {
             $errorMessage = 'Veuillez éviter d\'utiliser trop de majuscules.';
             return false;
         }
-
+    
+        // Nouvelle vérification pour les URLs
+        if (preg_match('/(https?:\/\/|www\.)\S+/i', $commentaire)) {
+            $errorMessage = 'Les URLs ne sont pas autorisées dans les commentaires.';
+            return false;
+        }
+    
         return true;
     }
 }

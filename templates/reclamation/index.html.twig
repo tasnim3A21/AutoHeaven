@@ -25,7 +25,12 @@
             </div>
 
             <div class="form-group">
-                {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="label-with-icon">
+                    {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
+                    <span id="voiceInputBtn" class="voice-input-label">
+                        <img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">
+                    </span>
+                </div>
                 <div class="textarea-container">
                     {{ form_widget(reclamationForm.contenu, {'attr': {'class': 'form-textarea', 'required': 'required', 'aria-describedby': 'word-counter message-error'}}) }}
                     <label for="form_imageFile" class="image-upload-label">
@@ -44,12 +49,10 @@
                 </div>
                 <div class="action-buttons">
                     <button type="button" id="correctTextBtn" class="btn-correct-text">Corriger la réclamation</button>
-                    <button type="button" id="voiceInputBtn" class="btn-voice-input">Dicter la réclamation</button>
                 </div>
             </div>
 
             <div class="button-container">
-                <button type="button" id="previewBtn" class="btn-preview">Prévisualiser</button>
                 <button type="submit" class="btn-submit">Envoyer</button>
             </div>
 
@@ -66,18 +69,6 @@
         </div>
         <div id="errorMessage" class="error-message" style="display: none;">
             Une erreur est survenue.
-        </div>
-
-        <!-- Modale de prévisualisation -->
-        <div id="previewModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h2>Prévisualisation de votre réclamation</h2>
-                <p><strong>Objet :</strong> <span id="previewTitre"></span></p>
-                <p><strong>Catégorie :</strong> <span id="previewCategory"></span></p>
-                <p><strong>Réclamation :</strong> <span id="previewContenu"></span></p>
-                <p><strong>Image :</strong> <span id="previewImage"></span></p>
-                <button type="button" id="closePreviewBtn" class="btn-close">Fermer</button>
-            </div>
         </div>
     </div>
 
@@ -163,6 +154,14 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             position: relative;
+            line-height: 1; /* Réduire la hauteur de ligne pour un alignement précis */
+        }
+
+        /* Conteneur pour aligner le label et l'icône */
+        .label-with-icon {
+            display: flex;
+            align-items: center; /* Centrer verticalement */
+            gap: 10px;
         }
 
         /* Champs de saisie */
@@ -255,6 +254,40 @@
             display: none;
         }
 
+        /* Icône de dictée */
+        .voice-input-label {
+            display: inline-flex; /* Utiliser inline-flex pour un meilleur contrôle */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            margin: 0; /* Supprimer toute marge */
+            padding: 0; /* Supprimer tout padding */
+        }
+
+        .voice-input-label:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+
+        .voice-input-label:focus {
+            outline: none;
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+
+        .voice-input-icon {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+            filter: brightness(0.9);
+            transition: filter 0.3s ease;
+        }
+
+        .voice-input-label:hover .voice-input-icon {
+            filter: brightness(1.1);
+        }
+
         /* Compteur de mots */
         .word-counter {
             font-size: 14px;
@@ -287,7 +320,7 @@
             transition: width 0.3s ease;
         }
 
-        /* Boutons d'action (Corriger et Dicter) */
+        /* Boutons d'action (Corriger) */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -326,108 +359,6 @@
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-        }
-
-        /* Bouton Dicter la réclamation */
-        .btn-voice-input {
-            background: linear-gradient(135deg, #28a745, #218838);
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: var(--font-family);
-            font-weight: 600;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 3px 8px var(--shadow-color);
-            letter-spacing: 0.5px;
-        }
-
-        .btn-voice-input:hover {
-            background: linear-gradient(135deg, #218838, #1e7e34);
-            transform: translateY(-1px);
-            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.3);
-        }
-
-        .btn-voice-input:focus {
-            outline: none;
-            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
-        }
-
-        /* Bouton Prévisualiser */
-        .btn-preview {
-            background: linear-gradient(135deg, #17a2b8, #138496);
-            color: #ffffff;
-            padding: 12px 35px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-family: var(--font-family);
-            font-weight: 600;
-            margin-right: 10px;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 10px var(--shadow-color);
-        }
-
-        .btn-preview:hover {
-            background: linear-gradient(135deg, #138496, #117a8b);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(23, 162, 184, 0.3);
-        }
-
-        /* Modale de prévisualisation */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: var(--background-lighter);
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 0 5px 15px var(--shadow-color);
-            font-family: var(--font-family);
-        }
-
-        .modal-content h2 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: var(--text-color);
-        }
-
-        .modal-content p {
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-        }
-
-        .btn-close {
-            background: var(--primary-color);
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: var(--font-family);
-            font-weight: 600;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-
-        .btn-close:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
         }
 
         /* Barre de progression pour la soumission */
@@ -474,10 +405,6 @@
             background: #fff5f5;
             padding: 8px 12px;
             border-radius: 6px;
-(gtag('event', 'submit', {
-  'event_category': 'Reclamation',
-  'event_label': 'Form Submission'
-}));
             border-left: 4px solid var(--primary-color);
             box-shadow: 0 2px 5px var(--shadow-color);
         }
@@ -616,6 +543,11 @@
                 height: 30px;
             }
 
+            .voice-input-icon {
+                width: 20px;
+                height: 20px;
+            }
+
             .image-file-name {
                 font-size: 13px;
                 margin-top: 6px;
@@ -636,8 +568,7 @@
                 gap: 8px;
             }
 
-            .btn-correct-text,
-            .btn-voice-input {
+            .btn-correct-text {
                 font-size: 13px;
                 padding: 8px 18px;
                 width: 100%;
@@ -655,7 +586,6 @@
                 gap: 10px;
             }
 
-            .btn-preview,
             .btn-submit {
                 font-size: 14px;
                 padding: 10px 30px;
@@ -669,15 +599,6 @@
                 margin-top: 20px;
                 padding: 10px;
             }
-
-            .modal-content {
-                max-width: 90%;
-                padding: 15px;
-            }
-
-            .modal-content h2 {
-                font-size: 18px;
-            }
         }
     </style>
 
@@ -689,15 +610,8 @@
             const contenuInput = form.querySelector('textarea[name="form[contenu]"]');
             const correctTextBtn = document.getElementById('correctTextBtn');
             const voiceInputBtn = document.getElementById('voiceInputBtn');
-            const previewBtn = document.getElementById('previewBtn');
-            const previewModal = document.getElementById('previewModal');
-            const closePreviewBtn = document.getElementById('closePreviewBtn');
-            const previewTitre = document.getElementById('previewTitre');
-            const previewCategory = document.getElementById('previewCategory');
-            const previewContenu = document.getElementById('previewContenu');
-            const previewImage = document.getElementById('previewImage');
             const imageFileInput = form.querySelector('#form_imageFile');
-            const imageFileName = form.querySelector('#imageFileName');
+            const imageFileName = document.getElementById('imageFileName');
             const imageUploadLabel = form.querySelector('.image-upload-label');
             const submitButton = form.querySelector('.btn-submit');
             const successMessage = document.getElementById('successMessage');
@@ -847,19 +761,6 @@
                     error.textContent = 'La reconnaissance vocale n\'est pas supportée par votre navigateur.';
                     contenuInput.parentNode.appendChild(error);
                 }
-            });
-
-            // Bouton "Prévisualiser"
-            previewBtn.addEventListener('click', function () {
-                previewTitre.textContent = titreInput.value || 'Non spécifié';
-                previewCategory.textContent = categoryInput.options[categoryInput.selectedIndex]?.text || 'Non spécifié';
-                previewContenu.textContent = contenuInput.value || 'Non spécifié';
-                previewImage.textContent = imageFileName.textContent || 'Aucune image';
-                previewModal.style.display = 'flex';
-            });
-
-            closePreviewBtn.addEventListener('click', function () {
-                previewModal.style.display = 'none';
             });
 
             // Ajouter un événement de débogage pour vérifier si le clic sur l'icône est détecté

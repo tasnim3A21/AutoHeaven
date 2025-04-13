@@ -5,11 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
-
-
-use App\Entity\Reservation;
-
-
+use App\Entity\Reclamation;
 
 #[ORM\Entity]
 class User
@@ -62,8 +58,6 @@ class User
     {
         return $this->id;
     }
-
-
 
     public function setId($value)
     {
@@ -200,52 +194,14 @@ class User
         $this->reponse = $value;
     }
 
-
-
-    #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
-    private Collection $commandes;
-
-        public function getCommandes(): Collection
-        {
-            return $this->commandes;
-        }
-    
-        public function addCommande(Commande $commande): self
-        {
-            if (!$this->commandes->contains($commande)) {
-                $this->commandes[] = $commande;
-                $commande->setId($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeCommande(Commande $commande): self
-        {
-            if ($this->commandes->removeElement($commande)) {
-                // set the owning side to null (unless already changed)
-                if ($commande->getId() === $this) {
-                    $commande->setId(null);
-                }
-            }
-    
-            return $this;
-        }
-
-
-
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
 
-
-
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
-
-
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]
     private Collection $mention_j_aimes;
