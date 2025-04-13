@@ -5,7 +5,9 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
+
 use App\Entity\Reservation;
+
 
 #[ORM\Entity]
 class User
@@ -194,6 +196,7 @@ class User
         $this->reponse = $value;
     }
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -224,11 +227,17 @@ class User
             return $this;
         }
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
+
+
+    #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
+    private Collection $commandes;
+
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]
     private Collection $mention_j_aimes;
