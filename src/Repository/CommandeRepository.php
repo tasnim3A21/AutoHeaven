@@ -12,6 +12,7 @@ class CommandeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Commande::class);
     }
+
     public function search(string $searchTerm): array
 {
     return $this->createQueryBuilder('c')
@@ -101,4 +102,5 @@ public function getMonthlySales(int $months = 6): array
 
     return $data;
 }  // Add custom methods as needed
+
 }

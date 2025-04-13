@@ -4,69 +4,74 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df6c70ba44ba89ac63de78fcb230b3ce",
+
+    "content-hash": "a1a21885b67421aac97f727fcb3dfe82",
     "packages": [
         {
-            "name": "beberlei/doctrineextensions",
-            "version": "v1.5.0",
+            "name": "cboden/ratchet",
+            "version": "v0.4.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/beberlei/DoctrineExtensions.git",
-                "reference": "281f1650641c2f438b0a54d8eaa7ba50ac7e3eb6"
+                "url": "https://github.com/ratchetphp/Ratchet.git",
+                "reference": "5012dc954541b40c5599d286fd40653f5716a38f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beberlei/DoctrineExtensions/zipball/281f1650641c2f438b0a54d8eaa7ba50ac7e3eb6",
-                "reference": "281f1650641c2f438b0a54d8eaa7ba50ac7e3eb6",
+                "url": "https://api.github.com/repos/ratchetphp/Ratchet/zipball/5012dc954541b40c5599d286fd40653f5716a38f",
+                "reference": "5012dc954541b40c5599d286fd40653f5716a38f",
                 "shasum": ""
             },
             "require": {
-                "doctrine/orm": "^2.19 || ^3.0",
-                "php": "^7.2 || ^8.0"
+                "guzzlehttp/psr7": "^1.7|^2.0",
+                "php": ">=5.4.2",
+                "ratchet/rfc6455": "^0.3.1",
+                "react/event-loop": ">=0.4",
+                "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5",
+                "symfony/http-foundation": "^2.6|^3.0|^4.0|^5.0|^6.0",
+                "symfony/routing": "^2.6|^3.0|^4.0|^5.0|^6.0"
             },
             "require-dev": {
-                "doctrine/annotations": "^1.14 || ^2",
-                "doctrine/coding-standard": "^9.0.2 || ^12.0",
-                "nesbot/carbon": "^2.72 || ^3",
-                "phpstan/phpstan": "^1.10",
-                "phpunit/phpunit": "^8.5 || ^9.6",
-                "squizlabs/php_codesniffer": "^3.8",
-                "symfony/cache": "^5.4 || ^6.4 || ^7.0",
-                "symfony/yaml": "^5.4 || ^6.4 || ^7.0",
-                "vimeo/psalm": "^3.18 || ^5.22",
-                "zf1/zend-date": "^1.12",
-                "zf1/zend-registry": "^1.12"
+                "phpunit/phpunit": "~4.8"
+
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "DoctrineExtensions\\": "src/"
+
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause"
+
+                "MIT"
             ],
             "authors": [
                 {
-                    "name": "Benjamin Eberlei",
-                    "email": "kontakt@beberlei.de"
+                    "name": "Chris Boden",
+                    "email": "cboden@gmail.com",
+                    "role": "Developer"
                 },
                 {
-                    "name": "Steve Lacey",
-                    "email": "steve@steve.ly"
+                    "name": "Matt Bonneau",
+                    "role": "Developer"
                 }
             ],
-            "description": "A set of extensions to Doctrine 2 that add support for additional query functions available in MySQL, Oracle, PostgreSQL and SQLite.",
+            "description": "PHP WebSocket library",
+            "homepage": "http://socketo.me",
             "keywords": [
-                "database",
-                "doctrine",
-                "orm"
+                "Ratchet",
+                "WebSockets",
+                "server",
+                "sockets",
+                "websocket"
             ],
             "support": {
-                "source": "https://github.com/beberlei/DoctrineExtensions/tree/v1.5.0"
+                "chat": "https://gitter.im/reactphp/reactphp",
+                "issues": "https://github.com/ratchetphp/Ratchet/issues",
+                "source": "https://github.com/ratchetphp/Ratchet/tree/v0.4.4"
             },
-            "time": "2024-03-03T17:55:15+00:00"
+            "time": "2021-12-14T00:20:41+00:00"
+
         },
         {
             "name": "composer/semver",
@@ -1432,6 +1437,7 @@
             "time": "2025-03-06T22:45:56+00:00"
         },
         {
+
             "name": "knplabs/knp-components",
             "version": "v5.2.0",
             "source": {
@@ -1487,6 +1493,7 @@
             "autoload": {
                 "psr-4": {
                     "Knp\\Component\\": "src/Knp/Component"
+
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1495,6 +1502,7 @@
             ],
             "authors": [
                 {
+
                     "name": "KnpLabs Team",
                     "homepage": "https://knplabs.com"
                 },
@@ -1554,11 +1562,14 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "6.x-dev"
+
                 }
             },
             "autoload": {
                 "psr-4": {
+
                     "Knp\\Bundle\\PaginatorBundle\\": "src"
+
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1567,6 +1578,7 @@
             ],
             "authors": [
                 {
+
                     "name": "KnpLabs Team",
                     "homepage": "https://knplabs.com"
                 },
@@ -1591,6 +1603,7 @@
                 "source": "https://github.com/KnpLabs/KnpPaginatorBundle/tree/v6.7.0"
             },
             "time": "2025-03-02T16:36:05+00:00"
+
         },
         {
             "name": "monolog/monolog",
@@ -2118,6 +2131,114 @@
             "time": "2019-01-08T18:20:26+00:00"
         },
         {
+            "name": "psr/http-factory",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-factory.git",
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1",
+                "psr/http-message": "^1.0 || ^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "PSR-17: Common interfaces for PSR-7 HTTP message factories",
+            "keywords": [
+                "factory",
+                "http",
+                "message",
+                "psr",
+                "psr-17",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-factory"
+            },
+            "time": "2024-04-15T12:06:14+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-message/tree/2.0"
+            },
+            "time": "2023-04-04T09:54:51+00:00"
+        },
+        {
             "name": "psr/link",
             "version": "2.0.1",
             "source": {
@@ -2224,6 +2345,7 @@
             "time": "2024-09-11T13:17:53+00:00"
         },
         {
+
             "name": "stripe/stripe-php",
             "version": "v17.1.1",
             "source": {
@@ -2257,6 +2379,7 @@
             "autoload": {
                 "psr-4": {
                     "Stripe\\": "lib/"
+
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2265,6 +2388,7 @@
             ],
             "authors": [
                 {
+
                     "name": "Stripe and contributors",
                     "homepage": "https://github.com/stripe/stripe-php/contributors"
                 }
@@ -2281,6 +2405,7 @@
                 "source": "https://github.com/stripe/stripe-php/tree/v17.1.1"
             },
             "time": "2025-04-05T00:09:14+00:00"
+
         },
         {
             "name": "symfony/asset",

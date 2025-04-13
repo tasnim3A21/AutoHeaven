@@ -3,12 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use App\Entity\Equipement;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Stock
 {
+
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
     #[ORM\GeneratedValue(strategy: "AUTO")]
@@ -27,9 +30,11 @@ class Stock
     private float $prixvente;
 
     public function getIdS(): ?int
+
     {
         return $this->id_s;
     }
+
 
     public function setIdS(int $id_s): self
     {
@@ -49,9 +54,11 @@ class Stock
     }
 
     public function getQuantite(): int
+
     {
         return $this->quantite;
     }
+
 
     public function setQuantite(int $quantite): self
     {
@@ -60,9 +67,11 @@ class Stock
     }
 
     public function getPrixvente(): float
+
     {
         return $this->prixvente;
     }
+
 
     public function setPrixvente(float $prixvente): self
     {
@@ -70,3 +79,4 @@ class Stock
         return $this;
     }
 }
+

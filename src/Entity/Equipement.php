@@ -3,13 +3,16 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Panier;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 #[ORM\Entity]
 class Equipement
 {
+
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
     #[ORM\GeneratedValue(strategy: "AUTO")]
@@ -199,3 +202,4 @@ class Equipement
         return $this;
     }
 }
+
