@@ -1,0 +1,50 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Statistiques des Avis{% endblock %}
+
+{% block body %}
+    <h1>Statistiques des Avis par Voiture</h1>
+
+    <!-- Création de l'élément canvas pour Chart.js -->
+    <canvas id="statistiquesChart" width="400" height="200"></canvas>
+
+    <script>
+        // Récupérer les statistiques depuis le backend avec json_encode au lieu du filtre Twig 'json'
+        const stats = {{ stats | json_encode() | raw }};
+        
+        // Extraire les labels (id des voitures), et les données pour "bons" et "mauvais"
+        const labels = stats.map(stat => 'Voiture ' + stat.id_v);  // On peut utiliser un ID ou une autre propriété comme label
+        const bons = stats.map(stat => stat.bons);
+        const mauvais = stats.map(stat => stat.mauvais);
+
+        // Configuration du graphique
+        const ctx = document.getElementById('statistiquesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar', // Choix du type de graphique (barres ici)
+            data: {
+                labels: labels, // Labels des voitures
+                datasets: [{
+                    label: 'Avis Bons (>= 4)',
+                    data: bons, // Données pour les avis bons
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Couleur des barres pour "bons"
+                    borderColor: 'rgba(75, 192, 192, 1)', // Bordure des barres pour "bons"
+                    borderWidth: 1
+                }, {
+                    label: 'Avis Mauvais (< 4)',
+                    data: mauvais, // Données pour les avis mauvais
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)', // Couleur des barres pour "mauvais"
+                    borderColor: 'rgba(255, 99, 132, 1)', // Bordure des barres pour "mauvais"
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true // S'assurer que le graphique commence à zéro
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'Avis{% endblock %}
+{% block spinner %}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Modifier l'avis</h1>
+
+    <div class="card shadow p-4 rounded">
+        {{ form_start(form) }}
+
+        <div class="mb-3">
+            {{ form_label(form.commentaire, 'Votre commentaire') }}
+            {{ form_widget(form.commentaire, {'attr': {'class': 'form-control', 'placeholder': 'Entrez votre avis...'}}) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.note, 'Votre note') }}
+            <div class="rating-stars">
+                {{ form_widget(form.note, {'attr': {'class': 'form-control d-none'}}) }}
+                <div class="stars">
+                    {% for i in 1..4 %}
+                        <i class="fa fa-star star" data-value="{{ i }}"></i>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.dateavis, 'Date') }}
+            {{ form_widget(form.dateavis, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <button class="btn btn-success">✅ Sauvegarder les modifications</button>
+
+        {{ form_end(form) }}
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('app_avis_index') }}" class="btn btn-secondary">⬅️ Retour à la liste</a>
+    </div>
+</div>
+
+{# FontAwesome pour les étoiles #}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+{# Script pour gérer les étoiles #}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stars = document.querySelectorAll('.star');
+        const noteInput = document.querySelector('input[name$="[note]"]');
+
+        const setStars = (value) => {
+            stars.forEach((star, index) => {
+                star.classList.toggle('text-warning', index < value);
+                star.classList.toggle('text-secondary', index >= value);
+            });
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.getAttribute('data-value'));
+                noteInput.value = value;
+                setStars(value);
+            });
+        });
+
+        // Initialiser avec la valeur existante
+        if (noteInput.value) {
+            setStars(parseInt(noteInput.value));
+        }
+    });
+</script>
+{% endblock %}
