@@ -16,33 +16,34 @@
                     <th>Remove</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for panier in paniers %}
-                    {% set equipement = panier.id_e %}
-                    {% set stock = equipement.stocks|first %}
-                    <tr>
-                        <td>
-                            <img src="{{ equipement.image }}" alt="{{ equipement.nom }}" style="width: 50px; height: 50px;">
-                            {{ equipement.nom }}
-                        </td>
-                        <td>${{ stock.prixvente|number_format(2) }}</td>
-                       <td>
-    <form action="{{ path('app_update_quantity', {'id': panier.id_p}) }}" method="POST" class="quantity-form">
-        <input type="number" name="quantity" value="{{ panier.quantite }}" min="1" class="quantity-input" data-id="{{ panier.id_p }}">
-        <button type="submit" style="display: none;"></button>
-    </form>
-</td>
-                        <td>${{ (stock.prixvente * panier.quantite)|number_format(2) }}</td>
-                        <td>
-                            <a href="{{ path('app_remove_from_cart', {'id': panier.id_p}) }}" class="btn btn-danger btn-sm">x</a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5">Your cart is empty.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
+           <!-- Modifier la partie du tableau -->
+<tbody>
+    {% for panier in paniers %}
+        {% set equipement = panier.id_e %}
+        {% set stock = equipement.stock %}
+        <tr>
+            <td>
+                <img src="{{ equipement.image }}" alt="{{ equipement.nom }}" style="width: 50px; height: 50px;">
+                {{ equipement.nom }}
+            </td>
+            <td>${{ stock ? stock.prixvente|number_format(2) : 'N/A' }}</td>
+            <td>
+                <form action="{{ path('app_update_quantity', {'id': panier.id_p}) }}" method="POST" class="quantity-form">
+                    <input type="number" name="quantity" value="{{ panier.quantite }}" min="1" class="quantity-input" data-id="{{ panier.id_p }}">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </td>
+            <td>${{ stock ? (stock.prixvente * panier.quantite)|number_format(2) : 'N/A' }}</td>
+            <td>
+                <a href="{{ path('app_remove_from_cart', {'id': panier.id_p}) }}" class="btn btn-danger btn-sm">x</a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5">Your cart is empty.</td>
+        </tr>
+    {% endfor %}
+</tbody>
         </table>
 
         <div class="coupon-section">

@@ -14,99 +14,98 @@ use App\Entity\Stock;
 use App\Form\EquipType;
 use App\Form\EditEquipType;
 use Psr\Log\LoggerInterface;
+use  Knp\Component\Pager\PaginatorInterface;
 
 final class EquipementsController extends AbstractController
 {
     #[Route('/equipements', name: 'app_equipements')]
-    public function index(EquipementRepository $equipementRepository , EntityManagerInterface $entityManager): Response
+    public function index(EquipementRepository $equipementRepository, EntityManagerInterface $entityManager , PaginatorInterface $paginator ,Request $request): Response
     {
+       $equipements = $paginator->paginate(
+            $equipementRepository->findAll(), // query NOT result
+            $request->query->getInt('page',1), // page number (default is 1)
+            5// limit per page (default is 10)
+        );
+       
+        // $equipements = $entityManager->getRepository(Equipement::class)->findAll();
         
-         $equipements = $entityManager->getRepository(Equipement::class)->findAll();
-
-      
-         $stocks = $entityManager->getRepository(Stock::class)->findAll();
- 
-         return $this->render('equipements/index.html.twig', [
-             'equipements' => $equipements,
-             'stocks' => $stocks,
-         ]);
+        return $this->render('equipements/index.html.twig', [
+            'equipements' => $equipements,
+        ]);
     }
-    #[Route('/equipements/search', name: 'app_equipements_search', methods: ['GET'])]
-    public function search(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $searchTerm = $request->query->get('search', '');
-        
-        $equipementRepository = $entityManager->getRepository(Equipement::class);
-        $queryBuilder = $equipementRepository->createQueryBuilder('e')
-            ->leftJoin(Stock::class, 's', 'WITH', 's.id = e.id');
-        
-        if (!empty($searchTerm)) {
-            $queryBuilder
-                ->where('e.nom LIKE :searchTerm OR e.marque LIKE :searchTerm OR e.reference LIKE :searchTerm')
-                ->setParameter('searchTerm', '%'.$searchTerm.'%');
-        }
-        
-        $equipements = $queryBuilder->getQuery()->getResult();
+   
+   #[Route('/equipements/search', name: 'app_equipements_search', methods: ['GET'])]
+public function search(Request $request, EntityManagerInterface $entityManager): JsonResponse
+{
+    $searchTerm = $request->query->get('search', '');
     
-        $data = [];
-        foreach ($equipements as $equipement) {
-            $stock = $entityManager->getRepository(Stock::class)->findOneBy(['id' => $equipement]);
+    $equipementRepository = $entityManager->getRepository(Equipement::class);
+    $queryBuilder = $equipementRepository->createQueryBuilder('e')
+        ->leftJoin('e.stock', 's');
+    
+    if (!empty($searchTerm)) {
+        $queryBuilder
+            ->where('e.nom LIKE :searchTerm OR e.marque LIKE :searchTerm OR e.reference LIKE :searchTerm')
+            ->setParameter('searchTerm', '%'.$searchTerm.'%');
+    }
+    
+    $equipements = $queryBuilder->getQuery()->getResult();
+
+    $data = [];
+    foreach ($equipements as $equipement) {
+        $stock = $equipement->getStock();
+        
+        $data[] = [
+            'id' => $equipement->getId(),
+            'reference' => $equipement->getReference(),
+            'nom' => $equipement->getNom(),
+            'marque' => $equipement->getMarque(),
+            'prix' => $stock ? $stock->getPrixvente() : 'N/A',
+            'quantite' => $stock ? $stock->getQuantite() : 'N/A',
+        ];
+    }
+
+    return new JsonResponse(['data' => $data]);
+}
+#[Route('/equipements/delete/{id}', name: 'app_equipements_delete', methods: ['POST', 'DELETE'])]
+public function delete(Request $request, Equipement $equipement, EntityManagerInterface $entityManager): Response
+{
+    if ($this->isCsrfTokenValid('delete'.$equipement->getId(), $request->request->get('_token'))) {
+        try {
+           
+            if ($equipement->getStock()) {
+                $entityManager->remove($equipement->getStock());
+            }
             
-            $data[] = [
-                'reference' => $equipement->getReference(),
-                'nom' => $equipement->getNom(),
-                'marque' => $equipement->getMarque(),
-                'prix' => $stock ? $stock->getPrixvente() : 'N/A',
-                'quantite' => $stock ? $stock->getQuantite() : 'N/A',
-              
-            ];
-        }
-    
-        return new JsonResponse(['data' => $data]);
-    }
-
-    #[Route('/equipements/delete/{id}', name: 'app_equipements_delete', methods: ['POST', 'DELETE'])]
-    public function delete(Request $request, Equipement $equipement, EntityManagerInterface $entityManager): Response
-    {
-
-        if ($this->isCsrfTokenValid('delete'.$equipement->getId(), $request->request->get('_token'))) {
-            try {
-               
-                foreach ($equipement->getStocks() as $stock) {
-                    $entityManager->remove($stock);
-                }
-                 // Supp les autres entités liées
-            $offres = $equipement->getOffres();
-            foreach ($offres as $offre) {
+            // Supprimer les autres entités liées
+            foreach ($equipement->getOffres() as $offre) {
                 $entityManager->remove($offre);
             }
     
-            $lignecommandes = $equipement->getLignecommandes();
-            foreach ($lignecommandes as $lignecommande) {
+            foreach ($equipement->getLignecommandes() as $lignecommande) {
                 $entityManager->remove($lignecommande);
             }
     
-            $paniers = $equipement->getPaniers();
-            foreach ($paniers as $panier) {
+            foreach ($equipement->getPaniers() as $panier) {
                 $entityManager->remove($panier);
             }
-                
-                
-                $entityManager->remove($equipement);
-                $entityManager->flush();
-                
-                $this->addFlash('success', 'Équipement supprimé avec succès');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de la suppression: '.$e->getMessage());
-            }
-        } else {
-            $this->addFlash('error', 'Token CSRF invalide');
+            
+            $entityManager->remove($equipement);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Équipement supprimé avec succès');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la suppression: '.$e->getMessage());
         }
-    
-        return $this->redirectToRoute('app_equipements');
+    } else {
+        $this->addFlash('error', 'Token CSRF invalide');
     }
-   
 
+    $page = $request->query->getInt('page', 1);
+    
+
+    return $this->redirectToRoute('app_equipements', ['page' => $page]);
+}
     /*#[Route('/equipements/update/{id}', name: 'app_equipements_update', methods: ['POST'])]
     public function update(Request $request, Equipement $equipement, EntityManagerInterface $entityManager): Response
     {
@@ -139,10 +138,11 @@ final class EquipementsController extends AbstractController
             'equipement' => $equipement,
         ]);
     }*/
-    #[Route('/equipements/edit/{id}', name: 'app_equipements_edit', methods: ['GET', 'POST'])]
+
+  #[Route('/equipements/edit/{id}', name: 'app_equipements_edit', methods: ['GET', 'POST'])]
 public function edit(Request $request, Equipement $equipement, EntityManagerInterface $entityManager): Response
 {
-    $stock = $entityManager->getRepository(Stock::class)->findOneBy(['id' => $equipement]);
+    $stock = $equipement->getStock();
 
     $form = $this->createForm(EditEquipType::class, $equipement, [
         'quantite' => $stock ? $stock->getQuantite() : 0,
@@ -166,15 +166,13 @@ public function edit(Request $request, Equipement $equipement, EntityManagerInte
             $newFilename = uniqid() . '.' . $imageFile->guessExtension();
             $imageFile->move($uploadDirectory, $newFilename);
 
-           
-
             $equipement->setImage('/uploads/equipements/' . $newFilename);
         }
 
-        // Mise à jour du stock
+      
         if (!$stock) {
             $stock = new Stock();
-            $stock->setId($equipement);
+            $stock->setEquipement($equipement);
         }
         $stock->setQuantite($form->get('quantite')->getData());
         $stock->setPrixvente($form->get('prixvente')->getData());
@@ -184,7 +182,12 @@ public function edit(Request $request, Equipement $equipement, EntityManagerInte
         $entityManager->flush();
 
         $this->addFlash('success', 'Équipement mis à jour avec succès');
-        return $this->redirectToRoute('app_equipements');
+        
+       
+        $page = $request->query->getInt('page', 1);
+        
+  
+        return $this->redirectToRoute('app_equipements', ['page' => $page]);
     }
 
     return $this->render('equipements/edit.html.twig', [
@@ -349,43 +352,54 @@ public function edit(Request $request, Equipement $equipement, EntityManagerInte
 
 
 
+    
     #[Route('/equipements/create', name: 'app_equipements_create', methods: ['GET', 'POST'])]
-public function create(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $equipement = new Equipement();
-    $form = $this->createForm(EquipType::class, $equipement);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $imageFile = $form->get('image')->getData();
-        if ($imageFile) {
-            $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/equipements';
-            if (!is_dir($uploadDirectory)) {
-                mkdir($uploadDirectory, 0777, true);
+    public function create(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+     {
+        $equipement = new Equipement();
+        $form = $this->createForm(EquipType::class, $equipement);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Gestion de l'image
+            $imageFile = $form->get('image')->getData();
+            if ($imageFile) {
+                $uploadDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/equipements';
+                if (!is_dir($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $imageFile->move($uploadDirectory, $newFilename);
+                $equipement->setImage('/uploads/equipements/' . $newFilename);
+            } else {
+                $equipement->setImage('/uploads/equipements/default.jpg');
             }
-            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-            $imageFile->move($uploadDirectory, $newFilename);
-            $equipement->setImage('/uploads/equipements/' . $newFilename);
-        } else {
-            $equipement->setImage('/uploads/equipements/default.jpg');
+    
+          
+            $entityManager->persist($equipement);
+            $entityManager->flush();
+    
+          
+            $stock = new Stock();
+            $stock->setEquipement($equipement);
+            $stock->setQuantite($form->get('quantite')->getData());
+            $stock->setPrixvente($form->get('prixvente')->getData());
+            $entityManager->persist($stock);
+            $entityManager->flush();
+    
+       
+            $limitPerPage = 5;
+            $totalEquipements = $entityManager->getRepository(Equipement::class)->count([]);
+            $lastPage = ceil($totalEquipements / $limitPerPage);
+    
+            $this->addFlash('success', 'Équipement créé avec succès');
+            
+           
+            return $this->redirectToRoute('app_equipements', ['page' => $lastPage]);
         }
-
-        $entityManager->persist($equipement);
-        $entityManager->flush();
-
-        $stock = new Stock();
-        $stock->setId($equipement);
-        $stock->setQuantite($form->get('quantite')->getData());
-        $stock->setPrixvente($form->get('prixvente')->getData());
-        $entityManager->persist($stock);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Équipement ajouté avec succès');
-        return $this->redirectToRoute('app_equipements');
+    
+        return $this->render('equipements/add_equipement.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
-
-    return $this->render('equipements/add_equipement.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
 }

@@ -1,17 +1,16 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
-
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
         mapping_types:
             enum: string
         options:
-            foreign_key_constraints: true  
+            foreign_key_constraints: true
+        # Ajoutez votre version de serveur MySQL/MariaDB (décommentez et adaptez)
+        # server_version: '8.0'  # Pour MySQL 8.0
+        # server_version: '5.7'  # Pour MySQL 5.7
+        # server_version: '10.4' # Pour MariaDB 10.4
        
     orm:
         auto_generate_proxy_classes: true
@@ -27,14 +26,19 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+        
+        # Configuration des fonctions DQL personnalisées
+        dql:
+            string_functions:
+                DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
+                YEAR: DoctrineExtensions\Query\Mysql\Year
+                MONTH: DoctrineExtensions\Query\Mysql\Month
+                DAY: DoctrineExtensions\Query\Mysql\Day
 
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-          
-
 
 when@prod:
     doctrine:
@@ -55,5 +59,3 @@ when@prod:
                     adapter: cache.app
                 doctrine.system_cache_pool:
                     adapter: cache.system
-
-  

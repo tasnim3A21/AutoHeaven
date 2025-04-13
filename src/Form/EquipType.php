@@ -20,36 +20,36 @@ class EquipType extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
-                'attr' => ['class' => 'form-control'],
+              
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'attr' => ['class' => 'form-control', 'rows' => 4],
+               
             ])
             ->add('image', FileType::class, [
                 'label' => 'Image de l\'équipement',
                // This field is not directly mapped to the entity
                 'required' => true,
-                'attr' => ['class' => 'form-control-file'],
+               
             ])
             ->add('reference', TextType::class, [
                 'label' => 'Référence',
-                'attr' => ['class' => 'form-control'],
+               
             ])
             ->add('marque', TextType::class, [
                 'label' => 'Marque',
-                'attr' => ['class' => 'form-control'],
+               
             ])
             ->add('quantite', NumberType::class, [
                 'label' => 'Quantité',
                 'mapped' => false, // Not part of Equipement entity
-                'attr' => ['class' => 'form-control'],
+              
                 'data' => 0, // Default value
             ])
             ->add('prixvente', NumberType::class, [
                 'label' => 'Prix de vente',
                 'mapped' => false, // Not part of Equipement entity
-                'attr' => ['class' => 'form-control'],
+                
                 'data' => 0.0, // Default value
             ]);
            

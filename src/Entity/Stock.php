@@ -3,69 +3,70 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use App\Entity\Equipement;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Stock
 {
-
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-    #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     private int $id_s;
 
-        #[ORM\ManyToOne(targetEntity: Equipement::class, inversedBy: "stocks")]
-    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Equipement $id;
+    #[ORM\OneToOne(targetEntity: Equipement::class, inversedBy: "stock")]
+    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private ?Equipement $equipement = null;
 
     #[ORM\Column(type: "integer")]
-    #[ORM\Assert\NotBlank(message: "Quantité est obligatoire.")]
-  
+    #[Assert\NotBlank(message: "Quantité est obligatoire.")]
     private int $quantite;
 
     #[ORM\Column(type: "float")]
-    #[ORM\Assert\NotBlank(message: "Prix de vente est obligatoire.")]
-   
+    #[Assert\NotBlank(message: "Prix de vente est obligatoire.")]
     private float $prixvente;
 
-    public function getId_s()
+    public function getIdS(): ?int
     {
         return $this->id_s;
     }
 
-    public function setId_s($value)
+    public function setIdS(int $id_s): self
     {
-        $this->id_s = $value;
+        $this->id_s = $id_s;
+        return $this;
     }
 
-    public function getId()
+    public function getEquipement(): ?Equipement
     {
-        return $this->id;
+        return $this->equipement;
     }
 
-    public function setId($value)
+    public function setEquipement(?Equipement $equipement): self
     {
-        $this->id = $value;
+        $this->equipement = $equipement;
+        return $this;
     }
 
-    public function getQuantite()
+    public function getQuantite(): int
     {
         return $this->quantite;
     }
 
-    public function setQuantite($value)
+    public function setQuantite(int $quantite): self
     {
-        $this->quantite = $value;
+        $this->quantite = $quantite;
+        return $this;
     }
 
-    public function getPrixvente()
+    public function getPrixvente(): float
     {
         return $this->prixvente;
     }
 
-    public function setPrixvente($value)
+    public function setPrixvente(float $prixvente): self
     {
-        $this->prixvente = $value;
+        $this->prixvente = $prixvente;
+        return $this;
     }
 }

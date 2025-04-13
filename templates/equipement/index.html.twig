@@ -4,18 +4,25 @@
 
 {% block content %}
 <style>
-/* styles.css */
+/* styles.css (inchangé sauf ajout pour le message de confirmation) */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #fff; /* White background to match the image */
+    background-color: #fff;
 }
 
 .equipments-section {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
+}
+
+.section-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .section-title {
@@ -25,9 +32,38 @@ body {
     margin-bottom: 20px;
 }
 
+.search-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #ff5722;
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 18px;
+}
+
 .equipments-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
@@ -36,36 +72,41 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    padding: 20px; /* Increased padding to make the card taller */
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 300px; /* Increased minimum height to make the card taller */
-    text-align: left; /* Align text to the left */
+    min-height: 300px;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+
+.equipment-card:hover {
+    transform: translateY(-5px);
 }
 
 .equipment-image {
     width: 100%;
-    height: auto; /* Prevent cropping, allow natural height */
-    max-height: 150px; /* Limit max height to keep proportions */
-    object-fit: contain; /* Ensure the entire image is visible */
+    height: auto;
+    max-height: 150px;
+    object-fit: contain;
     margin-bottom: 10px;
 }
 
 .star-rating {
-    color: #ff5722; /* Orange color for stars */
+    color: #ff5722;
     font-size: 14px;
     margin-bottom: 5px;
-    text-align: center; /* Center the stars */
+    text-align: center;
 }
 
 .equipment-name {
     font-size: 16px;
     font-weight: bold;
-    color: #1a0dab; /* Blue color for the name */
+    color: #1a0dab;
     margin: 5px 0;
-    text-align: left; /* Left-aligned title */
-    vertical-align: middle; /* Center vertically within its space */
+    text-align: left;
+    vertical-align: middle;
 }
 
 .price-button-row {
@@ -73,18 +114,18 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
-    gap: 10px; /* Reduced gap between price and button */
+    gap: 10px;
 }
 
 .equipment-price {
     font-size: 16px;
     font-weight: bold;
-    color: #e91e63; /* Pink color for the price */
+    color: #e91e63;
     margin: 0;
 }
 
 .add-to-cart-btn {
-    background-color: #ff5722; /* Orange color for the button */
+    background-color: #ff5722;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -92,11 +133,58 @@ body {
     font-size: 14px;
     cursor: pointer;
     text-decoration: none;
-    display: inline-block; /* Keep button as a small rounded button */
+    display: inline-block;
+    transition: background-color 0.3s ease;
 }
 
 .add-to-cart-btn:hover {
     background-color: #e64a19;
+}
+
+.search-error {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    background-color: #ffebee;
+    color: #c62828;
+    border-radius: 8px;
+}
+
+/* Style pour le message de confirmation */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.notification.success {
+    background-color: #4caf50;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.cart-icon {
+    font-size: 24px;
+    color: #ff5722;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.cart-icon:hover {
+    color: #e64a19;
 }
 
 @media (max-width: 768px) {
@@ -106,7 +194,7 @@ body {
 
     .equipment-card {
         padding: 15px;
-        min-height: 250px; /* Adjusted for smaller screens */
+        min-height: 250px;
     }
 
     .equipment-image {
@@ -127,25 +215,239 @@ body {
     }
 
     .price-button-row {
-        gap: 8px; /* Slightly smaller gap on smaller screens */
+        gap: 8px;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 10px 35px 10px 12px;
+    }
+
+    .search-icon {
+        font-size: 16px;
+        right: 12px;
+    }
+
+    .notification {
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        padding: 10px 15px;
     }
 }
 </style>
-    <section class="equipments-section">
+
+<section class="equipments-section">
+    <div class="section-title-container">
         <h2 class="section-title">Our Equipments</h2>
-        <div class="equipments-grid">
-            {% for equipement in equipements %}
-                {% set stock = stocks|filter(s => s.id == equipement)|first %}
-             <div class="equipment-card" onclick="window.location.href='{{ path('app_equipement_detail', {'id': equipement.id}) }}'" style="cursor: pointer;">
-    <img src="{{ asset(equipement.image) }}" alt="{{ equipement.nom }}" class="equipment-image">
-    <div class="star-rating">★★★★★</div>
-    <h3 class="equipment-name">{{ equipement.nom }}</h3>
-    <div class="price-button-row">
-        <p class="equipment-price">${{ stock ? stock.prixvente|number_format(2) : 'N/A' }}</p>
-        <a href="{{ path('app_equipement_detail', {'id': equipement.id}) }}" class="add-to-cart-btn">Add To Cart</a>
+        <a href="{{ path('app_panier') }}" class="cart-icon">
+            <i class="fa fa-shopping-cart"></i>
+        </a>
     </div>
-</div>
-            {% endfor %}
-        </div>
-    </section>
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search equipments..." autocomplete="off">
+        <span class="search-icon">🔍</span>
+    </div>
+    <div class="equipments-grid" id="equipmentsGrid">
+        {% for equipement in equipements %}
+            <div class="equipment-card" onclick="window.location.href='{{ path('app_equipement_detail', {'id': equipement.id}) }}'" style="cursor: pointer;">
+                <img src="{{ asset(equipement.image) }}" alt="{{ equipement.nom }}" class="equipment-image">
+                <div class="star-rating">★★★★★</div>
+                <h3 class="equipment-name">{{ equipement.nom }}</h3>
+                <div class="price-button-row">
+                    <p class="equipment-price">${{ equipement.stock ? equipement.stock.prixvente|number_format(2) : 'N/A' }}</p>
+                    <button class="add-to-cart-btn" data-equipement-id="{{ equipement.id }}">Add To Cart</button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const equipmentsGrid = document.getElementById('equipmentsGrid');
+    const originalContent = equipmentsGrid.innerHTML;
+    let searchTimeout;
+
+    // Fonction pour afficher les notifications
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type} show`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Gestion des boutons "Add to Cart"
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.stopPropagation(); // Empêche la redirection de la carte entière
+
+            const equipementId = this.getAttribute('data-equipement-id');
+
+            fetch(`/equipement/add-to-cart/${equipementId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'quantity=1' // Quantité par défaut
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                showNotification('An error occurred while adding to cart.', 'error');
+            });
+        });
+    });
+
+    // Recherche d'équipements (code existant)
+    function searchEquipments(searchTerm) {
+        if (searchTerm.length === 0) {
+            equipmentsGrid.innerHTML = originalContent;
+            // Ré-attacher les gestionnaires d'événements pour les nouveaux boutons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation();
+
+                    const equipementId = this.getAttribute('data-equipement-id');
+
+                    fetch(`/equipement/add-to-cart/${equipementId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: 'quantity=1'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                        } else {
+                            showNotification(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        showNotification('An error occurred while adding to cart.', 'error');
+                    });
+                });
+            });
+            return;
+        }
+
+        fetch(`/equipement/search?search=${encodeURIComponent(searchTerm)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    throw new Error(`Invalid response: ${text.substring(0, 100)}...`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.message || data.error);
+            }
+
+            if (!data.data || data.data.length === 0) {
+                equipmentsGrid.innerHTML = `
+                    <div class="search-error" style="grid-column: 1 / -1;">
+                        No equipment found for "${searchTerm}"
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            data.data.forEach(equipement => {
+                html += `
+                    <div class="equipment-card" onclick="window.location.href='/equipement/${equipement.id}'" style="cursor: pointer;">
+                        <img src="${equipement.image}" alt="${equipement.nom}" class="equipment-image">
+                        <div class="star-rating">★★★★★</div>
+                        <h3 class="equipment-name">${equipement.nom}</h3>
+                        <div class="price-button-row">
+                            <p class="equipment-price">$${equipement.prix}</p>
+                            <button class="add-to-cart-btn" data-equipement-id="${equipement.id}">Add To Cart</button>
+                        </div>
+                    </div>
+                `;
+            });
+            equipmentsGrid.innerHTML = html;
+
+            // Attacher les gestionnaires d'événements aux nouveaux boutons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.stopPropagation();
+
+                    const equipementId = this.getAttribute('data-equipement-id');
+
+                    fetch(`/equipement/add-to-cart/${equipementId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: 'quantity=1'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification(data.message, 'success');
+                        } else {
+                            showNotification(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        showNotification('An error occurred while adding to cart.', 'error');
+                    });
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            equipmentsGrid.innerHTML = `
+                <div class="search-error">
+                    <p>Search temporarily unavailable. Please try again later.</p>
+                    <details>
+                        <summary>Technical details</summary>
+                        <small>${error.message}</small>
+                    </details>
+                </div>
+            `;
+        });
+    }
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const searchTerm = this.value.trim();
+        
+        searchTimeout = setTimeout(() => {
+            searchEquipments(searchTerm);
+        }, 300);
+    });
+});
+</script>
 {% endblock %}
