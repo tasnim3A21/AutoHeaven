@@ -123,4 +123,19 @@ class Res_mecanicien
     {
         $this->status = $value;
     }
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id_mec", referencedColumnName: "id")]
+    private ?User $mecanicien = null;
+
+    public function getMecanicien(): ?User
+    {
+        return $this->mecanicien;
+    }
+
+    public function setMecanicien(?User $mecanicien): self
+    {
+        $this->mecanicien = $mecanicien;
+        return $this;
+    }
 }

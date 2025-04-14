@@ -84,4 +84,24 @@ final class ReservationRemorquageController extends AbstractController
 
         return $this->redirectToRoute('app_reservation_remorquage');
     }
+
+    #[Route('/reservation/remorquage/new', name: 'app_reservation_remorquage_new')]
+    public function new(Request $request): Response
+    {
+        $reservation = new Res_remorquage();
+        $form = $this->createForm(ResRemorquageType::class, $reservation);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
+            $this->entityManager->persist($reservation);
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('reservation_remorquage/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }

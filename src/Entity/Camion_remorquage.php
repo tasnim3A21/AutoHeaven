@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
@@ -12,6 +14,16 @@ class Camion_remorquage
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_cr;
+
+    #[ORM\Column(type:"string", length: 25)]
+    #[Assert\NotBlank(message: "Le nom de l'agence ne peut pas être vide")]
+    private string $nom_agence = '';  // Initialize with empty string
+
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+        $this->nom_agence = '';  // Initialize in constructor as well
+    }
 
     #[ORM\Column(type: "string")]
     #[Assert\NotBlank(message: "Le modèle ne peut pas être vide")]
@@ -90,5 +102,46 @@ class Camion_remorquage
     public function setStatut($value)
     {
         $this->statut = $value;
+    }
+
+    public function getNomAgence(): ?string
+    {
+        return $this->nom_agence;
+    }
+
+    public function setNomAgence(string $nom_agence): static
+    {
+        $this->nom_agence = $nom_agence;
+        return $this;
+    }
+
+    #[ORM\OneToMany(mappedBy: 'camionRemorquage', targetEntity: Res_remorquage::class)]
+    private Collection|array $reservations;
+
+    /**
+     * @return Collection<int, Res_remorquage>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Res_remorquage $reservation): self
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setCamionRemorquage($this);
+        }
+        return $this;
+    }
+
+    public function removeReservation(Res_remorquage $reservation): self
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            if ($reservation->getCamionRemorquage() === $this) {
+                $reservation->setCamionRemorquage(null);
+            }
+        }
+        return $this;
     }
 }
