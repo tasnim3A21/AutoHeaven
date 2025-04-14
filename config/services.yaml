@@ -6,6 +6,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
+    env(STRIPE_SECRET_KEY): '%env(STRIPE_SECRET_KEY)%'
+    env(STRIPE_CURRENCY): '%env(STRIPE_CURRENCY)%'
 
 services:
     # default configuration for services in this file
@@ -31,4 +33,8 @@ services:
 
     # Symfony Finder service (already configured)
     Symfony\Component\Finder\Finder: ~
+    App\Service\StripeService:
+        arguments:
+            $privateKey: 'sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk'
+            $currency: 'eur'
 

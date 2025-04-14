@@ -34,6 +34,7 @@ final class PanierController extends AbstractController
     
         $paniers = $entityManager->getRepository(Panier::class)->findBy(['id' => $user]);
     
+        
         $subtotal = 0;
         foreach ($paniers as $panier) {
             $equipement = $panier->getId_e();
