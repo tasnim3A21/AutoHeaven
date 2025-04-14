@@ -1,9 +1,41 @@
 {% extends 'base_admin.html.twig' %}
 
-{% block title %}Reservation Remorquage{% endblock %}
+{% block title %}Réservations Remorquage{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+<div class="container">
+    <h1>Réservations Remorquage</h1>
 
-
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID Camion</th>
+                <th>ID Utilisateur</th>
+                <th>Point de ramassage</th>
+                <th>Point de dépôt</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.id_rem }}</td>
+                <td>{{ reservation.idCr }}</td>
+                <td>{{ reservation.idU }}</td>
+                <td>{{ reservation.pointRamassage }}</td>
+                <td>{{ reservation.pointDepot }}</td>
+                <td>{{ reservation.date|date('Y-m-d') }}</td>
+                <td>{{ reservation.status }}</td>
+                <td>
+                    <a href="{{ path('app_reservation_remorquage_edit', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ path('app_reservation_remorquage_delete', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

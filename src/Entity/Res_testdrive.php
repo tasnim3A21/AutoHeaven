@@ -10,6 +10,7 @@ class Res_testdrive
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_td;
 
@@ -35,22 +36,22 @@ class Res_testdrive
         $this->id_td = $value;
     }
 
-    public function getId_u()
+    public function getIdU()
     {
         return $this->id_u;
     }
 
-    public function setId_u($value)
+    public function setIdU($value)
     {
         $this->id_u = $value;
     }
 
-    public function getId_v()
+    public function getIdV()
     {
         return $this->id_v;
     }
 
-    public function setId_v($value)
+    public function setIdV($value)
     {
         $this->id_v = $value;
     }
