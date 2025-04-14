@@ -24,6 +24,8 @@ class Equipement
 
     #[ORM\Column(type: "text")]
     #[Assert\NotBlank(message: "Description est obligatoire.")]
+    #[Assert\Length(min: 10, minMessage: "La description doit contenir au moins {{ limit }} caractères.")]
+    #[Assert\Length(max: 1000, maxMessage: "La description ne doit pas dépasser {{ limit }} caractères.")]
     private string $description;
 
     #[ORM\Column(type: "text")]

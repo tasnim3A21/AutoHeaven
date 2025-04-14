@@ -23,10 +23,12 @@ class Stock
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(message: "Quantité est obligatoire.")]
+    #[Assert\Positive(message: "La quantité doit être positive.")]
     private int $quantite;
 
     #[ORM\Column(type: "float")]
     #[Assert\NotBlank(message: "Prix de vente est obligatoire.")]
+    #[Assert\Positive(message: "Le prix de vente doit être positif.")]
     private float $prixvente;
 
     public function getIdS(): ?int
