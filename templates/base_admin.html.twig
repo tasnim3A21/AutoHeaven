@@ -16,6 +16,7 @@
      {%block fontjs %}
     <!-- FontAwesome JS -->
     <script defer src="{{ asset('plugins/fontawesome/js/all.min.js') }}"></script>
+
     <style>
         .reduction-badge { 
             background-color: #ff0000; /* Rouge */
@@ -27,6 +28,9 @@
             z-index: 10;
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 {% endblock %}
 </head>
@@ -170,13 +174,25 @@
                 </a>
             </li>
             <li class="nav-item">
-               <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_test_drive' %}active{% endif %}" href="{{ path('app_reservation_test_drive') }}">
+                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_test_drive' %}active{% endif %}" href="{{ path('app_reservation_test_drive') }}">
                     <span class="nav-icon">
-                        <i class="fas fa-car-side"></i>
+                        <i class="fas fa-calendar-check"></i>
                     </span>
-                    <span class="nav-link-text">Réservation TestDRIVE</span>
+                    <span class="nav-link-text">Réservation TestDrive</span>
                 </a>
             </li>
+           <li class="nav-item">
+  <a class="nav-link {% if app.request.attributes.get('_route') == 'app_statistique' %}active{% endif %}" href="{{ path('app_statistique') }}">
+    <span class="nav-icon">
+        <i class="fas fa-chart-bar"></i>
+    </span>
+    <span class="nav-link-text">Statistique Avis</span>
+</a>
+
+
+
+</li>
+
         </ul>
     </nav>
 <div class="app-sidepanel-footer"> 

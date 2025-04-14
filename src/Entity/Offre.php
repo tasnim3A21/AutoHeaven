@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -7,9 +8,11 @@ use App\Entity\Equipement;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+
 #[ORM\Entity]
 class Offre
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]  // Add this line to auto-generate the ID
     #[ORM\Column(type: "integer")]
@@ -22,6 +25,7 @@ class Offre
 
     #[ORM\Column(type: "string", length: 255)]
     private string $type_offre;  // Correctly named with underscore
+
 
     #[ORM\Column(type: "string", length: 255)]
     private string $description;
@@ -39,6 +43,7 @@ class Offre
     private string $image;
 
 
+
 /**
  * @Assert\Callback
  */
@@ -54,14 +59,18 @@ public function validateDates(ExecutionContextInterface $context): void
 
     // Correct getters and setters with snake_case
     public function getIdOffre()
+
     {
         return $this->id_offre;
     }
 
+
     public function setIdOffre($value)
+
     {
         $this->id_offre = $value;
     }
+
 
     public function getEquipement(): Equipement
     {
@@ -90,6 +99,7 @@ public function validateDates(ExecutionContextInterface $context): void
         return $this->description;
     }
 
+
     public function setDescription(string $value): self
     {
         $this->description = $value;
@@ -100,6 +110,7 @@ public function validateDates(ExecutionContextInterface $context): void
     {
         return $this->taux_reduction;
     }
+
 
     public function setTauxReduction(float $value): self
     {
@@ -112,6 +123,7 @@ public function validateDates(ExecutionContextInterface $context): void
         return $this->date_debut;
     }
 
+
     public function setDateDebut(\DateTimeInterface $value): self
     {
         $this->date_debut = $value;
@@ -123,6 +135,7 @@ public function validateDates(ExecutionContextInterface $context): void
         return $this->date_fin;
     }
 
+
     public function setDateFin(\DateTimeInterface $value): self
     {
         $this->date_fin = $value;
@@ -133,6 +146,7 @@ public function validateDates(ExecutionContextInterface $context): void
     {
         return $this->image;
     }
+
 
     public function setImage(string $value): self
     {

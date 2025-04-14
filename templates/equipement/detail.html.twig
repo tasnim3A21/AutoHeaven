@@ -1,0 +1,285 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Equipement Detail{% endblock %}
+{% block spinner %} {% endblock %}
+{% block content %}
+<style>
+/* styles.css reste identique à votre version originale */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+}
+
+.detail-section {
+    width: 100%;
+    margin: 40px 0;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.equipment-detail {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1200px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.equipment-image {
+    width: 65%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    margin-right: 0;
+}
+
+.equipment-info {
+    width: 35%;
+    padding: 20px;
+    text-align: left;
+    background-color: #fff;
+}
+
+.breadcrumb {
+    font-size: 14px;
+    color: #1a0dab;
+    margin-bottom: 10px;
+}
+
+.breadcrumb a {
+    color: #1a0dab;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.equipment-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.star-rating {
+    color: #ffca28;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.equipment-description {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.price-row {
+    margin-top: 10px;
+}
+
+.equipment-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff5722;
+}
+
+.quantity-button-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 20px;
+    gap: 15px;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.quantity-selector button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+.quantity-selector input {
+    width: 30px;
+    text-align: center;
+    border: none;
+    font-size: 14px;
+    background: none;
+    outline: none;
+    -moz-appearance: textfield;
+}
+
+.quantity-selector input::-webkit-outer-spin-button,
+.quantity-selector input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.add-to-cart-btn {
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #e64a19;
+}
+
+.equipment-details {
+    font-size: 14px;
+    color: #333;
+    margin-top: 20px;
+}
+
+.equipment-details strong {
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .equipment-detail {
+        flex-direction: column;
+    }
+
+    .equipment-image {
+        width: 100%;
+        max-height: 300px;
+        margin-bottom: 15px;
+    }
+
+    .equipment-info {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .equipment-name {
+        font-size: 22px;
+    }
+
+    .equipment-price {
+        font-size: 20px;
+    }
+
+    .add-to-cart-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
+    .quantity-button-row {
+        flex-direction: row;
+        gap: 10px;
+    }
+}
+</style>
+
+<div class="container py-5">
+    <div class="row align-items-center">
+        <!-- Image Section -->
+        <div class="col-md-6">
+            <div class="w-100 h-100 d-flex justify-content-center align-items-center overflow-hidden" style="max-height: 500px;">
+                <img src="{{ asset(equipement.image) }}" alt="{{ equipement.nom }}" class="img-fluid w-100 h-100 object-fit-cover" style="object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold">{{ equipement.nom }}</h1>
+            <p class="text-muted mt-3">{{ equipement.description }}</p>
+            <div class="mt-3">
+                <span class="text-danger h4 fw-semibold">${{ stock.prixvente|number_format(2) }}</span>
+            </div>
+            <p class="mt-2">Available Stock: <span id="available-stock">{{ stock.quantite }}</span></p>
+
+            <form id="add-to-cart-form" action="{{ path('app_add_to_cart', {'id': equipement.id}) }}" method="POST">
+                <div class="mt-4 quantity-button-row">
+                    <div class="quantity-selector">
+                        <button type="button" onclick="updateQuantity(-1)">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" step="1">
+                        <button type="button" onclick="updateQuantity(1)">+</button>
+                    </div>
+                    <button type="submit" class="add-to-cart-btn">Add to cart</button>
+                </div>
+            </form>
+
+            <div class="mt-5">
+                <p><strong>Categories:</strong> {{ equipement.marque }}</p>
+                <p><strong>Parts Model:</strong> {{ equipement.reference }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateQuantity(change) {
+    const input = document.getElementById('quantity');
+    let currentValue = parseInt(input.value) || 1;
+    currentValue = Math.max(1, currentValue + change);
+    input.value = currentValue;
+}
+
+document.getElementById('quantity').addEventListener('input', function(e) {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 1) {
+        this.value = 1;
+    }
+});
+
+document.getElementById('add-to-cart-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const quantityInput = document.getElementById('quantity');
+    const requestedQuantity = parseInt(quantityInput.value);
+    const availableStock = parseInt(document.getElementById('available-stock').textContent);
+
+    if (requestedQuantity > availableStock) {
+        alert('Requested quantity exceeds available stock. Only ' + availableStock + ' items are available.');
+        return;
+    }
+
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: form.method,
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success === false) {
+            alert(data.message);
+        } else {
+            window.location.href = '{{ path('app_panier') }}';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding to cart.');
+    });
+});
+</script>
+{% endblock %}

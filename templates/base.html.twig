@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -99,13 +100,14 @@
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                     <div class="dropdown-menu fade-up m-0">
-                        <a href="{{ path('app_booking') }}" class="dropdown-item {{ app.request.get('_route') == 'app_booking' ? 'active' : '' }}">Booking</a>
+                        <a href="{{ path('app_booking') }}" class="dropdown-item {{ app.request.get('_route') == 'app_booking' ? 'active' : '' }}">Reservations</a>
                         <a href="{{ path('app_technicians') }}" class="dropdown-item {{ app.request.get('_route') == 'app_technicians' ? 'active' : '' }}">Technicians</a>
                         <a href="{{ path('app_testimonial') }}" class="dropdown-item {{ app.request.get('_route') == 'app_testimonial' ? 'active' : '' }}">Testimonial</a>
                         <a href="{{ path('app_car') }}" class="dropdown-item {{ app.request.get('_route') == 'app_car' ? 'active' : '' }}">Cars</a>
                          <a href="{{ path('app_equipement') }}" class="dropdown-item {{ app.request.get('_route') == 'app_equipement' ? 'active' : '' }}">Equipments</a>
                           <a href="{{ path('app_reclamation') }}" class="dropdown-item {{ app.request.get('_route') == 'app_reclamation' ? 'active' : '' }}">Reclamation</a>
-                        
+                           <a href="{{ path('app_avis_index') }}" class="dropdown-item {{ app.request.get('_route') == 'app_avis_index' ? 'active' : '' }}">Avis</a>
+                       
                     </div>
                 </div>
                 <a href="{{ path('app_profile') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">Profile</a>

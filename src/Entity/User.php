@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -195,6 +196,7 @@ private ?string $reponse = null;
         $this->email = $value;
     }
 
+
     public function setPassword($value)
     {
         $this->password = $value;
@@ -299,6 +301,7 @@ private ?string $reponse = null;
         return $this;
     }
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
 
@@ -331,6 +334,7 @@ private ?string $reponse = null;
         return $this;
     }
 
+
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Messagerie::class)]
     private Collection $messageries;
 
@@ -340,6 +344,8 @@ private ?string $reponse = null;
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reservation::class)]
     private Collection $reservations;
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;
+
 }
