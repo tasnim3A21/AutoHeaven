@@ -25,25 +25,15 @@ class ResMecanicienType extends AbstractType
             ])
             ->add('adresse', TextType::class, [
                 'label' => 'Adresse',
-                'attr' => [
-                    'class' => 'form-control',
-                    'maxlength' => 25
-                ]
+                'attr' => ['class' => 'form-control']
             ])
             ->add('note', TextType::class, [
                 'label' => 'Note',
-                'attr' => [
-                    'class' => 'form-control',
-                    'maxlength' => 100
-                ]
+                'attr' => ['class' => 'form-control']
             ])
             ->add('date', DateType::class, [
                 'label' => 'Date',
                 'widget' => 'single_text',
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('status', TextType::class, [
-                'label' => 'Status',
                 'attr' => ['class' => 'form-control']
             ]);
     }

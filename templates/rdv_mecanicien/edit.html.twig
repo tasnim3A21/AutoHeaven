@@ -6,10 +6,41 @@
 <div class="container">
     <h1>Edit Réservation</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    {{ form_end(form) }}
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+        {{ form_widget(form._token) }}
+        
+        <div class="mb-3">
+            {{ form_label(form.id_u) }}
+            {{ form_widget(form.id_u) }}
+            {{ form_errors(form.id_u) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.id_mec) }}
+            {{ form_widget(form.id_mec) }}
+            {{ form_errors(form.id_mec) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.adresse) }}
+            {{ form_widget(form.adresse) }}
+            {{ form_errors(form.adresse) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.note) }}
+            {{ form_widget(form.note) }}
+            {{ form_errors(form.note) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.date) }}
+            {{ form_widget(form.date) }}
+            {{ form_errors(form.date) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+    {{ form_end(form, {'render_rest': false}) }}
 
     <a href="{{ path('app_rdv_mecanicien') }}" class="btn btn-secondary mt-3">Back to list</a>
 </div>

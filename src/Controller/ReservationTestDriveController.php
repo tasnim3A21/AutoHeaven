@@ -28,6 +28,7 @@ final class ReservationTestDriveController extends AbstractController
         
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
             return $this->redirectToRoute('app_reservation_test_drive');
@@ -46,6 +47,7 @@ final class ReservationTestDriveController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
             $this->entityManager->flush();
             return $this->redirectToRoute('app_reservation_test_drive');
         }
@@ -60,6 +62,24 @@ final class ReservationTestDriveController extends AbstractController
     public function delete(Res_testdrive $reservation): Response
     {
         $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_reservation_test_drive');
+    }
+
+    #[Route('/reservation/test/drive/confirm/{id}', name: 'app_reservation_test_drive_confirm')]
+    public function confirm(Res_testdrive $reservation): Response
+    {
+        $reservation->setStatus('confirmee');
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_reservation_test_drive');
+    }
+
+    #[Route('/reservation/test/drive/reject/{id}', name: 'app_reservation_test_drive_reject')]
+    public function reject(Res_testdrive $reservation): Response
+    {
+        $reservation->setStatus('rejetee');
         $this->entityManager->flush();
 
         return $this->redirectToRoute('app_reservation_test_drive');
