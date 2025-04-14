@@ -1,9 +1,37 @@
 {% extends 'base_admin.html.twig' %}
 
-{% block title %}Reservation TestDrive{% endblock %}
+{% block title %}Réservations Test Drive{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+<div class="container">
+    <h1>Réservations Test Drive</h1>
 
-
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID Utilisateur</th>
+                <th>ID Véhicule</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.id_td }}</td>
+                <td>{{ reservation.idU }}</td>
+                <td>{{ reservation.idV }}</td>
+                <td>{{ reservation.date|date('Y-m-d') }}</td>
+                <td>{{ reservation.status }}</td>
+                <td>
+                    <a href="{{ path('app_reservation_test_drive_edit', {'id': reservation.id_td}) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ path('app_reservation_test_drive_delete', {'id': reservation.id_td}) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

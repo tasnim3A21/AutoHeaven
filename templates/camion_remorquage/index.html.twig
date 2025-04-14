@@ -3,7 +3,43 @@
 {% block title %}Camion Remorquage{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+<div class="container">
+    <h1>Camion Remorquage</h1>
 
+    <div class="form-container">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn-add">Ajouter Camion</button>
+        {{ form_end(form) }}
+    </div>
 
+    <h2>Liste des Camions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Modèle</th>
+                <th>Année</th>
+                <th>Numéro de téléphone</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for camion in camions %}
+            <tr>
+                <td>{{ camion.id_cr }}</td>
+                <td>{{ camion.modele }}</td>
+                <td>{{ camion.annee }}</td>
+                <td>{{ camion.numTel }}</td>
+                <td>{{ camion.statut }}</td>
+                <td class="action-links">
+                    <a href="{{ path('app_camion_remorquage_edit', {'id': camion.id_cr}) }}" class="edit-link">Edit</a>
+                    <a href="{{ path('app_camion_remorquage_delete', {'id': camion.id_cr}) }}" class="delete-link">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

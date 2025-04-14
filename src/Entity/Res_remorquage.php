@@ -10,6 +10,7 @@ class Res_remorquage
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_rem;
 
@@ -28,6 +29,9 @@ class Res_remorquage
     #[ORM\Column(type: "date")]
     private \DateTimeInterface $date;
 
+    #[ORM\Column(type: "string")]
+    private string $status;
+
     public function getId_rem()
     {
         return $this->id_rem;
@@ -38,42 +42,42 @@ class Res_remorquage
         $this->id_rem = $value;
     }
 
-    public function getId_cr()
+    public function getIdCr()
     {
         return $this->id_cr;
     }
 
-    public function setId_cr($value)
+    public function setIdCr($value)
     {
         $this->id_cr = $value;
     }
 
-    public function getId_u()
+    public function getIdU()
     {
         return $this->id_u;
     }
 
-    public function setId_u($value)
+    public function setIdU($value)
     {
         $this->id_u = $value;
     }
 
-    public function getPoint_ramassage()
+    public function getPointRamassage()
     {
         return $this->point_ramassage;
     }
 
-    public function setPoint_ramassage($value)
+    public function setPointRamassage($value)
     {
         $this->point_ramassage = $value;
     }
 
-    public function getPoint_depot()
+    public function getPointDepot()
     {
         return $this->point_depot;
     }
 
-    public function setPoint_depot($value)
+    public function setPointDepot($value)
     {
         $this->point_depot = $value;
     }
@@ -86,5 +90,15 @@ class Res_remorquage
     public function setDate($value)
     {
         $this->date = $value;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($value)
+    {
+        $this->status = $value;
     }
 }

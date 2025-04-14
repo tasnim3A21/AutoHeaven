@@ -10,6 +10,7 @@ class Camion_remorquage
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_cr;
 
@@ -22,20 +23,12 @@ class Camion_remorquage
     #[ORM\Column(type: "string", length: 8)]
     private string $num_tel;
 
-
-
     #[ORM\Column(type: "string")]
-
     private string $statut;
 
     public function getId_cr()
     {
         return $this->id_cr;
-    }
-
-    public function setId_cr($value)
-    {
-        $this->id_cr = $value;
     }
 
     public function getModele()
@@ -58,12 +51,12 @@ class Camion_remorquage
         $this->annee = $value;
     }
 
-    public function getNum_tel()
+    public function getNumTel()
     {
         return $this->num_tel;
     }
 
-    public function setNum_tel($value)
+    public function setNumTel($value)
     {
         $this->num_tel = $value;
     }

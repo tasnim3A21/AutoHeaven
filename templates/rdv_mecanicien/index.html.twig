@@ -1,9 +1,42 @@
 {% extends 'base_admin.html.twig' %}
 
-{% block title %}Rdv MecanicienC{% endblock %}
+{% block title %}Réservations Mécanicien{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+<div class="container">
+    <h1>Réservations Mécanicien</h1>
 
 
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID Utilisateur</th>
+                <th>ID Mécanicien</th>
+                <th>Adresse</th>
+                <th>Note</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.id_res_m }}</td>
+                <td>{{ reservation.idU }}</td>
+                <td>{{ reservation.idMec }}</td>
+                <td>{{ reservation.adresse }}</td>
+                <td>{{ reservation.note }}</td>
+                <td>{{ reservation.date|date('Y-m-d') }}</td>
+                <td>{{ reservation.status }}</td>
+                <td>
+                    <a href="{{ path('app_rdv_mecanicien_edit', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ path('app_rdv_mecanicien_delete', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

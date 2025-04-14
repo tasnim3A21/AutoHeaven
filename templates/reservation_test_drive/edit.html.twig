@@ -1,0 +1,16 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Edit Réservation Test Drive{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Réservation Test Drive</h1>
+
+    {{ form_start(form, {'attr': {'class': 'mt-4'}}) }}
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_reservation_test_drive') }}" class="btn btn-secondary mt-3">Back to list</a>
+</div>
+{% endblock %}
