@@ -6,16 +6,21 @@
 <div class="container">
     <h1>Réservations Remorquage</h1>
 
-    <table class="table">
+    {# Search Bar #}
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+    </div>
+
+    <table class="table" id="reservationTable">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>ID Camion</th>
-                <th>ID Utilisateur</th>
-                <th>Point de ramassage</th>
-                <th>Point de dépôt</th>
-                <th>Date</th>
-                <th>Status</th>
+                <th class="sortable" data-sort="id">ID</th>
+                <th class="sortable" data-sort="camion">ID Camion</th>
+                <th class="sortable" data-sort="user">ID Utilisateur</th>
+                <th class="sortable" data-sort="ramassage">Point de ramassage</th>
+                <th class="sortable" data-sort="depot">Point de dépôt</th>
+                <th class="sortable" data-sort="date">Date</th>
+                <th class="sortable" data-sort="status">Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -30,12 +35,92 @@
                 <td>{{ reservation.date|date('Y-m-d') }}</td>
                 <td>{{ reservation.status }}</td>
                 <td>
-                    <a href="{{ path('app_reservation_remorquage_edit', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{{ path('app_reservation_remorquage_delete', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-danger">Delete</a>
+                    {% if reservation.status == 'en_cours_de_traitement' %}
+                        <a href="{{ path('app_reservation_remorquage_confirm', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-success">Confirmée</a>
+                        <a href="{{ path('app_reservation_remorquage_reject', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-warning">Rejetée</a>
+                    {% else %}
+                        <a href="{{ path('app_reservation_remorquage_edit', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ path('app_reservation_remorquage_delete', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-danger">Delete</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('reservationTable');
+    const rows = table.getElementsByTagName('tr');
+    const sortableHeaders = document.querySelectorAll('.sortable');
+
+    // Search functionality
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        for(let i = 1; i < rows.length; i++) {
+            let found = false;
+            const cells = rows[i].getElementsByTagName('td');
+            
+            for(let j = 0; j < cells.length - 1; j++) {
+                const cellText = cells[j].textContent.toLowerCase();
+                if(cellText.includes(searchTerm)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            rows[i].style.display = found ? '' : 'none';
+        }
+    });
+
+    // Sorting functionality
+    let sortDirection = 1;
+
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.dataset.sort;
+            const columnIndex = Array.from(this.parentElement.children).indexOf(this);
+            
+            const rowsArray = Array.from(table.getElementsByTagName('tr')).slice(1);
+            
+            rowsArray.sort((a, b) => {
+                let aValue = a.getElementsByTagName('td')[columnIndex].textContent;
+                let bValue = b.getElementsByTagName('td')[columnIndex].textContent;
+                
+                if (column === 'date') {
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
+                    return sortDirection * (aValue - bValue);
+                } else if (column === 'id' || column === 'camion' || column === 'user') {
+                    return sortDirection * (parseInt(aValue) - parseInt(bValue));
+                } else {
+                    return sortDirection * aValue.localeCompare(bValue, 'fr');
+                }
+            });
+            
+            sortDirection *= -1;
+            
+            const tbody = table.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            rowsArray.forEach(row => tbody.appendChild(row));
+        });
+    });
+});
+</script>
+{% endblock %}
+
+<style>
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+.sortable:hover {
+    background-color: #f8f9fa;
+}
+</style>
+
 {% endblock %}

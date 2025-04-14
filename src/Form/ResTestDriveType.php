@@ -27,16 +27,6 @@ class ResTestDriveType extends AbstractType
                 'label' => 'Date',
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control']
-            ])
-            ->add('status', ChoiceType::class, [
-                'label' => 'Statut',
-                'choices' => [
-                    'En attente' => 'en_attente',
-                    'Confirmé' => 'confirme',
-                    'Terminé' => 'termine',
-                    'Annulé' => 'annule'
-                ],
-                'attr' => ['class' => 'form-control']
             ]);
     }
 

@@ -3,27 +3,48 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Camion_remorquage
 {
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_cr;
 
     #[ORM\Column(type: "string")]
+    #[Assert\NotBlank(message: "Le modèle ne peut pas être vide")]
+    #[Assert\Choice(choices: ["Standard", "XL"], message: "Le modèle doit être soit Standard soit XL")]
     private string $modele;
 
     #[ORM\Column(type: "integer")]
+    #[Assert\NotBlank(message: "L'année ne peut pas être vide")]
+    #[Assert\Range(
+        min: 1990,
+        max: 2025,
+        notInRangeMessage: "L'année doit être entre {{ min }} et {{ max }}"
+    )]
     private int $annee;
 
     #[ORM\Column(type: "string", length: 8)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide")]
+    #[Assert\Length(
+        exactly: 8,
+        exactMessage: "Le numéro de téléphone doit contenir exactement {{ limit }} chiffres"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[0-9]+$/",
+        message: "Le numéro de téléphone ne doit contenir que des chiffres"
+    )]
     private string $num_tel;
 
     #[ORM\Column(type: "string")]
+    #[Assert\NotBlank(message: "Le statut ne peut pas être vide")]
+    #[Assert\Choice(
+        choices: ["Disponible", "Non Disponible"],
+        message: "Le statut doit être soit Disponible soit Non Disponible"
+    )]
     private string $statut;
 
     public function getId_cr()

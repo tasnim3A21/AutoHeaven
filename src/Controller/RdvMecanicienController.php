@@ -28,6 +28,7 @@ final class RdvMecanicienController extends AbstractController
         
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
             return $this->redirectToRoute('app_rdv_mecanicien');
@@ -46,7 +47,10 @@ final class RdvMecanicienController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
+            $this->entityManager->persist($reservation);
             $this->entityManager->flush();
+            
             return $this->redirectToRoute('app_rdv_mecanicien');
         }
 
@@ -60,6 +64,24 @@ final class RdvMecanicienController extends AbstractController
     public function delete(Res_mecanicien $reservation): Response
     {
         $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_rdv_mecanicien');
+    }
+
+    #[Route('/rdv/mecanicien/confirm/{id}', name: 'app_rdv_mecanicien_confirm')]
+    public function confirm(Res_mecanicien $reservation): Response
+    {
+        $reservation->setStatus('confirmee');
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_rdv_mecanicien');
+    }
+
+    #[Route('/rdv/mecanicien/reject/{id}', name: 'app_rdv_mecanicien_reject')]
+    public function reject(Res_mecanicien $reservation): Response
+    {
+        $reservation->setStatus('rejetee');
         $this->entityManager->flush();
 
         return $this->redirectToRoute('app_rdv_mecanicien');

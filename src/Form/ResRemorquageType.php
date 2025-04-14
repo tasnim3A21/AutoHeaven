@@ -25,25 +25,15 @@ class ResRemorquageType extends AbstractType
             ])
             ->add('point_ramassage', TextType::class, [
                 'label' => 'Point de ramassage',
-                'attr' => [
-                    'class' => 'form-control',
-                    'maxlength' => 25
-                ]
+                'attr' => ['class' => 'form-control']
             ])
             ->add('point_depot', TextType::class, [
                 'label' => 'Point de dépôt',
-                'attr' => [
-                    'class' => 'form-control',
-                    'maxlength' => 25
-                ]
+                'attr' => ['class' => 'form-control']
             ])
             ->add('date', DateType::class, [
                 'label' => 'Date',
                 'widget' => 'single_text',
-                'attr' => ['class' => 'form-control']
-            ])
-            ->add('status', TextType::class, [
-                'label' => 'Status',
                 'attr' => ['class' => 'form-control']
             ]);
     }

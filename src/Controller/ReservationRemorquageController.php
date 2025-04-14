@@ -28,6 +28,7 @@ final class ReservationRemorquageController extends AbstractController
         
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
             return $this->redirectToRoute('app_reservation_remorquage');
@@ -46,6 +47,7 @@ final class ReservationRemorquageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
             $this->entityManager->flush();
             return $this->redirectToRoute('app_reservation_remorquage');
         }
@@ -60,6 +62,24 @@ final class ReservationRemorquageController extends AbstractController
     public function delete(Res_remorquage $reservation): Response
     {
         $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_reservation_remorquage');
+    }
+
+    #[Route('/reservation/remorquage/confirm/{id}', name: 'app_reservation_remorquage_confirm')]
+    public function confirm(Res_remorquage $reservation): Response
+    {
+        $reservation->setStatus('confirmee');
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_reservation_remorquage');
+    }
+
+    #[Route('/reservation/remorquage/reject/{id}', name: 'app_reservation_remorquage_reject')]
+    public function reject(Res_remorquage $reservation): Response
+    {
+        $reservation->setStatus('rejetee');
         $this->entityManager->flush();
 
         return $this->redirectToRoute('app_reservation_remorquage');
