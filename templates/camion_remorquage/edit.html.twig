@@ -1,0 +1,39 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Edit Camion Remorquage{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Camion Remorquage</h1>
+
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+        <div class="mb-3">
+            {{ form_label(form.modele) }}
+            {{ form_widget(form.modele) }}
+            {{ form_errors(form.modele) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.annee) }}
+            {{ form_widget(form.annee) }}
+            {{ form_errors(form.annee) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.num_tel) }}
+            {{ form_widget(form.num_tel) }}
+            {{ form_errors(form.num_tel) }}
+        </div>
+        
+        <div class="mb-3">
+            {{ form_label(form.statut) }}
+            {{ form_widget(form.statut) }}
+            {{ form_errors(form.statut) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+    {{ form_end(form, {'render_rest': false}) }}
+
+    <a href="{{ path('app_camion_remorquage') }}" class="btn btn-secondary mt-3">Back to list</a>
+</div>
+{% endblock %}

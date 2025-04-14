@@ -13,6 +13,7 @@ class LignecommandeRepository extends ServiceEntityRepository
         parent::__construct($registry, Lignecommande::class);
     }
 
+
     public function getTopSoldProducts(int $limit = 5): array
     {
         $results = $this->createQueryBuilder('lc')

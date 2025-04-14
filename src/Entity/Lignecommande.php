@@ -13,6 +13,8 @@ class Lignecommande
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
 
+
+
     #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
     private int $id_l;
 
@@ -21,6 +23,7 @@ class Lignecommande
 
     #[ORM\Column(type: "float")]
     private float $prix_unitaire;
+
 
 
         #[ORM\ManyToOne(targetEntity: Equipement::class, inversedBy: "lignecommandes")]
@@ -82,6 +85,7 @@ class Lignecommande
     public function setIdc($value)
     {
         $this->idc = $value;
+
 
     }
 }

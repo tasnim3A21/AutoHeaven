@@ -7,11 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
+
 #[ORM\Entity]
 class Messagerie
 {
 
     #[ORM\Id]
+
     #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer", name: "id_m")]
     private ?int $id_m = null;
@@ -37,15 +39,22 @@ class Messagerie
     private ?string $receiver = null;
 
     public function getIdM(): ?int
+
     {
         return $this->id_m;
     }
 
+
+
     public function getIdRec(): ?Reclamation
+
+
 
     {
         return $this->id_rec;
     }
+
+
 
 
     public function setIdRec(?Reclamation $id_rec): self
@@ -56,9 +65,13 @@ class Messagerie
 
     public function getIdUser(): ?int
 
+
+
     {
         return $this->id_user;
     }
+
+
 
 
     public function setIdUser(?int $id_user): self
@@ -102,9 +115,12 @@ class Messagerie
 
     public function getReceiver(): ?string
 
+
     {
         return $this->receiver;
     }
+
+
 
     public function setReceiver(?string $receiver): self
     {
@@ -112,4 +128,5 @@ class Messagerie
         return $this;
     }
 }
+
 

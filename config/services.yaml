@@ -1,9 +1,16 @@
+
+# This file is the entry point to configure your own services.  
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    env(STRIPE_SECRET_KEY): '%env(STRIPE_SECRET_KEY)%'
-    env(STRIPE_CURRENCY): '%env(STRIPE_CURRENCY)%'
+    profile_directory: '%kernel.project_dir%/public/uploads'
 
 services:
+    # default configuration for services in this file
 
+services:
 
     _defaults:
         autowire: true
@@ -17,11 +24,11 @@ services:
             - '../src/Kernel.php'
 
 
-    Symfony\Component\Finder\Finder: ~
-
-    # 👉 Cette configuration spécifique doit venir à la fin
-    App\Service\StripeService:
+    # Custom AuthenticationSuccessHandler service definition
+    App\Security\AuthenticationSuccessHandler:
         arguments:
-            $privateKey: 'sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk'
-            $currency: 'eur'
+            $router: '@router'
+
+    # Symfony Finder service (already configured)
+    Symfony\Component\Finder\Finder: ~
 

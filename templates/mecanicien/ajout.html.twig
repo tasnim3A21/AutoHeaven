@@ -1,0 +1,65 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Ajouter un Mécanicien{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Ajouter un Mécanicien</h4>
+                </div>
+                <div class="card-body bg-light">
+                    {{ form_start(form) }}
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.nom, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.prenom, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                {{ form_row(form.email, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.username, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                {{ form_row(form.tel, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.adresse, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                {{ form_row(form.cin, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                {{ form_row(form.password, {'attr': {'class': 'form-control rounded-0'}}) }}
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-4">
+                             <button type="submit" class="btn btn-danger text-white">Enregistrer</button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

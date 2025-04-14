@@ -97,9 +97,12 @@ class Reclamation
 
     public function getId(): ?int
 
+
+
     {
         return $this->id;
     }
+
 
 
     public function setId(?int $id): self
@@ -110,9 +113,11 @@ class Reclamation
 
     public function getTitre(): ?string
 
+
     {
         return $this->titre;
     }
+
 
 
     public function setTitre(?string $titre): self
@@ -123,9 +128,13 @@ class Reclamation
 
     public function getContenu(): ?string
 
+
+
     {
         return $this->contenu;
     }
+
+
 
 
     public function setContenu(?string $contenu): self
@@ -158,9 +167,12 @@ class Reclamation
 
     public function getStatus(): ?string
 
+
     {
         return $this->status;
     }
+
+
 
 
     public function setStatus(?string $status): self
@@ -171,9 +183,13 @@ class Reclamation
 
     public function getDatecreation(): ?\DateTimeInterface
 
+
+
     {
         return $this->datecreation;
     }
+
+
 
 
     public function setDatecreation(?\DateTimeInterface $datecreation): self
@@ -214,4 +230,6 @@ class Reclamation
         return $this->titre ?? 'Réclamation #' . $this->id_rec;
     }
 }
+
+
 
