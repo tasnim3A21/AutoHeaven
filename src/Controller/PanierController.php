@@ -57,7 +57,7 @@ final class PanierController extends AbstractController
             throw $this->createNotFoundException('Cart item not found');
         }
 
-        // Optional: Check if the cart item belongs to the current user (user ID 3)
+      
         $user = $entityManager->getRepository(User::class)->find(3);
         if ($panier->getId() !== $user) {
             throw $this->createAccessDeniedException('You are not allowed to remove this item.');
