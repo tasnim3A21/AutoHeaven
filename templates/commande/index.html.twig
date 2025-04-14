@@ -9,36 +9,11 @@
         <div class="card shadow-sm rounded-3 border-0">
             <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Liste des Commandes</h5>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-toggle="dropdown">
-                        Filtres <span class="caret"></span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item {{ currentFilter == 'all' ? 'active' : '' }}" 
-                           href="{{ path('app_commande') }}">Toutes</a>
-                        <a class="dropdown-item {{ currentFilter == 'en attente' ? 'active' : '' }}" 
-                           href="{{ path('app_commande_filter', {'status': 'en attente'}) }}">En attente</a>
-                        <a class="dropdown-item {{ currentFilter == 'confirmé' ? 'active' : '' }}" 
-                           href="{{ path('app_commande_filter', {'status': 'confirmé'}) }}">Confirmées</a>
-                    </div>
-                </div>
+               
             </div>
             
             <div class="card-body">
-                <div class="mb-4">
-                    <div class="input-group">
-                        <input type="text" 
-                               id="searchInput" 
-                               class="form-control" 
-                               placeholder="Rechercher par nom, téléphone ou référence..."
-                               autocomplete="off">
-                        <div class="input-group-append">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+               
 
                 <div class="table-responsive">
                     <table class="table align-middle" id="commandesTable">
@@ -111,40 +86,5 @@
 
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            let searchTimeout;
-            
-            $('#searchInput').on('input', function() {
-                clearTimeout(searchTimeout);
-                const searchTerm = $(this).val().trim();
-                
-                searchTimeout = setTimeout(function() {
-                    if (searchTerm.length >= 2 || searchTerm.length === 0) {
-                        $.ajax({
-                            url: '{{ path('app_commande_search') }}',
-                            data: { search: searchTerm },
-                            success: function(data) {
-                                // Mise à jour du tableau uniquement
-                                $('#commandesTable tbody').html($(data).find('tbody').html());
-                                
-                                // Mise à jour de la pagination si nécessaire
-                                const newPagination = $(data).find('.pagination').html();
-                                if (newPagination) {
-                                    $('nav').html(newPagination);
-                                } else {
-                                    $('nav').remove();
-                                }
-                            },
-                            error: function() {
-                                $('#commandesTable tbody').html(
-                                    '<tr><td colspan="7" class="text-center text-danger">Erreur lors de la recherche</td></tr>'
-                                );
-                            }
-                        });
-                    }
-                }, 300);
-            });
-        });
-    </script>
+  
 {% endblock %}

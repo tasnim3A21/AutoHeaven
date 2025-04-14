@@ -77,10 +77,10 @@ public function delete(Request $request, Equipement $equipement, EntityManagerIn
                 $entityManager->remove($equipement->getStock());
             }
             
-            // Supprimer les autres entités liées
+           /* // Supprimer les autres entités liées
             foreach ($equipement->getOffres() as $offre) {
                 $entityManager->remove($offre);
-            }
+            }*/
     
             foreach ($equipement->getLignecommandes() as $lignecommande) {
                 $entityManager->remove($lignecommande);

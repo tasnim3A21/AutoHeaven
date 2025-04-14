@@ -5,10 +5,12 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 #[ORM\Entity]
@@ -272,6 +274,7 @@ private ?string $reponse = null;
         $this->reponse = $value;
     }
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -302,8 +305,11 @@ private ?string $reponse = null;
     }
 
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
+
+
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]
     private Collection $mention_j_aimes;

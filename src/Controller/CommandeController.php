@@ -37,45 +37,9 @@ final class CommandeController extends AbstractController
         ]);
     }
 
-    #[Route('/commande/filter/{status}', name: 'app_commande_filter')]
-    public function filter(
-        string $status,
-        CommandeRepository $commandeRepository,
-        Request $request,
-        PaginatorInterface $paginator
-    ): Response {
-        $query = $commandeRepository->createQueryBuilder('c')
-            ->join('c.id', 'u')
-            ->addSelect('u')
-            ->where('c.status = :status')
-            ->setParameter('status', $status)
-            ->orderBy('c.date_com', 'DESC')
-            ->getQuery();
+  
 
-        $commandes = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', 1),
-            10
-        );
-
-        return $this->render('commande/index.html.twig', [
-            'commandes' => $commandes,
-            'currentFilter' => $status
-        ]);
-    }
-
-    #[Route('/commande/search', name: 'app_commande_search')]
-    public function search(Request $request, CommandeRepository $commandeRepository): Response
-    {
-        $searchTerm = $request->query->get('search', '');
-        $commandes = $commandeRepository->search($searchTerm);
-    
-        return $this->render('commande/index.html.twig', [
-            'commandes' => $commandes,
-            'currentFilter' => 'all'
-        ]);
-    }
-
+   
     #[Route('/commande/confirm/{id}', name: 'app_commande_confirm')]
     public function confirm(int $id, EntityManagerInterface $entityManager): Response
     {
