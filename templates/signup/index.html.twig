@@ -1,0 +1,93 @@
+{% extends 'base_signup.html.twig' %}
+
+{% block title %}Register Form{% endblock %}
+
+{% block body %}
+  <link rel="stylesheet" href="{{ asset('style.css') }}">
+
+  <style>
+    /* CSS for error messages */
+    .error-message {
+      color: red;  /* Red color for error messages */
+      
+    }
+  </style>
+
+  <div class="wrapper">
+    {{ form_start(form) }}
+      <h2>Register</h2>
+
+      <div class="input-field">
+        {{ form_widget(form.prenom) }}
+        <div class="error-message">
+          {{ form_errors(form.prenom) }}
+        </div>
+        <label>Votre prénom</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.nom) }}
+        <div class="error-message">
+          {{ form_errors(form.nom) }}
+        </div>
+        <label>Votre nom</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.cin) }}
+        <div class="error-message">
+          {{ form_errors(form.cin) }}
+        </div>
+        <label>Votre CIN</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.tel) }}
+        <div class="error-message">
+          {{ form_errors(form.tel) }}
+        </div>
+        <label>Votre numéro de téléphone</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.email) }}
+        <div class="error-message">
+          {{ form_errors(form.email) }}
+        </div>
+        <label>Votre email</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.adresse) }}
+        <div class="error-message">
+          {{ form_errors(form.adresse) }}
+        </div>
+        <label>Votre adresse</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.username) }}
+        <div class="error-message">
+          {{ form_errors(form.username) }}
+        </div>
+        <label>Votre username</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.password) }}
+        <div class="error-message">
+          {{ form_errors(form.password) }}
+        </div>
+        <label>Votre mot de passe</label>
+      </div>
+
+      {{ form_row(form._token) }}
+
+      <button type="submit">Register</button>
+
+      <div class="login">
+        <p>Already have an account? <a href="{{ path('app_login') }}">Login</a></p>
+      </div>
+    {{ form_end(form) }}
+  </div>
+{% endblock %}

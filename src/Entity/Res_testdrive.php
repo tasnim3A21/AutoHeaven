@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 #[ORM\Entity]
@@ -11,7 +13,9 @@ class Res_testdrive
 {
 
     #[ORM\Id]
+
     #[ORM\GeneratedValue]
+
     #[ORM\Column(type: "integer")]
     private int $id_td;
 
@@ -38,6 +42,7 @@ class Res_testdrive
         choices: ["en_cours_de_traitement", "confirmee", "rejetee"],
         message: "Le status doit être soit en cours de traitement, confirmée ou rejetée"
     )]
+
     private string $status;
 
     public function getId_td()
@@ -50,22 +55,30 @@ class Res_testdrive
         $this->id_td = $value;
     }
 
+
     public function getIdU()
+
     {
         return $this->id_u;
     }
 
+
     public function setIdU($value)
+
     {
         $this->id_u = $value;
     }
 
+
     public function getIdV()
+
     {
         return $this->id_v;
     }
 
+
     public function setIdV($value)
+
     {
         $this->id_v = $value;
     }

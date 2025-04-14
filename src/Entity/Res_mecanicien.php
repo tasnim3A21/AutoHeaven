@@ -3,14 +3,18 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Res_mecanicien
 {
 
     #[ORM\Id]
+
     #[ORM\GeneratedValue]
+
     #[ORM\Column(type: "integer")]
     private int $id_res_m;
 
@@ -64,22 +68,30 @@ class Res_mecanicien
         return $this->id_res_m;
     }
 
+
     public function getIdU()
+
     {
         return $this->id_u;
     }
 
+
     public function setIdU($value)
+
     {
         $this->id_u = $value;
     }
 
+
     public function getIdMec()
+
     {
         return $this->id_mec;
     }
 
+
     public function setIdMec($value)
+
     {
         $this->id_mec = $value;
     }
@@ -138,4 +150,5 @@ class Res_mecanicien
         $this->mecanicien = $mecanicien;
         return $this;
     }
+
 }

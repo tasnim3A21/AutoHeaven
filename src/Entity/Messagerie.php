@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -46,12 +45,15 @@ class Messagerie
     }
 
 
+
     public function getIdRec(): ?Reclamation
+
 
 
     {
         return $this->id_rec;
     }
+
 
 
 
@@ -64,9 +66,11 @@ class Messagerie
     public function getIdUser(): ?int
 
 
+
     {
         return $this->id_user;
     }
+
 
 
 
@@ -115,6 +119,7 @@ class Messagerie
     {
         return $this->receiver;
     }
+
 
 
     public function setReceiver(?string $receiver): self

@@ -17,6 +17,7 @@ class Stock
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
 
+
     #[ORM\GeneratedValue(strategy: "AUTO")]
     private int $id_s;
 
@@ -36,11 +37,9 @@ class Stock
 
     public function getIdS(): ?int
 
-
     {
         return $this->id_s;
     }
-
 
 
     public function setIdS(int $id_s): self
@@ -69,6 +68,7 @@ class Stock
 
 
 
+
     public function setQuantite(int $quantite): self
     {
         $this->quantite = $quantite;
@@ -78,9 +78,11 @@ class Stock
     public function getPrixvente(): float
 
 
+
     {
         return $this->prixvente;
     }
+
 
 
 

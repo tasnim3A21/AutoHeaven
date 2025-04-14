@@ -14,7 +14,9 @@ class Panier
     #[ORM\Column(type: "integer")]
 
 
+
     #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
+
 
     private int $id_p;
 

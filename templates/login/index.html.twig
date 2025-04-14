@@ -1,0 +1,50 @@
+{% extends 'base_login.html.twig' %}
+
+{% block title %} Login Form{% endblock %}
+
+{% block body %}
+  <link rel="stylesheet" href="{{ asset('style.css') }}">
+
+  <div class="wrapper">
+    <form action="{{ path('app_login') }}" method="post">
+      <h2>Login</h2>
+
+      <!-- Email Field -->
+      <div class="input-field">
+        <input type="text" name="email" required value="{{ last_username }}">
+        <label>Enter your email</label>
+      </div>
+
+      <!-- Password Field -->
+      <div class="input-field">
+        <input type="password" name="password" required>
+        <label>Enter your password</label>
+      </div>
+
+      <!-- CSRF Token -->
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+      <!-- Show Error if Invalid Credentials -->
+      {% if error %}
+  <div class="alert alert-danger">
+    <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+  </div>
+{% endif %}
+
+
+      <div class="forget">
+        <label for="remember">
+          <input type="checkbox" id="remember" name="remember_me">
+          <p>Remember me</p>
+        </label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit">Log In</button>
+
+      <div class="register">
+        <p>Don't have an account? <a href="{{ path('app_register') }}">Register</a></p>
+      </div>
+    </form>
+  </div>
+{% endblock %}

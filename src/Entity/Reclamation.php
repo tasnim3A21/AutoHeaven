@@ -1,7 +1,6 @@
 <?php
 
 
-
 // src/Entity/Reclamation.php
 
 namespace App\Entity;
@@ -99,9 +98,11 @@ class Reclamation
     public function getId(): ?int
 
 
+
     {
         return $this->id;
     }
+
 
 
     public function setId(?int $id): self
@@ -128,9 +129,11 @@ class Reclamation
     public function getContenu(): ?string
 
 
+
     {
         return $this->contenu;
     }
+
 
 
 
@@ -171,6 +174,7 @@ class Reclamation
 
 
 
+
     public function setStatus(?string $status): self
     {
         $this->status = $status;
@@ -180,9 +184,11 @@ class Reclamation
     public function getDatecreation(): ?\DateTimeInterface
 
 
+
     {
         return $this->datecreation;
     }
+
 
 
 
@@ -224,5 +230,6 @@ class Reclamation
         return $this->titre ?? 'Réclamation #' . $this->id_rec;
     }
 }
+
 
 

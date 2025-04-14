@@ -14,6 +14,7 @@ class Lignecommande
     #[ORM\Column(type: "integer")]
 
 
+
     #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
     private int $id_l;
 
@@ -35,8 +36,6 @@ class Lignecommande
 
 
 
-
-
     public function getId_l()
     {
         return $this->id_l;
@@ -46,7 +45,6 @@ class Lignecommande
     {
         $this->id_l = $value;
     }
-
 
 
     public function getQuantite()

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Categorie;
@@ -18,6 +19,7 @@ class Voiture
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
     private int $id_v;
+
     #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Avis::class, cascade: ["persist", "remove"])]
     private Collection $avis;
     
@@ -108,4 +110,5 @@ class Voiture
     }
     // Méthodes pour Reservation sont aussi ici, comme dans la version précédente
 }
+
 

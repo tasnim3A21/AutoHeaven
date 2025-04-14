@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Panier;
 
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -16,6 +17,7 @@ class Equipement
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
+
 
     #[ORM\GeneratedValue(strategy: "AUTO")]
     private int $id;

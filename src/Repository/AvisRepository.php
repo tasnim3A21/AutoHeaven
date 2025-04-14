@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Repository;
 
 use App\Entity\Avis;
@@ -13,6 +12,7 @@ class AvisRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Avis::class);
     }
+
 
     // src/Repository/AvisRepository.php
 
@@ -30,4 +30,5 @@ class AvisRepository extends ServiceEntityRepository
     
     
 }
+
 

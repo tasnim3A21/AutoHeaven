@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Camion_remorquage
@@ -57,12 +59,14 @@ class Camion_remorquage
         choices: ["Disponible", "Non Disponible"],
         message: "Le statut doit être soit Disponible soit Non Disponible"
     )]
+
     private string $statut;
 
     public function getId_cr()
     {
         return $this->id_cr;
     }
+
 
     public function getModele()
     {
@@ -84,12 +88,16 @@ class Camion_remorquage
         $this->annee = $value;
     }
 
+
     public function getNumTel()
+
     {
         return $this->num_tel;
     }
 
+
     public function setNumTel($value)
+
     {
         $this->num_tel = $value;
     }
@@ -103,6 +111,7 @@ class Camion_remorquage
     {
         $this->statut = $value;
     }
+
 
     public function getNomAgence(): ?string
     {
@@ -144,4 +153,4 @@ class Camion_remorquage
         }
         return $this;
     }
-}
+

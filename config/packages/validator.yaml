@@ -12,3 +12,5 @@ when@test:
     framework:
         validation:
             not_compromised_password: false
+            enable_annotations: true
+
