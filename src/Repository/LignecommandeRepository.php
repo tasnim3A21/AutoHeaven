@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\Lignecommande;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+class LignecommandeRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Lignecommande::class);
+    }
+
+    // Add custom methods as needed
+}
