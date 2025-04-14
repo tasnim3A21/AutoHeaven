@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -128,5 +130,20 @@ class Res_remorquage
     public function setStatus($value)
     {
         $this->status = $value;
+    }
+
+    #[ORM\ManyToOne(targetEntity: Camion_remorquage::class)]
+    #[ORM\JoinColumn(name: 'id_cr', referencedColumnName: 'id_cr')]
+    private ?Camion_remorquage $camionRemorquage = null;
+
+    public function getCamionRemorquage(): ?Camion_remorquage
+    {
+        return $this->camionRemorquage;
+    }
+
+    public function setCamionRemorquage(?Camion_remorquage $camionRemorquage): self
+    {
+        $this->camionRemorquage = $camionRemorquage;
+        return $this;
     }
 }

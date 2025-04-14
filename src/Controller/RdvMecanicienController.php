@@ -86,4 +86,24 @@ final class RdvMecanicienController extends AbstractController
 
         return $this->redirectToRoute('app_rdv_mecanicien');
     }
+
+    #[Route('/rdv/mecanicien/new', name: 'app_rdv_mecanicien_new')]
+    public function new(Request $request): Response
+    {
+        $reservation = new Res_mecanicien();
+        $form = $this->createForm(ResMecanicienType::class, $reservation);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $reservation->setStatus('en_cours_de_traitement');
+            $this->entityManager->persist($reservation);
+            $this->entityManager->flush();
+
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('rdv_mecanicien/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }
