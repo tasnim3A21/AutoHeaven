@@ -50,8 +50,8 @@ class Voiture
     private ?float $prix = null;
 
     #[ORM\Column(type: "text")]
-    #[Assert\NotBlank(message: "L'image est obligatoire.")]
-    private ?string $image = null;
+    //#[Assert\NotBlank(message: "L'image est obligatoire.")]
+    private string $image;
 
     #[ORM\Column(type: "string")]
     #[Assert\Choice(choices: ["oui", "non"], message: "La disponibilité doit être 'oui' ou 'non'.")]
