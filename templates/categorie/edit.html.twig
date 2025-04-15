@@ -1,0 +1,47 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Modifier une Catégorie{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Modifier une Catégorie</h2>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+
+        <div class="form-group">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.type) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.type_carburant) }}  {# Correct field name: type_carburant #}
+            {{ form_widget(form.type_carburant, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.type_carburant) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.type_utilisation) }}  {# Correct field name: type_utilisation #}
+            {{ form_widget(form.type_utilisation, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.type_utilisation) }} 
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.nbr_porte) }}  {# Correct field name: nbr_porte #}
+            {{ form_widget(form.nbr_porte, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.nbr_porte) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.transmission) }}
+            {{ form_widget(form.transmission, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.transmission) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{{ path('app_categorie') }}" class="btn btn-secondary">Annuler</a>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+

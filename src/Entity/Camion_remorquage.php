@@ -153,4 +153,4 @@ class Camion_remorquage
         }
         return $this;
     }
-
+}

@@ -1,0 +1,64 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Ajouter une Voiture{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Ajouter une Voiture</h2>
+
+   {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+    <div class="form-group">
+        {{ form_label(form.id_c) }}
+        {{ form_widget(form.id_c, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.id_c) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.marque) }}
+        {{ form_widget(form.marque, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.marque) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.description) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.kilometrage) }}
+        {{ form_widget(form.kilometrage, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.kilometrage) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.couleur) }}
+        {{ form_widget(form.couleur, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.couleur) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.prix) }}
+        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.prix) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.disponibilite) }}
+        {{ form_widget(form.disponibilite, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.disponibilite) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.imageFile) }}
+        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control-file'}}) }}
+        {{ form_errors(form.imageFile) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+    <a href="{{ path('app_voiture') }}" class="btn btn-secondary">Annuler</a>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+

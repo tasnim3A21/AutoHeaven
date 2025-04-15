@@ -1,0 +1,40 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Détails de la Voiture{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h2>Détails de la Voiture</h2>
+
+        <div class="card" style="width: 18rem;">
+        
+           {% if voiture.image %}
+            <img src="{{ asset('images/' ~ voiture.image) }}" alt="Image de la voiture" style="max-width: 300px;">
+        {% else %}
+            <p>Aucune image disponible</p>
+        {% endif %}
+
+            <div class="card-body">
+                <h5 class="card-title">{{ voiture.marque }} - {{ voiture.description }}</h5>
+                <p class="card-text">
+                    <strong>Modèle:</strong> {{ voiture.marque }}<br>
+                    <strong>Prix:</strong> {{ voiture.prix }} €<br>
+                    <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
+                    <strong>Couleur:</strong> {{ voiture.couleur }}<br>
+                    <strong>Disponibilité:</strong> {{ voiture.disponibilite == '1' ? 'Disponible' : 'Indisponible' }}<br>
+                    
+                    <hr>
+                    
+                    <strong>Catégorie:</strong> {{ voiture.id_c.type }}<br>
+                    <strong>Type de carburant:</strong> {{ voiture.id_c.typeCarburant }}<br>
+                    <strong>Type d'utilisation:</strong> {{ voiture.id_c.typeUtilisation }}<br>
+                    <strong>Transmission:</strong> {{ voiture.id_c.transmission }}<br>
+                    <strong>Nombre de portes:</strong> {{ voiture.id_c.nbrPorte }}<br>
+                </p>
+            </div>
+        </div>
+
+        <a href="{{ path('voiture_edit', { id: voiture.id_v }) }}" class="btn btn-primary mt-3">Modifier</a>
+        <a href="{{ path('app_voiture') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+    </div>
+{% endblock %}

@@ -35,25 +35,6 @@ security:
                 target: app_login
 
     access_control:
-    # Allow access to login and register without auth
-    - { path: ^/login, roles: PUBLIC_ACCESS }
-    - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: ROLE_USER }
 
-    # Admin-only routes
-    - { path: ^/acceuil, roles: ROLE_ADMIN }
-    - { path: ^/offre, roles: ROLE_ADMIN }
-    - { path: ^/client, roles: ROLE_ADMIN }
-    - { path: ^/mecanicien, roles: ROLE_ADMIN }
-
-    # Mecanicien-only routes
-    - { path: ^/home, roles: ROLE_MECANICIEN }  # example prefix for mechanic dashboard
-    - { path: ^/offres, roles: ROLE_MECANICIEN }
-    - { path: ^/profile, roles: ROLE_MECANICIEN }
-
-    # Client-only routes
-    - { path: ^/home, roles: ROLE_CLIENT }
-    - { path: ^/offres, roles: ROLE_CLIENT }
-    - { path: ^/profile, roles: ROLE_CLIENT }
-
-    # All other URLs: require user to be logged in (any role)
-    - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
