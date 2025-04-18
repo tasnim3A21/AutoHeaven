@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with Gemini Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        .chat-box {
+            max-width: 600px;
+            margin: auto;
+        }
+        .message {
+            margin-bottom: 1rem;
+        }
+        .bot {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .user {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-box">
+        <h1>Chat with Gemini Bot</h1>
+
+        <form method="get" action="{{ path('chatbot') }}" id="chat-form">
+            <label for="message">Your Message:</label>
+            <input type="text" name="message" id="message" value="{{ userMessage }}" required>
+            <button type="submit">Send</button>
+            <button type="button" onclick="clearChat()">Clear</button>
+        </form>
+
+        {% if userMessage %}
+            <div class="message user">You: {{ userMessage }}</div>
+        {% endif %}
+
+        {% if botResponse is not null %}
+            <div class="message bot">Bot: {{ botResponse }}</div>
+        {% endif %}
+    </div>
+
+    <script>
+        function clearChat() {
+            // Clear the message input field
+            document.getElementById('message').value = '';
+
+            // Optionally, clear userMessage and botResponse in your view context (through JS or form submission)
+            // If you're handling this on the server, you'd want to send an empty message to the server to reset those values.
+            document.getElementById('chat-form').submit();  // Resubmit form with empty message
+        }
+    </script>
+</body>
+</html>

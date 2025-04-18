@@ -9,9 +9,6 @@ parameters:
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
 services:
     # default configuration for services in this file
-
-services:
-
     _defaults:
         autowire: true
         autoconfigure: true
@@ -23,6 +20,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Service\ChatbotService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%' 
 
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:
