@@ -4,29 +4,29 @@
             "content": {
                 "parts": [
                     {
-                        "text": "Hey there! How can I help you today?\n"
+                        "text": "Sure! What about Tesla are you interested in discussing?  There are many different aspects we could talk about, such as:\n\n* **Tesla vehicles:**  Model S, 3, X, Y, Cybertruck, Roadster, etc.  We could discuss their features, performance, range, charging, or compare them to other electric vehicles.\n* **Tesla technology:**  Autopilot, Full Self-Driving (FSD), battery technology, Supercharger network, manufacturing processes, etc.\n* **Tesla the company:**  Their business model, stock price, competition, leadership (Elon Musk), future plans, controversies, etc.\n* **Tesla's impact:**  On the automotive industry, on electric vehicle adoption, on the environment, etc.\n\n\nTo get us started, could you tell me what specifically about Tesla interests you?\n"
                     }
                 ],
                 "role": "model"
             },
             "finishReason": "STOP",
-            "avgLogprobs": -0.0023647963323376394
+            "avgLogprobs": -0.1770345434288069
         }
     ],
     "usageMetadata": {
-        "promptTokenCount": 1,
-        "candidatesTokenCount": 11,
-        "totalTokenCount": 12,
+        "promptTokenCount": 18,
+        "candidatesTokenCount": 173,
+        "totalTokenCount": 191,
         "promptTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 1
+                "tokenCount": 18
             }
         ],
         "candidatesTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 11
+                "tokenCount": 173
             }
         ]
     },

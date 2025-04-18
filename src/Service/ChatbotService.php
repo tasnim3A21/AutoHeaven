@@ -15,39 +15,49 @@ class ChatbotService
         $this->apiKey = $apiKey;
     }
 
-    public function getChatbotResponse(string $message): string
+    /**
+     * Sends a conversation to the Gemini API and returns the bot's response.
+     *
+     * @param array $conversation Array of messages with 'role' (user/assistant) and 'text'
+     * @return string The bot's response or an error message
+     */
+    public function getChatbotResponse(array $conversation): string
     {
-        $model = 'gemini-1.5-pro-002'; // Change if you want another model
+        $model = 'gemini-1.5-pro-002';
         $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $this->apiKey;
 
         try {
+            // Build the contents array for the API
+            $contents = [];
+            foreach ($conversation as $message) {
+                $contents[] = [
+                    'role' => $message['role'] === 'user' ? 'user' : 'model', // Gemini uses 'model' for assistant
+                    'parts' => [
+                        ['text' => $message['text']]
+                    ]
+                ];
+            }
+
             $response = $this->httpClient->request('POST', $endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $message]
-                            ]
-                        ]
-                    ]
+                    'contents' => $contents
                 ],
             ]);
 
-            $data = $response->toArray(false); // Keep HTTP status codes
+            $data = $response->toArray(false);
 
-            // Optionally log response to file
+            // Log response for debugging
             file_put_contents(__DIR__ . '/../gemini_response.json', json_encode($data, JSON_PRETTY_PRINT));
 
-            // Extract response text safely
+            // Extract response text
             if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                 return $data['candidates'][0]['content']['parts'][0]['text'];
             }
 
             return 'Gemini responded, but no valid message was found.';
-
         } catch (\Throwable $e) {
             return 'Error: ' . $e->getMessage();
         }
