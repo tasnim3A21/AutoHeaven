@@ -5,6 +5,12 @@
 {% block content %}
     <h1 class="mb-4">Découvrez Nos Voitures</h1>
 
+    <div class="text-end mb-3">
+        <a href="{{ path('chatbot') }}" class="btn btn-primary">
+            <i class="bi bi-chat-dots"></i> Chat avec le Bot
+        </a>
+    </div>
+
     <div class="row">
         {% for voiture in voitures %}
             <div class="col-md-4 mb-4">
