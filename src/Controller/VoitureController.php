@@ -32,6 +32,7 @@ public function index(Request $request, EntityManagerInterface $entityManager): 
 
     // Create a query builder for the Voiture repository
     $queryBuilder = $entityManager->getRepository(Voiture::class)->createQueryBuilder('v');
+    $repo = $entityManager->getRepository(Voiture::class);
     
     // If there is a search term, apply filters to the query
     if (!empty($searchTerm)) {
@@ -226,5 +227,15 @@ public function search(Request $request, EntityManagerInterface $entityManager):
 
     // Return a JSON response with the data
     return new JsonResponse(['data' => $data]);
+}
+#[Route('/voiture/sort/marque', name: 'voiture_sort_marque', methods: ['GET'])]
+public function sortByMarque(EntityManagerInterface $entityManager): Response
+{
+    $voitures = $entityManager->getRepository(Voiture::class)->findBy([], ['marque' => 'ASC']);
+
+    return $this->render('voiture/index.html.twig', [
+        'voitures' => $voitures,
+        'search' => '', // Optional: keep consistent with your search input
+    ]);
 }
 }

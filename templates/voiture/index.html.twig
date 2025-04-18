@@ -9,9 +9,10 @@
     <form method="get" action="{{ path('app_voiture') }}">
         <input type="text" name="search" placeholder="Rechercher par marque" value="{{ app.request.query.get('search') }}">
         <button type="submit">Rechercher</button>
-    </form>
+        <a href="{{ path('voiture_sort_marque') }}" class="btn btn-primary">Tri</a>
+        </form>
 
-    <table border="1" cellpadding="8" cellspacing="0">
+       <table border="1" cellpadding="8" cellspacing="0">
         <thead>
             <tr>
                 <th>Marque</th>
