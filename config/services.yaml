@@ -7,6 +7,7 @@
 parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
+    currencyfreaks_api_key: '%env(CURRENCYFREAKS_API_KEY)%'
 services:
     # default configuration for services in this file
     _defaults:
@@ -23,6 +24,10 @@ services:
     App\Service\ChatbotService:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%' 
+
+    App\Service\CurrencyConversionService:
+        arguments:
+            $apiKey: '%currencyfreaks_api_key%'
 
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:
