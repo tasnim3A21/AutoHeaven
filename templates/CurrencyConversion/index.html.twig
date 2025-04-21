@@ -14,12 +14,29 @@
             </div>
             <div class="col-md-4">
                 <label for="currency" class="form-label">Devise</label>
-                <select name="currency" id="currency" class="form-select" onchange="this.form.submit()">
-                    <option value="TND" {{ selectedCurrency == 'TND' ? 'selected' : '' }}>TND</option>
-                    <option value="USD" {{ selectedCurrency == 'USD' ? 'selected' : '' }}>USD</option>
-                    <option value="EUR" {{ selectedCurrency == 'EUR' ? 'selected' : '' }}>EUR</option>
-                    <option value="GBP" {{ selectedCurrency == 'GBP' ? 'selected' : '' }}>GBP</option>
-                </select>
+               <select name="currency" id="currency" class="form-select" onchange="this.form.submit()">
+    {% set mainCurrencies = ['USD', 'EUR', 'GBP'] %}
+
+    {# Main currencies first #}
+    {% for code in mainCurrencies %}
+        {% if currencies[code] is defined %}
+            <option value="{{ code }}" {{ selectedCurrency == code ? 'selected' : '' }}>
+                {{ code }}
+            </option>
+        {% endif %}
+    {% endfor %}
+
+    <option disabled>──────────</option>
+
+    {# Remaining currencies sorted alphabetically (excluding main ones) #}
+    {% for code in currencies|keys|sort %}
+        {% if code not in mainCurrencies %}
+            <option value="{{ code }}" {{ selectedCurrency == code ? 'selected' : '' }}>
+                {{ code }}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary w-100">Convertir</button>
