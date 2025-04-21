@@ -1,4 +1,3 @@
-
 # This file is the entry point to configure your own services.  
 # Files in the packages/ subdirectory configure your dependencies.
 
@@ -8,6 +7,7 @@ parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
     currencyfreaks_api_key: '%env(CURRENCYFREAKS_API_KEY)%'
+
 services:
     # default configuration for services in this file
     _defaults:
@@ -29,6 +29,10 @@ services:
         arguments:
             $apiKey: '%currencyfreaks_api_key%'
 
+    App\Controller\CurrencyConversionController:
+        arguments:
+            $currencyfreaksApiKey: '%currencyfreaks_api_key%'
+
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:
         arguments:
@@ -36,4 +40,3 @@ services:
 
     # Symfony Finder service (already configured)
     Symfony\Component\Finder\Finder: ~
-
