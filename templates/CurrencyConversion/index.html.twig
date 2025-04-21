@@ -15,7 +15,7 @@
             <div class="col-md-4">
                 <label for="currency" class="form-label">Devise</label>
                <select name="currency" id="currency" class="form-select" onchange="this.form.submit()">
-    {% set mainCurrencies = ['USD', 'EUR', 'GBP'] %}
+    {% set mainCurrencies = ['EUR','USD','DZD','MAD','GBP'] %}
 
     {# Main currencies first #}
     {% for code in mainCurrencies %}

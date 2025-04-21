@@ -29,6 +29,9 @@
                     </div>
                     <div class="card-footer text-center">
                         <a href="{{ path('car_details', { id: voiture.id_v }) }}" class="btn btn-outline-primary">Voir Détails</a>
+                        <a href="{{ path('currency_conversion', { amount: voiture.prix }) }}" class="btn btn-outline-success">
+        Convertir le Prix
+                        </a>
                     </div>
                 </div>
             </div>

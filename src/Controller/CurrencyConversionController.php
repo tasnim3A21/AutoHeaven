@@ -21,7 +21,7 @@ class CurrencyConversionController extends AbstractController
 public function index(Request $request, HttpClientInterface $httpClient): Response
 {
     $amount = $request->query->get('amount', 0);
-    $selectedCurrency = $request->query->get('currency', 'TND');
+    $selectedCurrency = $request->query->get('currency', 'EUR');
     $convertedAmount = null;
     $error = null;
     $currencies = [];
