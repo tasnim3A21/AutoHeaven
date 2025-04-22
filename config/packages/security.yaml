@@ -35,7 +35,22 @@ security:
                 target: app_login
 
     access_control:
-    # Allow access to login and register without auth
-    
-        - { path: ^/, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: ROLE_USER }
+        # Allow access to login and register without auth
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+
+        # Admin-only routes
+        - { path: ^/offres, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+        - { path: ^/acceuil, roles: ROLE_ADMIN }
+        - { path: ^/offre, roles: ROLE_ADMIN }
+        - { path: ^/client, roles: ROLE_ADMIN }
+        - { path: ^/mecanicien, roles: ROLE_ADMIN }
+
+    # Shared access to /home, /offres, /profile for client and mecanicien
+        - { path: ^/home, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+        
+        - { path: ^/profile, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+
+        # All other URLs: require user to be logged in (any role)
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+
