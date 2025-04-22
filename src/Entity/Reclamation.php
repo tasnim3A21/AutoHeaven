@@ -1,5 +1,4 @@
 <?php
-
 // src/Entity/Reclamation.php
 
 namespace App\Entity;
@@ -81,6 +80,12 @@ class Reclamation
      */
     #[ORM\OneToMany(mappedBy: "id_rec", targetEntity: Messagerie::class, cascade: ["persist", "remove"])]
     private Collection $messageries;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default": false})
+     */
+    #[ORM\Column(type: "boolean", nullable: true, options: ["default" => false])]
+    private ?bool $urgent = false;
 
     public function __construct()
     {
@@ -195,6 +200,17 @@ class Reclamation
                 $messagerie->setIdRec(null);
             }
         }
+        return $this;
+    }
+
+    public function isUrgent(): ?bool
+    {
+        return $this->urgent;
+    }
+
+    public function setUrgent(?bool $urgent): self
+    {
+        $this->urgent = $urgent;
         return $this;
     }
 

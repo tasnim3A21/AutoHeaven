@@ -11,14 +11,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 final class ReclamationListController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private LoggerInterface $logger;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
     }
 
     #[Route('/reclamation/list', name: 'app_reclamation_list')]
@@ -27,11 +30,41 @@ final class ReclamationListController extends AbstractController
         $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
 
         $reclamationsWithUserData = [];
+        $urgentCount = 0;
+        $nonUrgentCount = 0;
+
         foreach ($reclamations as $reclamation) {
+            // Récupérer l'ID utilisateur (clé étrangère vers user)
+            $userId = $reclamation->getId();
             $userData = $this->entityManager->getConnection()->fetchAssociative(
                 'SELECT nom, prenom, tel, email FROM user WHERE id = ?',
-                [$reclamation->getId()]
+                [$userId]
             );
+            if (!$userData) {
+                $this->logger->warning('No user found for user ID {user_id} in reclamation ID {id_rec}', [
+                    'user_id' => $userId,
+                    'id_rec' => $reclamation->getIdRec()
+                ]);
+            }
+
+            // Vérifier si "urgente" ou "importante" est présent dans le titre ou le contenu
+            $keywords = ['urgente', 'importante'];
+            $title = strtolower($reclamation->getTitre() ?? '');
+            $content = strtolower($reclamation->getContenu() ?? '');
+            $isUrgent = false;
+            foreach ($keywords as $keyword) {
+                if (str_contains($title, $keyword) || str_contains($content, $keyword)) {
+                    $isUrgent = true;
+                    break;
+                }
+            }
+
+            // Compter les réclamations urgentes et non urgentes
+            if ($isUrgent) {
+                $urgentCount++;
+            } else {
+                $nonUrgentCount++;
+            }
 
             $reclamationsWithUserData[] = [
                 'id_rec' => $reclamation->getIdRec(),
@@ -45,12 +78,15 @@ final class ReclamationListController extends AbstractController
                 'prenom' => $userData['prenom'] ?? 'Inconnu',
                 'tel' => $userData['tel'] ?? 'N/A',
                 'email' => $userData['email'] ?? 'N/A',
+                'isUrgent' => $isUrgent,
             ];
         }
 
         return $this->render('reclamation_list/index.html.twig', [
             'controller_name' => 'ReclamationListController',
             'reclamations' => $reclamationsWithUserData,
+            'urgentCount' => $urgentCount,
+            'nonUrgentCount' => $nonUrgentCount,
         ]);
     }
 
@@ -59,6 +95,7 @@ final class ReclamationListController extends AbstractController
     {
         $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
         if (!$reclamation) {
+            $this->logger->error('Réclamation non trouvée pour id_rec={id_rec}', ['id_rec' => $id_rec]);
             throw $this->createNotFoundException('Réclamation non trouvée');
         }
 
@@ -70,19 +107,18 @@ final class ReclamationListController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            error_log('Formulaire soumis pour id_rec=' . $id_rec);
+            $this->logger->info('Formulaire soumis pour id_rec={id_rec}', ['id_rec' => $id_rec]);
             if ($form->isValid()) {
-                error_log('Formulaire valide');
+                $this->logger->info('Formulaire valide pour id_rec={id_rec}', ['id_rec' => $id_rec]);
 
-                // Vérifier l'utilisateur
-                $userId = 1; // Remplacez par l'ID de l'utilisateur connecté si possible
+                $userId = 3; // Utilisateur statique ID 3
                 $userExists = $this->entityManager->getConnection()->fetchOne(
                     'SELECT COUNT(*) FROM user WHERE id = ?',
                     [$userId]
                 );
                 if (!$userExists) {
-                    error_log('Utilisateur avec id=' . $userId . ' non trouvé');
-                    $this->addFlash('error', 'Utilisateur avec id=' . $userId . ' non trouvé');
+                    $this->logger->error('Utilisateur avec id={userId} non trouvé', ['userId' => $userId]);
+                    $this->addFlash('error', 'Utilisateur avec ID 3 non trouvé');
                     return $this->render('reclamation_list/respond.html.twig', [
                         'reclamation' => $reclamation,
                         'form' => $form->createView(),
@@ -103,11 +139,14 @@ final class ReclamationListController extends AbstractController
                     $this->entityManager->persist($message);
                     $this->entityManager->persist($reclamation);
                     $this->entityManager->flush();
-                    error_log('Données enregistrées avec succès');
+                    $this->logger->info('Réponse enregistrée avec succès pour id_rec={id_rec}', ['id_rec' => $id_rec]);
                     $this->addFlash('success', 'Réponse envoyée avec succès !');
                     return $this->redirectToRoute('app_reclamation_list');
                 } catch (\Exception $e) {
-                    error_log('Erreur lors de l\'enregistrement : ' . $e->getMessage());
+                    $this->logger->error('Erreur lors de l\'enregistrement pour id_rec={id_rec} : {error}', [
+                        'id_rec' => $id_rec,
+                        'error' => $e->getMessage()
+                    ]);
                     $this->addFlash('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
                 }
             } else {
@@ -115,11 +154,14 @@ final class ReclamationListController extends AbstractController
                 foreach ($form->getErrors(true) as $error) {
                     $errors[] = $error->getMessage();
                 }
-                error_log('Formulaire invalide : ' . implode(', ', $errors));
+                $this->logger->error('Formulaire invalide pour id_rec={id_rec} : {errors}', [
+                    'id_rec' => $id_rec,
+                    'errors' => implode(', ', $errors)
+                ]);
                 $this->addFlash('error', 'Erreur de validation : ' . implode(', ', $errors));
             }
         } else {
-            error_log('Formulaire non soumis pour id_rec=' . $id_rec);
+            $this->logger->info('Formulaire non soumis pour id_rec={id_rec}', ['id_rec' => $id_rec]);
         }
 
         return $this->render('reclamation_list/respond.html.twig', [
@@ -133,20 +175,34 @@ final class ReclamationListController extends AbstractController
     {
         $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
         if (!$reclamation) {
+            $this->logger->error('Réclamation non trouvée pour id_rec={id_rec}', ['id_rec' => $id_rec]);
             if ($request->isXmlHttpRequest()) {
                 return new JsonResponse(['success' => false, 'message' => 'Réclamation non trouvée'], 404);
             }
             throw $this->createNotFoundException('Réclamation non trouvée');
         }
 
-        $this->entityManager->remove($reclamation);
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->remove($reclamation);
+            $this->entityManager->flush();
+            $this->logger->info('Réclamation supprimée avec succès pour id_rec={id_rec}', ['id_rec' => $id_rec]);
 
-        if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(['success' => true, 'message' => 'Réclamation supprimée']);
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['success' => true, 'message' => 'Réclamation supprimée']);
+            }
+
+            $this->addFlash('success', 'Réclamation supprimée avec succès !');
+            return $this->redirectToRoute('app_reclamation_list');
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la suppression pour id_rec={id_rec} : {error}', [
+                'id_rec' => $id_rec,
+                'error' => $e->getMessage()
+            ]);
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['success' => false, 'message' => 'Erreur lors de la suppression'], 500);
+            }
+            $this->addFlash('error', 'Erreur lors de la suppression de la réclamation.');
+            return $this->redirectToRoute('app_reclamation_list');
         }
-
-        $this->addFlash('success', 'Réclamation supprimée avec succès !');
-        return $this->redirectToRoute('app_reclamation_list');
     }
 }
