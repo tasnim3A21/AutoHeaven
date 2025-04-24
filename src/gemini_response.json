@@ -10,17 +10,17 @@
                 "role": "model"
             },
             "finishReason": "STOP",
-            "avgLogprobs": -9.293012871322307e-5
+            "avgLogprobs": -2.1677062084729023e-8
         }
     ],
     "usageMetadata": {
-        "promptTokenCount": 152,
+        "promptTokenCount": 69,
         "candidatesTokenCount": 11,
-        "totalTokenCount": 163,
+        "totalTokenCount": 80,
         "promptTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 152
+                "tokenCount": 69
             }
         ],
         "candidatesTokensDetails": [

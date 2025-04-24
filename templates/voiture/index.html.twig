@@ -6,11 +6,26 @@
     <h1>Liste des Voitures</h1>
 
     <!-- Search Bar -->
-    <form method="get" action="{{ path('app_voiture') }}">
-        <input type="text" name="search" placeholder="Rechercher par marque" value="{{ app.request.query.get('search') }}">
-        <button type="submit">Rechercher</button>
-        <a href="{{ path('voiture_sort_marque') }}" class="btn btn-primary">Tri</a>
-        </form>
+   <form method="get" action="{{ path('app_voiture') }}">
+    <input type="text" name="search" placeholder="Rechercher par marque" value="{{ app.request.query.get('search') }}">
+    
+    <select name="couleur">
+        <option value="">-- Toutes les couleurs --</option>
+        {% for couleur in couleurs %}
+            <option value="{{ couleur }}" {% if app.request.query.get('couleur') == couleur %}selected{% endif %}>{{ couleur }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="sort">
+        <option value="">-- Trier par --</option>
+        <option value="prix_asc" {% if app.request.query.get('sort') == 'prix_asc' %}selected{% endif %}>Prix croissant</option>
+        <option value="prix_desc" {% if app.request.query.get('sort') == 'prix_desc' %}selected{% endif %}>Prix décroissant</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+        <a href="{{ path('app_voiture') }}" class="btn btn-secondary" style="margin-left: 10px;">❌ Effacer</a>
+
+</form>
 
        <table border="1" cellpadding="8" cellspacing="0">
         <thead>
