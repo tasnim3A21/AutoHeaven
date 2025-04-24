@@ -4,29 +4,29 @@
             "content": {
                 "parts": [
                     {
-                        "text": "Ahla is a common Arabic greeting, meaning \"hello\" or \"hi.\"  It's often used in more informal settings.  Sometimes you'll see it spelled \"ahalan\" or \"ahlan.\"\n"
+                        "text": "Sorry, I can only answer questions about cars.\n"
                     }
                 ],
                 "role": "model"
             },
             "finishReason": "STOP",
-            "avgLogprobs": -0.22891940241274628
+            "avgLogprobs": -9.293012871322307e-5
         }
     ],
     "usageMetadata": {
-        "promptTokenCount": 2,
-        "candidatesTokenCount": 46,
-        "totalTokenCount": 48,
+        "promptTokenCount": 152,
+        "candidatesTokenCount": 11,
+        "totalTokenCount": 163,
         "promptTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 2
+                "tokenCount": 152
             }
         ],
         "candidatesTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 46
+                "tokenCount": 11
             }
         ]
     },

@@ -25,19 +25,28 @@ class ChatbotService
     {
         $model = 'gemini-1.5-pro-002';
         $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $this->apiKey;
-
+    
         try {
-            // Build the contents array for the API
             $contents = [];
+    
+            // System instruction to limit chatbot scope
+            $contents[] = [
+                'role' => 'user',
+                'parts' => [
+                    ['text' => 'You are a helpful assistant that only answers questions related to cars. If a question is not related to cars, reply with: "Sorry, I can only answer questions about cars."']
+                ]
+            ];
+    
+            // Add user/model messages
             foreach ($conversation as $message) {
                 $contents[] = [
-                    'role' => $message['role'] === 'user' ? 'user' : 'model', // Gemini uses 'model' for assistant
+                    'role' => $message['role'] === 'user' ? 'user' : 'model',
                     'parts' => [
                         ['text' => $message['text']]
                     ]
                 ];
             }
-
+    
             $response = $this->httpClient->request('POST', $endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -46,20 +55,20 @@ class ChatbotService
                     'contents' => $contents
                 ],
             ]);
-
+    
             $data = $response->toArray(false);
-
+    
             // Log response for debugging
             file_put_contents(__DIR__ . '/../gemini_response.json', json_encode($data, JSON_PRETTY_PRINT));
-
-            // Extract response text
+    
             if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                 return $data['candidates'][0]['content']['parts'][0]['text'];
             }
-
+    
             return 'Gemini responded, but no valid message was found.';
         } catch (\Throwable $e) {
             return 'Error: ' . $e->getMessage();
         }
     }
+    
 }

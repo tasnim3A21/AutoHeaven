@@ -100,6 +100,20 @@
         .chat-input button.clear:hover {
             background: #b71c1c;
         }
+        .chat-footer {
+            text-align: center;
+            padding: 15px;
+        }
+        .chat-footer a {
+            padding: 10px 20px;
+            background-color: #6200ea;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .chat-footer a:hover {
+            background-color: #4500a0;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +132,9 @@
             <button type="submit">Send</button>
             <button type="button" class="clear" onclick="clearChat()">Clear</button>
         </form>
+        <div class="chat-footer">
+            <a href="{{ path('app_voiture') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
     </div>
 
     <script>
