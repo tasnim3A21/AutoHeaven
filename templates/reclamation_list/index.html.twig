@@ -181,6 +181,17 @@
                 box-shadow: 0 0 4px rgba(40, 167, 69, 0.5);
             }
 
+            .status-btn.banni {
+                background: linear-gradient(135deg, #ff0000, #cc0000);
+                cursor: default;
+                box-shadow: 0 1px 3px var(--shadow-color);
+            }
+
+            .status-btn.banni:focus {
+                outline: none;
+                box-shadow: 0 0 4px rgba(255, 0, 0, 0.5);
+            }
+
             .delete-icon {
                 background: none;
                 border: none;
@@ -202,6 +213,12 @@
                 color: var(--primary-hover);
                 background-color: #f5f5f5;
                 box-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
+            }
+
+            .red-flag {
+                margin-left: 5px;
+                font-size: 14px;
+                color: #ff0000;
             }
 
             .modal {
@@ -487,6 +504,11 @@
                 background-color: #ff9999 !important;
             }
 
+            /* Style pour les lignes bannies */
+            .banned-row {
+                background-color: #d3d3d3 !important; /* Gris */
+            }
+
             @media screen and (max-width: 768px) {
                 .reclamation-table thead {
                     display: none;
@@ -618,7 +640,7 @@
             </thead>
             <tbody>
                 {% for reclamation in reclamations %}
-                    <tr class="{% if reclamation.isUrgent %}urgent-row{% endif %}">
+                    <tr class="{% if reclamation.isUrgent %}urgent-row{% endif %}" data-user-id="{{ reclamation.id|default('') }}">
                         <td data-label="Nom">{{ reclamation.nom }}</td>
                         <td data-label="Prénom">{{ reclamation.prenom }}</td>
                         <td data-label="Téléphone">{{ reclamation.tel }}</td>
@@ -712,6 +734,34 @@
                     table.order([column, order]).draw();
                 });
 
+                // Liste des "badwords" en français et en anglais
+                const badWords = [
+                    // Français
+                    'idiot', 'stupide', 'imbécile', 'insulte', 'grossier',
+                    'merde', 'putain', 'connard', 'salope', 'enculé',
+                    'con', 'débile', 'abruti', 'crétin', 'pétasse',
+                    // Anglais
+                    'fuck', 'shit', 'asshole', 'bitch', 'dick',
+                    'bastard', 'damn', 'cunt', 'prick', 'whore'
+                ];
+
+                // Vérifier les badwords dans les réclamations au chargement
+                table.rows().every(function () {
+                    const data = this.data();
+                    const titre = data[4].toLowerCase();
+                    const contenu = data[5].toLowerCase();
+                    const hasBadWord = badWords.some(word => titre.includes(word) || contenu.includes(word));
+
+                    if (hasBadWord) {
+                        // Afficher uniquement le drapeau rouge dans la colonne Statut
+                        table.cell(this, 7).data(`
+                            <i class="fas fa-flag red-flag"></i>
+                        `).draw();
+                        $(this.node()).addClass('banned-row');
+                    }
+                });
+
+                // Gestion de la suppression
                 $(document).on('click', '.delete-icon', function () {
                     const idRec = $(this).data('id');
                     $('#deleteModal').addClass('show');

@@ -200,13 +200,14 @@ final class ReclamationController extends AbstractController
                 }
 
                 return [
-                    'id_rec' => $reclamation->getIdRec(), // Ajout de id_rec pour la modale
+                    'id_rec' => $reclamation->getIdRec(),
                     'titre' => $reclamation->getTitre(),
                     'contenu' => $reclamation->getContenu(),
                     'status' => $reclamation->getStatus(),
                     'datecreation' => $reclamation->getDatecreation() ? $reclamation->getDatecreation()->format('d/m/Y H:i') : null,
                     'urgent' => $isUrgent,
                     'image' => $reclamation->getImage(),
+                    'hasResponse' => !$reclamation->getMessageries()->isEmpty(),
                 ];
             }, $reclamations);
 
@@ -218,6 +219,85 @@ final class ReclamationController extends AbstractController
             return new JsonResponse([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des réclamations : ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    #[Route('/reclamation/edit', name: 'app_reclamation_edit', methods: ['POST'])]
+    public function edit(Request $request): JsonResponse
+    {
+        try {
+            // Validate id_rec
+            $idRec = $request->request->get('id_rec');
+            if (!$idRec) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'ID de la réclamation manquant.'
+                ], 400);
+            }
+
+            // Fetch the reclamation
+            $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($idRec);
+            if (!$reclamation) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Réclamation non trouvée.'
+                ], 404);
+            }
+
+            // Check if the reclamation belongs to user with id = 3
+            if ($reclamation->getId() !== 3) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Vous n\'êtes pas autorisé à modifier cette réclamation.'
+                ], 403);
+            }
+
+            // Check if status is 'en_attente'
+            if ($reclamation->getStatus() !== 'en_attente') {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Cette réclamation ne peut plus être modifiée car son statut n\'est plus en attente.'
+                ], 403);
+            }
+
+            // Check if there are any responses
+            if (!$reclamation->getMessageries()->isEmpty()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Cette réclamation ne peut plus être modifiée car elle a déjà reçu une réponse.'
+                ], 403);
+            }
+
+            // Validate required fields
+            $titre = $request->request->get('titre');
+            $contenu = $request->request->get('contenu');
+            $urgent = $request->request->get('urgent') === 'true' || $request->request->get('urgent') === 'on';
+
+            if (!$titre || !$contenu) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Les champs titre et contenu sont requis.'
+                ], 400);
+            }
+
+            // Update reclamation fields
+            $reclamation->setTitre($titre);
+            $reclamation->setContenu($contenu);
+            $reclamation->setUrgent($urgent);
+            // Removed setKeywords since it doesn't exist in the Reclamation entity
+
+            $this->entityManager->persist($reclamation);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Réclamation modifiée avec succès !'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la modification de la réclamation : ' . $e->getMessage()
             ], 500);
         }
     }
