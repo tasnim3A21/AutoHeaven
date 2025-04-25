@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Reclamation;
-use App\Entity\Messagerie;
 use App\Form\ReclamationReponseType;
+use App\Service\MailerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,11 +17,13 @@ final class ReclamationListController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
+    private MailerService $mailerService;
 
-    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger, MailerService $mailerService)
     {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
+        $this->mailerService = $mailerService;
     }
 
     #[Route('/reclamation/list', name: 'app_reclamation_list')]
@@ -34,7 +36,6 @@ final class ReclamationListController extends AbstractController
         $nonUrgentCount = 0;
 
         foreach ($reclamations as $reclamation) {
-            // Récupérer l'ID utilisateur (clé étrangère vers user)
             $userId = $reclamation->getId();
             $userData = $this->entityManager->getConnection()->fetchAssociative(
                 'SELECT nom, prenom, tel, email FROM user WHERE id = ?',
@@ -47,7 +48,6 @@ final class ReclamationListController extends AbstractController
                 ]);
             }
 
-            // Vérifier si "urgente" ou "importante" est présent dans le titre ou le contenu
             $keywords = ['urgente', 'importante'];
             $title = strtolower($reclamation->getTitre() ?? '');
             $content = strtolower($reclamation->getContenu() ?? '');
@@ -59,7 +59,6 @@ final class ReclamationListController extends AbstractController
                 }
             }
 
-            // Compter les réclamations urgentes et non urgentes
             if ($isUrgent) {
                 $urgentCount++;
             } else {
@@ -99,8 +98,7 @@ final class ReclamationListController extends AbstractController
             throw $this->createNotFoundException('Réclamation non trouvée');
         }
 
-        $message = new Messagerie();
-        $form = $this->createForm(ReclamationReponseType::class, $message, [
+        $form = $this->createForm(ReclamationReponseType::class, null, [
             'reclamation_titre' => $reclamation->getTitre() ?? 'Titre non défini',
             'reclamation_contenu' => $reclamation->getContenu() ?? 'Contenu non défini',
         ]);
@@ -111,7 +109,7 @@ final class ReclamationListController extends AbstractController
             if ($form->isValid()) {
                 $this->logger->info('Formulaire valide pour id_rec={id_rec}', ['id_rec' => $id_rec]);
 
-                $userId = 3; // Utilisateur statique ID 3
+                $userId = 3; // Utilisateur statique ID 3 (admin)
                 $userExists = $this->entityManager->getConnection()->fetchOne(
                     'SELECT COUNT(*) FROM user WHERE id = ?',
                     [$userId]
@@ -125,29 +123,67 @@ final class ReclamationListController extends AbstractController
                     ]);
                 }
 
-                $message->setIdRec($reclamation);
-                $message->setMessage($form->get('message')->getData());
-                $message->setDatemessage(new \DateTime());
-                $message->setIdUser($userId);
-                $message->setSender('admin');
-                $message->setReceiver('client');
+                // Récupérer les données du formulaire
+                $messageContent = $form->get('message')->getData();
 
-                $reclamation->addMessagerie($message);
+                // Mettre à jour le statut de la réclamation
                 $reclamation->setStatus('repondu');
 
+                // Récupérer les informations du client (email, nom, prénom)
+                $clientUserId = $reclamation->getId();
+                $clientData = $this->entityManager->getConnection()->fetchAssociative(
+                    'SELECT email, nom, prenom FROM user WHERE id = ?',
+                    [$clientUserId]
+                );
+
                 try {
-                    $this->entityManager->persist($message);
+                    // Enregistrer la réclamation mise à jour
                     $this->entityManager->persist($reclamation);
                     $this->entityManager->flush();
-                    $this->logger->info('Réponse enregistrée avec succès pour id_rec={id_rec}', ['id_rec' => $id_rec]);
-                    $this->addFlash('success', 'Réponse envoyée avec succès !');
+                    $this->logger->info('Statut de la réclamation mis à jour pour id_rec={id_rec}', ['id_rec' => $id_rec]);
+
+                    // Utiliser l'email du client s'il existe, sinon utiliser une adresse par défaut
+                    $recipientEmail = !empty($clientData['email']) ? $clientData['email'] : 'abidiahlemea@gmail.com';
+
+                    // Préparer le nom et prénom du client pour la salutation
+                    $clientName = 'Client';
+                    if (!empty($clientData['nom']) && !empty($clientData['prenom'])) {
+                        $clientName = $clientData['prenom'] . ' ' . $clientData['nom'];
+                    } elseif (!empty($clientData['nom'])) {
+                        $clientName = $clientData['nom'];
+                    } elseif (!empty($clientData['prenom'])) {
+                        $clientName = $clientData['prenom'];
+                    }
+
+                    // Formatter le message avec la salutation et le texte fixe
+                    $formattedMessage = "Bonjour " . $clientName . ",\n\n" . $messageContent . "\n\nSi vous avez d'autres questions, n'hésitez pas à nous contacter.";
+
+                    $this->logger->info('Tentative d\'envoi d\'email à {email} pour id_rec={id_rec}', [
+                        'email' => $recipientEmail,
+                        'id_rec' => $id_rec
+                    ]);
+                    $this->mailerService->sendEmail(
+                        $recipientEmail,
+                        'Réponse à votre réclamation',
+                        $formattedMessage,
+                        'admin',
+                        'client',
+                        $id_rec,
+                        $userId
+                    );
+                    $this->logger->info('Email envoyé avec succès à {email} pour id_rec={id_rec}', [
+                        'email' => $recipientEmail,
+                        'id_rec' => $id_rec
+                    ]);
+                    $this->addFlash('success', 'Réponse envoyée avec succès et email transmis à ' . $recipientEmail . ' !');
+
                     return $this->redirectToRoute('app_reclamation_list');
                 } catch (\Exception $e) {
-                    $this->logger->error('Erreur lors de l\'enregistrement pour id_rec={id_rec} : {error}', [
+                    $this->logger->error('Erreur pour id_rec={id_rec} : {error}', [
                         'id_rec' => $id_rec,
                         'error' => $e->getMessage()
                     ]);
-                    $this->addFlash('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
+                    $this->addFlash('error', 'Erreur : ' . $e->getMessage());
                 }
             } else {
                 $errors = [];
