@@ -4,29 +4,29 @@
             "content": {
                 "parts": [
                     {
-                        "text": "Sorry, I can only answer questions about cars.\n"
+                        "text": "The latest Tesla models available are the Model S, Model 3, Model X, and Model Y.  Tesla frequently updates its models, so specifying what kind of \"latest\" you're asking about would help me give a more precise answer.  For example, are you curious about the newest model introduced, the most recent model year available, or the latest version with specific features?\n"
                     }
                 ],
                 "role": "model"
             },
             "finishReason": "STOP",
-            "avgLogprobs": -2.1677062084729023e-8
+            "avgLogprobs": -0.25286821775798557
         }
     ],
     "usageMetadata": {
-        "promptTokenCount": 69,
-        "candidatesTokenCount": 11,
-        "totalTokenCount": 80,
+        "promptTokenCount": 42,
+        "candidatesTokenCount": 79,
+        "totalTokenCount": 121,
         "promptTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 69
+                "tokenCount": 42
             }
         ],
         "candidatesTokensDetails": [
             {
                 "modality": "TEXT",
-                "tokenCount": 11
+                "tokenCount": 79
             }
         ]
     },

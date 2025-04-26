@@ -7,6 +7,7 @@ parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
     currencyfreaks_api_key: '%env(CURRENCYFREAKS_API_KEY)%'
+    api_ninjas_api_key: '%env(APININJAS_API_KEY)%'
 
 services:
     # default configuration for services in this file
@@ -32,6 +33,14 @@ services:
     App\Controller\CurrencyConversionController:
         arguments:
             $currencyfreaksApiKey: '%currencyfreaks_api_key%'
+
+    App\Service\CarDetailsService:
+        arguments:
+            $apiKey: '%api_ninjas_api_key%'
+
+    App\Controller\CarDetailsController:
+        arguments:
+            $apiNinjasApiKey: '%api_ninjas_api_key%'
 
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:

@@ -1,0 +1,62 @@
+{% block title %}Détails de la Voiture{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Recherche de Voiture</h1>
+
+    <form method="get" action="{{ path('car_details_index') }}" class="mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="make" class="form-label">Marque</label>
+                <input type="text" name="make" id="make" class="form-control" value="{{ make }}">
+            </div>
+            <div class="col-md-5">
+                <label for="model" class="form-label">Modèle</label>
+                <input type="text" name="model" id="model" class="form-control" value="{{ model }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Chercher</button>
+            </div>
+        </div>
+    </form>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if carDetails %}
+        <h2 class="mt-4">Résultats :</h2>
+        <ul class="list-group mt-3">
+            {% for car in carDetails %}
+                <li class="list-group-item">
+                    <h5><strong>{{ car.make|capitalize }} {{ car.model|capitalize }}</strong> - Année: {{ car.year ?? 'Non disponible' }}</h5>
+
+                    <ul>
+                        {# Basic Specs #}
+                        <li><strong>Cylindrée:</strong> {{ car.displacement ?? 'Non disponible' }} L</li>
+                        <li><strong>Cylindres:</strong> {{ car.cylinders ?? 'Non disponible' }}</li>
+                        <li><strong>Carburant:</strong> {{ car.fuel_type ?? 'Non disponible' }}</li>
+                        <li><strong>Transmission:</strong> {{ car.transmission ?? 'Non disponible' }}</li>
+                        <li><strong>Traction:</strong> {{ car.drive ?? 'Non disponible' }}</li>
+
+                        {# Mechanical Equipments #}
+                        <li><strong>Équipements Mécaniques :</strong>
+                            <ul>
+                                <li>Consommation en Ville: {{ car.city_mpg ?? 'Premium seulement 🔒' }}</li>
+                                <li>Consommation Autoroute: {{ car.highway_mpg ?? 'Premium seulement 🔒' }}</li>
+                                <li>Consommation Mixte: {{ car.combination_mpg ?? 'Premium seulement 🔒' }}</li>
+                            </ul>
+                        </li>
+
+                        {# Extended fields - always shown even if empty #}
+                        <li><strong>Puissance Moteur:</strong> {{ car.engine_power_hp ?? 'Premium seulement 🔒' }} HP</li>
+                        <li><strong>Couple Moteur:</strong> {{ car.engine_torque_lbft ?? 'Premium seulement 🔒' }} lb-ft</li>
+                        <li><strong>Vitesse Maximale:</strong> {{ car.top_speed_mph ?? 'Premium seulement 🔒' }} mph</li>
+                        <li><strong>Poids:</strong> {{ car.weight_lbs ?? 'Premium seulement 🔒' }} lbs</li>
+                        <li><strong>Nombre de Sièges:</strong> {{ car.seats ?? 'Premium seulement 🔒' }}</li>
+                        <li><strong>Nombre de Portes:</strong> {{ car.doors ?? 'Premium seulement 🔒' }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
