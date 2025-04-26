@@ -9,12 +9,68 @@
         <div class="card shadow-sm rounded-3 border-0">
             <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Liste des Commandes</h5>
-               
+                
+                <div class="d-flex align-items-center">
+                    <!-- Barre de recherche AJAX -->
+                    <div class="search-container position-relative me-3">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par nom..." 
+                                   value="{{ searchTerm ?? '' }}">
+                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div id="searchResults" class="dropdown-menu w-100" style="display: none;"></div>
+                    </div>
+
+                    <!-- Menu de tri -->
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-sort"></i> Trier
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item sort-option {{ currentSort == 'c.date_com' and currentDirection == 'DESC' ? 'active' : '' }}" 
+                                   href="{{ path('app_commande', app.request.query.all|merge({'sort': 'c.date_com', 'direction': 'DESC'})) }}">
+                                   Date (récentes d'abord)
+                            </a></li>
+                            <li><a class="dropdown-item sort-option {{ currentSort == 'c.date_com' and currentDirection == 'ASC' ? 'active' : '' }}" 
+                                   href="{{ path('app_commande', app.request.query.all|merge({'sort': 'c.date_com', 'direction': 'ASC'})) }}">
+                                   Date (anciennes d'abord)
+                            </a></li>
+                            <li><a class="dropdown-item sort-option {{ currentSort == 'u.nom' and currentDirection == 'ASC' ? 'active' : '' }}" 
+                                   href="{{ path('app_commande', app.request.query.all|merge({'sort': 'u.nom', 'direction': 'ASC'})) }}">
+                                   Nom (A-Z)
+                            </a></li>
+                            <li><a class="dropdown-item sort-option {{ currentSort == 'u.nom' and currentDirection == 'DESC' ? 'active' : '' }}" 
+                                   href="{{ path('app_commande', app.request.query.all|merge({'sort': 'u.nom', 'direction': 'DESC'})) }}">
+                                   Nom (Z-A)
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             
             <div class="card-body">
-               
+                <!-- Filtres par statut -->
+                <div class="mb-3">
+                    <div class="btn-group btn-group-sm filter-buttons">
+                        <a href="{{ path('app_commande', app.request.query.all|merge({'filter': 'all'})) }}" 
+                           class="btn btn-sm {{ currentFilter == 'all' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            Toutes
+                        </a>
+                        <a href="{{ path('app_commande', app.request.query.all|merge({'filter': 'en attente'})) }}" 
+                           class="btn btn-sm {{ currentFilter == 'en attente' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            En attente
+                        </a>
+                        <a href="{{ path('app_commande', app.request.query.all|merge({'filter': 'traitée'})) }}" 
+                           class="btn btn-sm {{ currentFilter == 'traitée' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            Traitées
+                        </a>
+                    </div>
+                </div>
 
+                <!-- Tableau des commandes -->
                 <div class="table-responsive">
                     <table class="table align-middle" id="commandesTable">
                         <thead class="table-light">
@@ -75,6 +131,7 @@
                     </table>
                 </div>
 
+                <!-- Pagination -->
                 {% if commandes|length > 0 %}
                     <nav aria-label="Pagination">
                         {{ knp_pagination_render(commandes) }}
@@ -85,6 +142,157 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Remplacez tout le code JavaScript par : -->
+<script>
+$(document).ready(function() {
+    const $searchInput = $('#searchInput');
+    const $tableBody = $('#commandesTable tbody');
+    let searchTimeout;
+
+    function renderCommandes(commandes) {
+        if (commandes.length === 0) {
+            $tableBody.html(`
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                        <p class="text-muted">Aucune commande trouvée</p>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        let html = '';
+        commandes.forEach(commande => {
+            html += `
+                <tr class="${commande.status === 'en attente' ? 'table-warning' : ''}">
+                    <td>CMD-${commande.id}</td>
+                    <td>${commande.nom} ${commande.prenom}</td>
+                    <td>${commande.tel}</td>
+                    <td>
+                        ${commande.date.split(' ')[0]}
+                        <small class="text-muted d-block">${commande.date.split(' ')[1]}</small>
+                    </td>
+                    <td class="font-weight-bold">${commande.montant} €</td>
+                    <td>
+                        <span class="badge badge-${commande.statusClass}">
+                            ${commande.status}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="/commande/details/${commande.id}" 
+                               class="btn btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            ${commande.status === 'en attente' ? `
+                            <a href="/commande/confirm/${commande.id}" 
+                               class="btn btn-success"
+                               onclick="return confirm('Confirmer cette commande ?')">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        $tableBody.html(html);
+    }
+
+    function performSearch(searchTerm) {
+        clearTimeout(searchTimeout);
+        
+        if (searchTerm.length < 1) {
+            // Recharger la page si la recherche est vide
+            window.location.href = '{{ path("app_commande") }}';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            $.ajax({
+                url: '{{ path("app_commande_search") }}',
+                data: { 
+                    q: searchTerm,
+                    filter: '{{ currentFilter }}'
+                },
+                beforeSend: function() {
+                    $tableBody.html(`
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                },
+                success: function(data) {
+                    renderCommandes(data);
+                },
+                error: function() {
+                    $tableBody.html(`
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-danger">
+                                Une erreur est survenue lors de la recherche
+                            </td>
+                        </tr>
+                    `);
+                }
+            });
+        }, 300);
+    }
+
+    // Événements
+    $searchInput.on('input', function() {
+        performSearch($(this).val());
+    });
+
+    $('#searchButton').on('click', function() {
+        performSearch($searchInput.val());
+    });
+
+    $searchInput.on('keypress', function(e) {
+        if (e.which === 13) {
+            performSearch($(this).val());
+        }
+    });
+});
+</script>
+
+    <style>
+        .search-container {
+            position: relative;
+            min-width: 300px;
+        }
+        #searchResults {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        .dropdown-item {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #eee;
+            white-space: normal;
+        }
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        .filter-buttons .btn {
+            border-radius: 20px;
+            margin-right: 5px;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    </style>
 {% endblock %}

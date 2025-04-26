@@ -19,27 +19,102 @@ final class CommandeController extends AbstractController
         Request $request,
         PaginatorInterface $paginator
     ): Response {
-        $query = $commandeRepository->createQueryBuilder('c')
-            ->join('c.id', 'u')
-            ->addSelect('u')
-            ->orderBy('c.date_com', 'DESC')
-            ->getQuery();
-
+        $filter = $request->query->get('filter', 'all');
+       
+        $sort = $request->query->get('sort', 'c.date_com');
+        $direction = $request->query->get('direction', 'DESC');
+    
+        // Construction de la requête de base
+        $queryBuilder = $commandeRepository->createQueryBuilder('c')
+            ->leftJoin('c.id', 'u')
+            ->addSelect('u');
+    
+        // Filtre par statut
+        if ($filter !== 'all') {
+            $queryBuilder->andWhere('c.status = :status')
+                ->setParameter('status', $filter);
+        }
+    
+      
+    
+        // Gestion du tri
+        $validSortFields = ['c.date_com', 'u.nom']; // Liste des champs autorisés
+        $sortField = in_array($sort, $validSortFields) ? $sort : 'c.date_com';
+        $sortDirection = in_array(strtoupper($direction), ['ASC', 'DESC']) ? $direction : 'DESC';
+        
+        $queryBuilder->orderBy($sortField, $sortDirection);
+    
+        // Configuration de la pagination sans utiliser les options problématiques
         $commandes = $paginator->paginate(
-            $query,
+            $queryBuilder,
             $request->query->getInt('page', 1),
-            10
+            10,
+            [
+                'wrap-queries' => true,
+                'sortFieldWhitelist' => $validSortFields // Liste blanche des champs de tri
+            ]
         );
-
+    
         return $this->render('commande/index.html.twig', [
             'commandes' => $commandes,
-            'currentFilter' => 'all'
+            'currentFilter' => $filter,
+           
+            'currentSort' => $sortField,
+            'currentDirection' => $sortDirection
         ]);
     }
-
-  
-
    
+
+    #[Route('/commande/search', name: 'app_commande_search', methods: ['GET'])]
+    public function search(CommandeRepository $commandeRepository, Request $request): JsonResponse
+    {
+        try {
+            $searchTerm = $request->query->get('q', '');
+            $filter = $request->query->get('filter', 'all');
+    
+            $queryBuilder = $commandeRepository->createQueryBuilder('c')
+                ->join('c.id', 'u')
+                ->addSelect('u')
+                ->where('u.nom LIKE :search OR u.prenom LIKE :search')
+                ->setParameter('search', '%'.$searchTerm.'%');
+    
+            if ($filter !== 'all') {
+                $queryBuilder->andWhere('c.status = :status')
+                    ->setParameter('status', $filter);
+            }
+    
+            $commandes = $queryBuilder
+                ->orderBy('c.date_com', 'DESC')
+                ->getQuery()
+                ->getResult();
+    
+            $results = [];
+            foreach ($commandes as $commande) {
+                $user = $commande->getId();
+                $results[] = [
+                    'id' => $commande->getIdCom(),
+                    'nom' => $user->getNom(),
+                    'prenom' => $user->getPrenom(),
+                    'tel' => $user->getTel(),
+                    'date' => $commande->getDateCom()->format('d/m/Y H:i'),
+                    'montant' => number_format($commande->getMontantTotal(), 2),
+                    'status' => $commande->getStatus(),
+                    'statusClass' => $commande->getStatus() == 'traitée' ? 'success' : 'warning'
+                ];
+            }
+    
+            return $this->json([
+                'success' => true,
+                'data' => $results
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     #[Route('/commande/confirm/{id}', name: 'app_commande_confirm')]
     public function confirm(int $id, EntityManagerInterface $entityManager): Response
     {

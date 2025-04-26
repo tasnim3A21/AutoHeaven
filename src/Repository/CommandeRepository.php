@@ -103,6 +103,6 @@ public function getMonthlySales(int $months = 6): array
     }
 
     return $data;
-}  // Add custom methods as needed
+} 
 
 }
