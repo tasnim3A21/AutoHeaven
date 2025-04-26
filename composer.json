@@ -10,7 +10,7 @@
 
         "beberlei/doctrineextensions": "^1.5",
 
-        "cboden/ratchet": "*
+        "cboden/ratchet": "*",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",

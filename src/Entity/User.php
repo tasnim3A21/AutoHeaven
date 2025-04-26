@@ -202,7 +202,7 @@ class User
 
 
 
-    #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
+    /*#[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
 
         public function getCommandes(): Collection
@@ -232,7 +232,7 @@ class User
             return $this;
         }
 
-
+*/
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;

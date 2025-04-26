@@ -78,15 +78,7 @@ class Voiture
         return $this->aviss;
     }
 
-    public function addAvis(Avis $avis): self
-    {
-        if (!$this->aviss->contains($avis)) {
-            $this->aviss[] = $avis;
-            $avis->setIdV($this); // Associer l'avis à la voiture
-        }
-
-        return $this;
-    }
+   
 
     public function removeAvis(Avis $avis): self
     {

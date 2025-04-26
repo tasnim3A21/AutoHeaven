@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_admin.html.twig' %}
 
 {% block title %}Liste des Avis{% endblock %}
 {% block spinner %}{% endblock %}
@@ -8,13 +8,12 @@
 
         <h1 class="mb-4" style="text-align: center; color: #0a0a23;">Liste des Avis</h1>
 
-        {# Recherche par mot-clé #}
-        <div class="form-group mb-3">
-            <label for="searchKeyword">Rechercher un mot-clé</label>
-            <input type="text" id="searchKeyword" name="searchKeyword" class="form-control" placeholder="Entrez un mot-clé pour la recherche">
+        {# Recherche par voiture #}
+        <div class="mb-4">
+            <label for="voitureId">Rechercher les avis par ID de voiture :</label>
+            <input type="number" id="voitureId" placeholder="Entrez un ID..." />
+            <button type="button" id="btnRechercher" class="btn btn-secondary btn-sm">Rechercher</button>
         </div>
-
-        <button id="btnRechercher" class="btn btn-primary mb-3">Rechercher</button>
 
         {# Tableau des avis #}
         <table class="table table-bordered" style="border-collapse: collapse;">
@@ -24,6 +23,7 @@
                     <th>Commentaire</th>
                     <th>Date</th>
                     <th>Utilisateur</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="avisTableBody">
@@ -37,6 +37,17 @@
                         <td>{{ avis.commentaire }}</td>
                         <td>{{ avis.dateavis ? avis.dateavis|date('Y-m-d') : 'Aucune date' }}</td>
                         <td>{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</td>
+                        <td>
+                            <a href="{{ path('app_avis_edit', {'id': avis.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                            <form method="post"
+                                  action="{{ path('app_avis_delete', {'id': avis.id}) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Confirmer la suppression ?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ avis.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -67,26 +78,26 @@
         const tbody = document.getElementById('avisTableBody');
 
         btn.addEventListener('click', () => {
-            const keyword = document.getElementById('searchKeyword').value.trim();
-            if (!keyword) {
-                alert('Veuillez entrer un mot-clé pour la recherche.');
+            const id = document.getElementById('voitureId').value.trim();
+            if (!id) {
+                alert('Veuillez saisir un ID de voiture.');
                 return;
             }
 
-            fetch(`/avis/search?searchKeyword=${keyword}`)
+            fetch(/avis/api/avis/voiture/${id})
                 .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    if (!res.ok) throw new Error(HTTP ${res.status});
                     return res.json();
                 })
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `
+                        tbody.innerHTML = 
                             <tr>
-                              <td colspan="4" class="text-center p-3">
-                                Aucun avis trouvé pour "${keyword}".
+                              <td colspan="5" class="text-center p-3">
+                                Aucun avis trouvé pour la voiture #${id}.
                               </td>
-                            </tr>`;
+                            </tr>;
                         return;
                     }
 
@@ -95,13 +106,14 @@
                         const color = note >= 4 ? '#d4edda' : (note === 3 ? '#fff3cd' : '#f8d7da');
                         const smile = note >= 4 ? '😊' : (note === 3 ? '😐' : '😞');
 
-                        tbody.innerHTML += `
+                        tbody.innerHTML += 
                             <tr style="background-color: ${color};">
                               <td>${note} ${smile}</td>
                               <td>${a.commentaire}</td>
                               <td>${a.dateavis}</td>
                               <td>${a.utilisateur}</td>
-                            </tr>`;
+                              <td>—</td>
+                            </tr>;
                     });
                 })
                 .catch(err => {
@@ -122,10 +134,10 @@
                 data.forEach(c => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    li.textContent = `${c.prenom} ${c.nom}`;
+                    li.textContent = ${c.prenom} ${c.nom};
                     const span = document.createElement('span');
                     span.className = 'badge bg-primary rounded-pill';
-                    span.textContent = `${c.nbAvis} avis`;
+                    span.textContent = ${c.nbAvis} avis;
                     li.append(span);
                     ul.append(li);
                 });
@@ -133,4 +145,4 @@
             .catch(err => console.error('Erreur Top Clients :', err));
     });
     </script>
-{% endblock %}
+{% endblock %} 
