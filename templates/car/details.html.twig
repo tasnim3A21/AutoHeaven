@@ -41,9 +41,11 @@
                     </p>
                 </div>
             </div>
+            <a href="{{ path('car_details_index', { make: voiture.marque, model: '' }) }}" class="btn btn-outline-info">
+        Infos Complètes
+    </a>
         </div>
     </div>
-
     <a href="{{ path('app_car') }}" class="btn btn-secondary mt-3">⬅️ Retour à la liste</a>
 </div>
 {% endblock %}
