@@ -123,6 +123,7 @@ final class ReclamationListController extends AbstractController
                     ]);
                 }
 
+                
                 // Récupérer les données du formulaire
                 $messageContent = $form->get('message')->getData();
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Reclamation;
+use App\Event\ReclamationSubmittedEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,21 +14,24 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReclamationController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private EventDispatcherInterface $eventDispatcher;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, EventDispatcherInterface $eventDispatcher)
     {
         $this->entityManager = $entityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     #[Route('/reclamation', name: 'app_reclamation', methods: ['GET', 'POST'])]
     public function index(Request $request): Response
     {
         $reclamation = new Reclamation();
-        $reclamation->setId(3); // Set static user ID to 3 as per requirement
+        $reclamation->setId(3); // ID statique 3 comme spécifié
 
         // Create the form using createFormBuilder
         $form = $this->createFormBuilder($reclamation)
@@ -55,7 +59,7 @@ final class ReclamationController extends AbstractController
             ])
             ->add('imageFile', FileType::class, [
                 'label' => false,
-                'mapped' => false, // Do not map directly to the entity
+                'mapped' => false,
                 'required' => false,
                 'attr' => [
                     'id' => 'form_imageFile',
@@ -93,8 +97,13 @@ final class ReclamationController extends AbstractController
 
             if ($form->isValid()) {
                 try {
+                    $reclamation->setDatecreation(new \DateTime());
                     $this->entityManager->persist($reclamation);
                     $this->entityManager->flush();
+
+                    // Déclencher l'événement de soumission de réclamation
+                    $event = new ReclamationSubmittedEvent($reclamation);
+                    $this->eventDispatcher->dispatch($event, ReclamationSubmittedEvent::NAME);
                 } catch (\Exception $e) {
                     if ($request->isXmlHttpRequest()) {
                         return new JsonResponse([
@@ -137,6 +146,60 @@ final class ReclamationController extends AbstractController
         ]);
     }
 
+    #[Route('/reclamation/list', name: 'app_reclamation_list', methods: ['GET'])]
+    public function list(): Response
+    {
+        // Récupérer toutes les réclamations
+        $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+
+        // Préparer les données pour le template
+        $reclamationsData = [];
+        $urgentCount = 0;
+        $nonUrgentCount = 0;
+
+        // Définir les informations statiques de l'utilisateur avec ID 3
+        $userStaticData = [
+            'nom' => 'ahlem',
+            'prenom' => 'ahlem',
+            'tel' => '58732503',
+            'email' => 'ahlemhidri724@gmail.com',
+        ];
+
+        foreach ($reclamations as $reclamation) {
+            // Vérifier si la réclamation est urgente en fonction de la case à cocher ou des mots-clés
+            $title = strtolower($reclamation->getTitre() ?? '');
+            $content = strtolower($reclamation->getContenu() ?? '');
+            $isUrgent = $reclamation->isUrgent() || str_contains($title, 'urgente') || str_contains($content, 'urgente') || str_contains($title, 'importante') || str_contains($content, 'importante');
+
+            // Ajouter les informations de l'utilisateur uniquement si l'ID de la réclamation correspond à 3
+            $reclamationsData[] = [
+                'id_rec' => $reclamation->getIdRec(),
+                'nom' => $reclamation->getId() === 3 ? $userStaticData['nom'] : 'N/A',
+                'prenom' => $reclamation->getId() === 3 ? $userStaticData['prenom'] : 'N/A',
+                'tel' => $reclamation->getId() === 3 ? $userStaticData['tel'] : 'N/A',
+                'email' => $reclamation->getId() === 3 ? $userStaticData['email'] : 'N/A',
+                'titre' => $reclamation->getTitre(),
+                'contenu' => $reclamation->getContenu(),
+                'status' => $reclamation->getStatus(),
+                'datecreation' => $reclamation->getDatecreation(),
+                'urgent' => $isUrgent, // Changé de 'isUrgent' à 'urgent' pour correspondre au template
+                'image' => $reclamation->getImage(),
+            ];
+
+            if ($isUrgent) {
+                $urgentCount++;
+            } else {
+                $nonUrgentCount++;
+            }
+        }
+
+        return $this->render('reclamation_admin/index.html.twig', [
+            'reclamations' => $reclamationsData,
+            'urgentCount' => $urgentCount,
+            'nonUrgentCount' => $nonUrgentCount,
+        ]);
+    }
+
     #[Route('/reclamation/history', name: 'app_reclamation_history', methods: ['GET'])]
     public function history(): Response
     {
@@ -160,6 +223,10 @@ final class ReclamationController extends AbstractController
 
             $reclamationsWithData[] = [
                 'idRec' => $reclamation->getIdRec(),
+                'nom' => 'N/A',
+                'prenom' => 'N/A',
+                'tel' => 'N/A',
+                'email' => 'N/A',
                 'titre' => $reclamation->getTitre(),
                 'contenu' => $reclamation->getContenu(),
                 'status' => $reclamation->getStatus(),
@@ -183,7 +250,7 @@ final class ReclamationController extends AbstractController
                 ->findBy(
                     ['id' => 3],
                     ['datecreation' => 'DESC'],
-                    5 // Limit to 5 recent reclamations
+                    5
                 );
 
             $reclamationsData = array_map(function (Reclamation $reclamation) {
@@ -201,6 +268,10 @@ final class ReclamationController extends AbstractController
 
                 return [
                     'id_rec' => $reclamation->getIdRec(),
+                    'nom' => 'N/A',
+                    'prenom' => 'N/A',
+                    'tel' => 'N/A',
+                    'email' => 'N/A',
                     'titre' => $reclamation->getTitre(),
                     'contenu' => $reclamation->getContenu(),
                     'status' => $reclamation->getStatus(),
@@ -285,7 +356,6 @@ final class ReclamationController extends AbstractController
             $reclamation->setTitre($titre);
             $reclamation->setContenu($contenu);
             $reclamation->setUrgent($urgent);
-            // Removed setKeywords since it doesn't exist in the Reclamation entity
 
             $this->entityManager->persist($reclamation);
             $this->entityManager->flush();

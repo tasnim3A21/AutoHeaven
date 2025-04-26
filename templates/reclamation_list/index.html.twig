@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 
         <style>
             :root {
@@ -506,7 +507,72 @@
 
             /* Style pour les lignes bannies */
             .banned-row {
-                background-color: #d3d3d3 !important; /* Gris */
+                background-color: #d3d3d3 !important;
+            }
+
+            /* Styles pour la notification */
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(145deg, #ffffff, #f8f9fa);
+                border: 1px solid var(--border-color);
+                border-left: 4px solid var(--primary-color);
+               nost-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 4px 10px var(--shadow-color);
+                z-index: 2000;
+                max-width: 350px;
+                font-family: var(--font-family);
+                opacity: 0;
+                transform: translateX(100%);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+
+            .notification.show {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .notification .notification-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .notification .notification-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--text-color);
+            }
+
+            .notification .notification-close {
+                background: none;
+                border: none;
+                font-size: 16px;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+            .notification .notification-close:hover {
+                color: var(--primary-color);
+            }
+
+            .notification .notification-body {
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.4;
+            }
+
+            .notification .notification-body p {
+                margin: 5px 0;
+            }
+
+            .notification .notification-body .urgent {
+                color: var(--primary-color);
+                font-weight: 600;
             }
 
             @media screen and (max-width: 768px) {
@@ -589,6 +655,21 @@
                 .dataTables_wrapper .dataTables_paginate .paginate_button {
                     padding: 5px 8px;
                     font-size: 11px;
+                }
+
+                .notification {
+                    top: 10px;
+                    right: 10px;
+                    max-width: 90%;
+                    padding: 10px;
+                }
+
+                .notification .notification-title {
+                    font-size: 13px;
+                }
+
+                .notification .notification-body {
+                    font-size: 12px;
                 }
             }
         </style>
@@ -691,6 +772,107 @@
 
         <script>
             $(document).ready(function () {
+                // Initialiser Pusher
+                const pusher = new Pusher('74385132812fd01535d9', {
+                    cluster: 'eu',
+                    encrypted: true
+                });
+
+                // S'abonner au canal admin-channel
+                const channel = pusher.subscribe('admin-channel');
+
+                // Lier l'événement new-reclamation
+                channel.bind('new-reclamation', function(data) {
+                    // Créer la notification
+                    const notification = document.createElement('div');
+                    notification.className = 'notification';
+                    notification.innerHTML = `
+                        <div class="notification-header">
+                            <span class="notification-title">Nouvelle Réclamation</span>
+                            <button class="notification-close">×</button>
+                        </div>
+                        <div class="notification-body">
+                            <p><strong>Nom :</strong> ${data.nom}</p>
+                            <p><strong>Prénom :</strong> ${data.prenom}</p>
+                            <p><strong>Téléphone :</strong> ${data.tel}</p>
+                            <p><strong>Email :</strong> ${data.email}</p>
+                            <p><strong>Titre :</strong> ${data.titre}</p>
+                            <p><strong>Contenu :</strong> ${data.contenu}</p>
+                            <p><strong>Urgent :</strong> <span class="${data.urgent ? 'urgent' : ''}">${data.urgent ? 'Oui' : 'Non'}</span></p>
+                            <p><strong>Date :</strong> ${data.datecreation}</p>
+                            ${data.image ? `<p><strong>Image :</strong> <a href="/Uploads/reclamations/${data.image}" target="_blank">Voir l'image</a></p>` : ''}
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Afficher la notification
+                    setTimeout(() => {
+                        notification.classList.add('show');
+                    }, 100);
+
+                    // Fermer la notification après 10 secondes ou au clic
+                    const closeBtn = notification.querySelector('.notification-close');
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 300);
+                    });
+
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.classList.remove('show');
+                            setTimeout(() => {
+                                notification.remove();
+                            }, 300);
+                        }
+                    }, 10000);
+
+                    // Ajouter la réclamation au tableau DataTable
+                    const table = $('#reclamationTable').DataTable();
+                    const isUrgent = data.urgent || ['urgente', 'importante'].some(keyword => 
+                        data.titre.toLowerCase().includes(keyword) || data.contenu.toLowerCase().includes(keyword)
+                    );
+                    const rowData = [
+                        data.nom,
+                        data.prenom,
+                        data.tel,
+                        data.email,
+                        data.titre,
+                        data.contenu,
+                        data.image ? `<a href="/Uploads/reclamations/${data.image}" target="_blank"><img src="/Uploads/reclamations/${data.image}" alt="Image de la réclamation" class="reclamation-image"></a>` : 'Aucune image',
+                        `<a href="{{ path('app_reclamation_respond', {'id_rec': '__ID__'}) }}".replace('__ID__', data.id_rec) class="status-btn en-attente">En attente</a>`,
+                        data.datecreation,
+                        `<button class="delete-icon" data-id="${data.id_rec}"><i class="fas fa-trash"></i></button>`
+                    ];
+                    const rowNode = table.row.add(rowData).draw().node();
+                    if (isUrgent) {
+                        $(rowNode).addClass('urgent-row');
+                    }
+
+                    // Vérifier les badwords
+                    const badWords = [
+                        'idiot', 'stupide', 'imbécile', 'insulte', 'grossier',
+                        'merde', 'putain', 'connard', 'salope', 'enculé',
+                        'con', 'débile', 'abruti', 'crétin', 'pétasse',
+                        'fuck', 'shit', 'asshole', 'bitch', 'dick',
+                        'bastard', 'damn', 'cunt', 'prick', 'whore'
+                    ];
+                    const titre = data.titre.toLowerCase();
+                    const contenu = data.contenu.toLowerCase();
+                    const hasBadWord = badWords.some(word => titre.includes(word) || contenu.includes(word));
+                    if (hasBadWord) {
+                        table.cell(rowNode, 7).data(`<i class="fas fa-flag red-flag"></i>`).draw();
+                        $(rowNode).addClass('banned-row');
+                    }
+
+                    // Mettre à jour les compteurs
+                    const urgentCount = parseInt($('.stats-box .urgent').text()) + (isUrgent ? 1 : 0);
+                    const nonUrgentCount = parseInt($('.stats-box .non-urgent').text()) + (isUrgent ? 0 : 1);
+                    $('.stats-box .urgent').text(urgentCount);
+                    $('.stats-box .non-urgent').text(nonUrgentCount);
+                });
+
                 const table = $('#reclamationTable').DataTable({
                     "language": {
                         "decimal": "",

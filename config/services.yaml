@@ -19,16 +19,15 @@ services:
     Symfony\Component\Finder\Finder: ~
 
     Pusher\Pusher:
+        class: Pusher\Pusher
         arguments:
-            $auth_key: '%pusher.key%'
-            $secret: '%pusher.secret%'
-            $app_id: '%pusher.app_id%'
+            $auth_key: '74385132812fd01535d9'
+            $secret: '4937fbe3b81792e1a3cf'
+            $app_id: '1981315'
             $options:
-                cluster: '%pusher.cluster%'
+                cluster: 'eu'
                 useTLS: true
 
-
-
-
-   
-    
+    App\EventListener\ReclamationNotificationListener:
+        tags:
+            - { name: kernel.event_listener, event: reclamation.submitted, method: onReclamationSubmitted }
