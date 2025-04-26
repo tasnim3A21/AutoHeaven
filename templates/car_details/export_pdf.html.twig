@@ -1,0 +1,60 @@
+{# templates/car_details/export_pdf.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche de Voiture - {{ make }} {{ model }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #333; text-align: center; }
+        .card { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+        .section-title { color: #0066cc; font-size: 18px; margin-top: 20px; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Recherche de Voiture</h1>
+    <h2 style="text-align: center;">{{ make|capitalize }} {{ model|capitalize }}</h2>
+    
+    {% if error %}
+        <div style="color: red; text-align: center;">{{ error }}</div>
+    {% endif %}
+
+    {% for car in carDetails %}
+        <div class="card">
+            <h3>{{ car.make|capitalize }} {{ car.model|capitalize }} ({{ car.year ?? 'Année inconnue' }})</h3>
+            
+            <h4 class="section-title">Informations de base</h4>
+            <ul>
+                <li><strong>Cylindrée:</strong> {{ car.displacement ?? 'N/A' }} L</li>
+                <li><strong>Cylindres:</strong> {{ car.cylinders ?? 'N/A' }}</li>
+                <li><strong>Carburant:</strong> {{ car.fuel_type ?? 'N/A' }}</li>
+                <li><strong>Transmission:</strong> {{ car.transmission ?? 'N/A' }}</li>
+                <li><strong>Traction:</strong> {{ car.drive ?? 'N/A' }}</li>
+            </ul>
+            
+            <h4 class="section-title">Performances</h4>
+            <ul>
+                <li><strong>Consommation Ville:</strong> {{ car.city_mpg ?? 'Premium 🔒' }}</li>
+                <li><strong>Autoroute:</strong> {{ car.highway_mpg ?? 'Premium 🔒' }}</li>
+                <li><strong>Mixte:</strong> {{ car.combination_mpg ?? 'Premium 🔒' }}</li>
+            </ul>
+            
+            <h4 class="section-title">Spécifications supplémentaires</h4>
+            <ul>
+                <li><strong>Puissance:</strong> {{ car.engine_power_hp ?? 'Premium 🔒' }} HP</li>
+                <li><strong>Couple:</strong> {{ car.engine_torque_lbft ?? 'Premium 🔒' }} lb-ft</li>
+                <li><strong>Vitesse Max:</strong> {{ car.top_speed_mph ?? 'Premium 🔒' }} mph</li>
+                <li><strong>Poids:</strong> {{ car.weight_lbs ?? 'Premium 🔒' }} lbs</li>
+                <li><strong>Sièges:</strong> {{ car.seats ?? 'Premium 🔒' }}</li>
+                <li><strong>Portes:</strong> {{ car.doors ?? 'Premium 🔒' }}</li>
+            </ul>
+        </div>
+    {% endfor %}
+    
+    <footer style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+        Généré le {{ "now"|date("d/m/Y H:i") }} - AutoHeaven
+    </footer>
+</body>
+</html>

@@ -92,4 +92,12 @@
             </div>
         </div>
     </div>
+    {% if carDetails %}
+    <div class="text-center mb-4">
+        <a href="{{ path('car_details_export_pdf', {'make': make, 'model': model}) }}" 
+           class="btn btn-success">
+            <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+        </a>
+    </div>
+{% endif %}
 {% endblock %}
