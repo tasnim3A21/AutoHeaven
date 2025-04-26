@@ -26,7 +26,7 @@
                     <h5 class="card-title">{{ voiture.marque }} - {{ voiture.description }}</h5>
                     <p class="card-text">
                         <strong>Modèle:</strong> {{ voiture.marque }}<br>
-                        <strong>Prix:</strong> {{ voiture.prix }} TND<br>
+                        <strong>Prix:</strong> {{ voiture.prix }} TND <a href="{{ path('currency_conversion', { amount: voiture.prix }) }}" class="btn btn-outline-success">Convertir le Prix</a><br>
                         <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
                         <strong>Couleur:</strong> {{ voiture.couleur }}<br>
                         <strong>Disponibilité:</strong> {{ voiture.disponibilite == '1' ? 'Disponible' : 'Indisponible' }}<br>
