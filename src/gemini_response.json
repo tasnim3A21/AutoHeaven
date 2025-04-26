@@ -10,7 +10,7 @@
                 "role": "model"
             },
             "finishReason": "STOP",
-            "avgLogprobs": -2.817548027616629e-7
+            "avgLogprobs": -2.571278442205353e-5
         }
     ],
     "usageMetadata": {
