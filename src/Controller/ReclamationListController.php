@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Reclamation;
 use App\Form\ReclamationReponseType;
+use App\Service\GeminiTranslationService;
 use App\Service\MailerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,12 +19,18 @@ final class ReclamationListController extends AbstractController
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
     private MailerService $mailerService;
+    private GeminiTranslationService $translationService;
 
-    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger, MailerService $mailerService)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        LoggerInterface $logger,
+        MailerService $mailerService,
+        GeminiTranslationService $translationService
+    ) {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
         $this->mailerService = $mailerService;
+        $this->translationService = $translationService;
     }
 
     #[Route('/reclamation/list', name: 'app_reclamation_list')]
@@ -36,6 +43,15 @@ final class ReclamationListController extends AbstractController
         $nonUrgentCount = 0;
 
         foreach ($reclamations as $reclamation) {
+            $idRec = $reclamation->getIdRec();
+            // Skip reclamations with invalid id_rec
+            if (!is_numeric($idRec) || $idRec <= 0) {
+                $this->logger->warning('Invalid id_rec={id_rec} for reclamation, skipping', [
+                    'id_rec' => $idRec
+                ]);
+                continue;
+            }
+
             $userId = $reclamation->getId();
             $userData = $this->entityManager->getConnection()->fetchAssociative(
                 'SELECT nom, prenom, tel, email FROM user WHERE id = ?',
@@ -44,7 +60,7 @@ final class ReclamationListController extends AbstractController
             if (!$userData) {
                 $this->logger->warning('No user found for user ID {user_id} in reclamation ID {id_rec}', [
                     'user_id' => $userId,
-                    'id_rec' => $reclamation->getIdRec()
+                    'id_rec' => $idRec
                 ]);
             }
 
@@ -66,7 +82,7 @@ final class ReclamationListController extends AbstractController
             }
 
             $reclamationsWithUserData[] = [
-                'id_rec' => $reclamation->getIdRec(),
+                'id_rec' => $idRec,
                 'titre' => $reclamation->getTitre(),
                 'contenu' => $reclamation->getContenu(),
                 'status' => $reclamation->getStatus(),
@@ -89,7 +105,7 @@ final class ReclamationListController extends AbstractController
         ]);
     }
 
-    #[Route('/reclamation/respond/{id_rec}', name: 'app_reclamation_respond', methods: ['GET', 'POST'])]
+    #[Route('/reclamation/respond/{id_rec}', name: 'app_reclamation_respond', methods: ['GET', 'POST'], requirements: ['id_rec' => '\d+'])]
     public function respond(Request $request, int $id_rec): Response
     {
         $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
@@ -123,7 +139,6 @@ final class ReclamationListController extends AbstractController
                     ]);
                 }
 
-                
                 // Récupérer les données du formulaire
                 $messageContent = $form->get('message')->getData();
 
@@ -132,10 +147,21 @@ final class ReclamationListController extends AbstractController
 
                 // Récupérer les informations du client (email, nom, prénom)
                 $clientUserId = $reclamation->getId();
+                $this->logger->info('Récupération des données du client pour clientUserId={clientUserId} et id_rec={id_rec}', [
+                    'clientUserId' => $clientUserId,
+                    'id_rec' => $id_rec
+                ]);
                 $clientData = $this->entityManager->getConnection()->fetchAssociative(
                     'SELECT email, nom, prenom FROM user WHERE id = ?',
                     [$clientUserId]
                 );
+                if (!$clientData) {
+                    $this->logger->warning('Aucune donnée utilisateur trouvée pour clientUserId={clientUserId} et id_rec={id_rec}', [
+                        'clientUserId' => $clientUserId,
+                        'id_rec' => $id_rec
+                    ]);
+                    $clientData = ['email' => 'abidiahlemea@gmail.com', 'nom' => null, 'prenom' => null];
+                }
 
                 try {
                     // Enregistrer la réclamation mise à jour
@@ -240,6 +266,137 @@ final class ReclamationListController extends AbstractController
             }
             $this->addFlash('error', 'Erreur lors de la suppression de la réclamation.');
             return $this->redirectToRoute('app_reclamation_list');
+        }
+    }
+
+    #[Route('/reclamation/preview-translate/{id_rec}/{targetLang}', name: 'app_reclamation_preview_translate', methods: ['GET'])]
+    public function previewTranslate(int $id_rec, string $targetLang): JsonResponse
+    {
+        $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
+        if (!$reclamation) {
+            $this->logger->error('Réclamation non trouvée pour id_rec={id_rec}', ['id_rec' => $id_rec]);
+            return new JsonResponse(['success' => false, 'message' => 'Réclamation non trouvée'], 404);
+        }
+
+        $supportedLanguages = ['en', 'fr', 'es', 'de', 'it', 'ar'];
+        if (!in_array($targetLang, $supportedLanguages)) {
+            $this->logger->error('Langue cible non supportée: {targetLang}', ['targetLang' => $targetLang]);
+            return new JsonResponse(['success' => false, 'message' => 'Langue cible non supportée'], 400);
+        }
+
+        try {
+            $titre = $reclamation->getTitre();
+            $contenu = $reclamation->getContenu();
+
+            $translatedTitre = null;
+            $translatedContenu = null;
+
+            if ($titre) {
+                $translatedTitre = $this->translationService->translate($titre, $targetLang);
+                if (!$translatedTitre) {
+                    $this->logger->warning('Échec de la traduction du titre pour id_rec={id_rec} en {targetLang}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang
+                    ]);
+                }
+            }
+
+            if ($contenu) {
+                $translatedContenu = $this->translationService->translate($contenu, $targetLang);
+                if (!$translatedContenu) {
+                    $this->logger->warning('Échec de la traduction du contenu pour id_rec={id_rec} en {targetLang}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang
+                    ]);
+                }
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'translatedTitre' => $translatedTitre,
+                'translatedContenu' => $translatedContenu
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de l\'aperçu de la traduction pour id_rec={id_rec} en {targetLang}: {error}', [
+                'id_rec' => $id_rec,
+                'targetLang' => $targetLang,
+                'error' => $e->getMessage()
+            ]);
+            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de l\'aperçu de la traduction: ' . $e->getMessage()], 500);
+        }
+    }
+
+    #[Route('/reclamation/confirm-translate/{id_rec}/{targetLang}', name: 'app_reclamation_confirm_translate', methods: ['POST'])]
+    public function confirmTranslate(int $id_rec, string $targetLang): JsonResponse
+    {
+        $reclamation = $this->entityManager->getRepository(Reclamation::class)->find($id_rec);
+        if (!$reclamation) {
+            $this->logger->error('Réclamation non trouvée pour id_rec={id_rec}', ['id_rec' => $id_rec]);
+            return new JsonResponse(['success' => false, 'message' => 'Réclamation non trouvée'], 404);
+        }
+
+        $supportedLanguages = ['en', 'fr', 'es', 'de', 'it', 'ar'];
+        if (!in_array($targetLang, $supportedLanguages)) {
+            $this->logger->error('Langue cible non supportée: {targetLang}', ['targetLang' => $targetLang]);
+            return new JsonResponse(['success' => false, 'message' => 'Langue cible non supportée'], 400);
+        }
+
+        try {
+            $titre = $reclamation->getTitre();
+            $contenu = $reclamation->getContenu();
+
+            $translatedTitre = null;
+            $translatedContenu = null;
+
+            if ($titre) {
+                $translatedTitre = $this->translationService->translate($titre, $targetLang);
+                if ($translatedTitre) {
+                    $reclamation->setTitre($translatedTitre);
+                    $this->logger->info('Titre traduit pour id_rec={id_rec} en {targetLang}: {translated}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang,
+                        'translated' => $translatedTitre
+                    ]);
+                } else {
+                    $this->logger->warning('Échec de la traduction du titre pour id_rec={id_rec} en {targetLang}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang
+                    ]);
+                }
+            }
+
+            if ($contenu) {
+                $translatedContenu = $this->translationService->translate($contenu, $targetLang);
+                if ($translatedContenu) {
+                    $reclamation->setContenu($translatedContenu);
+                    $this->logger->info('Contenu traduit pour id_rec={id_rec} en {targetLang}: {translated}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang,
+                        'translated' => $translatedContenu
+                    ]);
+                } else {
+                    $this->logger->warning('Échec de la traduction du contenu pour id_rec={id_rec} en {targetLang}', [
+                        'id_rec' => $id_rec,
+                        'targetLang' => $targetLang
+                    ]);
+                }
+            }
+
+            $this->entityManager->persist($reclamation);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'translatedTitre' => $translatedTitre,
+                'translatedContenu' => $translatedContenu
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la confirmation de la traduction pour id_rec={id_rec} en {targetLang}: {error}', [
+                'id_rec' => $id_rec,
+                'targetLang' => $targetLang,
+                'error' => $e->getMessage()
+            ]);
+            return new JsonResponse(['success' => false, 'message' => 'Erreur lors de la confirmation de la traduction: ' . $e->getMessage()], 500);
         }
     }
 }

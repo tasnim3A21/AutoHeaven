@@ -3,6 +3,7 @@ parameters:
     pusher.key: '%env(PUSHER_KEY)%'
     pusher.secret: '%env(PUSHER_SECRET)%'
     pusher.cluster: '%env(PUSHER_CLUSTER)%'
+    gemini.api_key: '%env(GOOGLE_GEMINI_API_KEY)%'
 
 services:
     _defaults:
@@ -27,6 +28,10 @@ services:
             $options:
                 cluster: 'eu'
                 useTLS: true
+
+    App\Service\GeminiTranslationService:
+        arguments:
+            $apiKey: '%gemini.api_key%'
 
     App\EventListener\ReclamationNotificationListener:
         tags:
