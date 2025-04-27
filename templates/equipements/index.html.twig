@@ -1,170 +1,173 @@
 {% extends 'base_admin.html.twig' %}
 
-{% block title %}Liste des Équipements{% endblock %}
+{% block title %}Ajouter un Équipement{% endblock %}
 
 {% block content %}
-    <!-- Ancien CSS -->
-    <link rel="stylesheet" href="{{ asset('css/equiptable.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .form-control, .form-control-file { border-radius: 5px; border: 1px solid #ced4da; }
+        .form-control:focus, .form-control-file:focus { border-color: #5c6bc0; box-shadow: 0 0 5px rgba(92, 107, 192, 0.3); }
+        .btn-primary { background-color: #5c6bc0; border-color: #5c6bc0; border-radius: 5px; }
+        .btn-primary:hover { background-color: #4a5aa8; border-color: #4a5aa8; }
+        .btn-secondary { background-color: #e0e0e0; border-color: #e0e0e0; color: #333; border-radius: 5px; }
+        .btn-secondary:hover { background-color: #d0d0d0; border-color: #d0d0d0; }
+        label { font-weight: 500; color: #333; }
+        .custom-file-upload { display: flex; align-items: center; gap: 10px; }
+        .custom-file-upload input[type="file"] { display: none; }
+        .custom-file-upload label { background-color: #5c6bc0; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .custom-file-upload label:hover { background-color: #4a5aa8; }
+        .custom-file-upload .reset-btn { background-color: #e0e0e0; color: #333; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .custom-file-upload .reset-btn:hover { background-color: #d0d0d0; }
+        .file-info { font-size: 12px; color: #666; margin-top: 5px; }
+        .image-preview { width: 100px; height: 100px; border-radius: 50%; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-right: 15px; }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .image-section { display: flex; align-items: center; }
+        .invalid-feedback {
+            color: red;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        .is-invalid {
+            border-color: red !important;
+        }
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
 
     <div class="container mt-5">
-        <div class="card shadow-sm rounded-3 border-0">
-            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Liste des Équipements</h5>
-                <a href="{{ path('app_equipements_create') }}" class="btn btn-primary">+ Add Equipement</a>
-            </div>
-            
-            <div class="card-body">
-                <!-- Formulaire de recherche -->
-                <div class="mb-4">
-                    <div class="input-group">
-                        <input type="text" 
-                               id="searchInput" 
-                               class="form-control" 
-                               placeholder="Rechercher par nom, marque ou référence..."
-                               autocomplete="off">
-                        <div class="input-group-append">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
-                            </span>
+        <div class="card p-4">
+            <h2 class="mb-4">Ajouter un Équipement</h2>
+               {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+                <div class="mb-3">
+                    <label>Image de l'équipement</label>
+                    <div class="image-section">
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImage" src="#" alt="Image Preview" style="display: none;">
+                        </div>
+                        <div class="custom-file-upload">
+                            {{ form_widget(form.image) }}
+                            <label for="{{ form.image.vars.id }}">Choisir une image</label>
+                            <span class="reset-btn" onclick="resetImage()">RESET</span>
                         </div>
                     </div>
+                    <div class="error-message">{{ form_errors(form.image) }}</div>
                 </div>
-
-                <!-- Tableau -->
-                <div class="table-responsive">
-                    <table class="table align-middle" id="equipementsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Reference</th>
-                                <th>Nom</th>
-                                <th>Marque</th>
-                                <th>Prix</th>
-                                <th>Quantite</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                       <!-- Modifier la partie du tableau -->
-<tbody class="table-border-bottom-0">
-    {% for equipement in equipements %}
-        <tr>
-            <td>{{ equipement.reference }}</td>
-            <td>{{ equipement.nom }}</td>
-            <td>{{ equipement.marque }}</td>
-            <td>{{ equipement.stock ? equipement.stock.prixvente : 'N/A' }}</td>
-            <td>{{ equipement.stock ? equipement.stock.quantite : 'N/A' }}</td>
-            <td>
-               <a href="{{ path('app_equipements_edit', {'id': equipement.id, 'page': app.request.query.get('page', 1)}) }}" class="btn btn-sm btn-primary">
-    <i class="fas fa-edit"></i>
-</a>
-                <form method="POST" action="{{ path('app_equipements_delete', {'id': equipement.id, 'page': app.request.query.get('page', 1)}) }}" 
-      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');"
-      style="display: inline-block;">
-    <input type="hidden" name="_method" value="DELETE">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ equipement.id) }}">
-    <button type="submit" class="btn btn-sm btn-danger">
-        <i class="fas fa-trash"></i>
-    </button>
-</form>
-            </td>
-        </tr>
-    {% endfor %}
-</tbody>
-                    </table>
-                    <div class="navigation d-flex justify-content-center">
-                    {{knp_pagination_render(equipements)}}
-                    </  >
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+    {{ form_label(form.nom) }}
+    {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.nom) }}
+    </div>
+</div>
+                       
+                    </div>
+                    <div class="col-md-6 mb-3">
+                       <div class="form-group">
+    {{ form_label(form.marque) }}
+    {{ form_widget(form.marque, {'attr': {'class': 'form-control' ~ (form.marque.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.marque) }}
+    </div>
+</div>
+                       
+                    </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+    {{ form_label(form.reference) }}
+    {{ form_widget(form.reference, {'attr': {'class': 'form-control' ~ (form.reference.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.reference) }}
+    </div>
+</div>
+                        
+                    </div>
+                    <div class="col-md-6 mb-3">
+                       <div class="form-group">
+    {{ form_label(form.quantite) }}
+    {{ form_widget(form.quantite, {'attr': {'class': 'form-control' ~ (form.quantite.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.quantite) }}
+    </div>
+</div>
+                       
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+    {{ form_label(form.prixvente) }}
+    {{ form_widget(form.prixvente, {'attr': {'class': 'form-control' ~ (form.prixvente.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.prixvente) }}
+    </div>
+</div>
+                       
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                      <div class="form-group">
+    {{ form_label(form.description) }}
+    {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid')}}) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.description) }}
+    </div>
+</div>
+                        
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle mr-2"></i> Ajouter l'équipement
+                    </button>
+                    <a href="{{ path('app_equipements') }}" class="btn btn-secondary ml-2">Annuler</a>
+                </div>
+            {{ form_end(form) }}
         </div>
     </div>
 
-   
-
-    <!-- Ancien JavaScript de recherche conservé -->
+    <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-   <script>
-   
-        document.addEventListener('DOMContentLoaded', function() {
-             {% for message in app.flashes('success') %}
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Succès',
-                    text: '{{ message }}',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                });
-            {% endfor %}
-            
-            {% for message in app.flashes('error') %}
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erreur',
-                    text: '{{ message }}',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
-                });
-            {% endfor %}
-            const searchInput = document.getElementById('searchInput');
-            const tableBody = document.querySelector('#equipementsTable tbody');
-            const originalTableContent = tableBody.innerHTML;
-            let searchTimeout;
+    <script>
+        // Image preview (fonctionnalité visuelle uniquement, pas de validation)
+        document.getElementById('{{ form.image.vars.id }}').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const previewImage = document.getElementById('previewImage');
+            const imagePreview = document.getElementById('imagePreview');
 
-            function searchEquipements(searchTerm) {
-                if (searchTerm.length === 0) {
-                    tableBody.innerHTML = originalTableContent;
-                    return;
-                }
-
-                fetch(`/equipements/search?search=${encodeURIComponent(searchTerm)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.data.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Aucun résultat trouvé</td></tr>';
-                        } else {
-                            let html = '';
-                            data.data.forEach(equipement => {
-                                html += `
-                                    <tr>
-                                        <td>${equipement.reference}</td>
-                                        <td>${equipement.nom}</td>
-                                        <td>${equipement.marque}</td>
-                                        <td>${equipement.prix}</td>
-                                        <td>${equipement.quantite}</td>
-                                        <td>
-                                            <a href="/equipements/edit/${equipement.id}" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="/equipements/delete/${equipement.id}" 
-                                               class="btn btn-sm btn-danger"
-                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?');">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
-                            tableBody.innerHTML = html;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Erreur lors de la recherche</td></tr>';
-                    });
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    imagePreview.style.backgroundColor = 'transparent';
+                };
+                reader.readAsDataURL(file);
             }
-
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const searchTerm = this.value.trim();
-                
-                searchTimeout = setTimeout(() => {
-                    searchEquipements(searchTerm);
-                }, 300);
-            });
         });
+
+        function resetImage() {
+            const previewImage = document.getElementById('previewImage');
+            const imagePreview = document.getElementById('imagePreview');
+            document.getElementById('{{ form.image.vars.id }}').value = '';
+            previewImage.src = '#';
+            previewImage.style.display = 'none';
+            imagePreview.style.backgroundColor = '#e0e0e0';
+        }
     </script>
 {% endblock %}
