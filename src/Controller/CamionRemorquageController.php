@@ -39,15 +39,20 @@ final class CamionRemorquageController extends AbstractController
         ]);
     }
 
-    #[Route('/camion/remorquage/edit/{id}', name: 'app_camion_remorquage_edit')]
-    public function edit(Request $request, Camion_remorquage $camion): Response
+    #[Route('/{id}/edit', name: 'app_camion_remorquage_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Camion_remorquage $camion, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CamionRemorquageType::class, $camion);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->flush();
-            return $this->redirectToRoute('app_camion_remorquage');
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Camion updated successfully');
+                return $this->redirectToRoute('app_camion_remorquage');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Error updating camion: ' . $e->getMessage());
+            }
         }
 
         return $this->render('camion_remorquage/edit.html.twig', [
