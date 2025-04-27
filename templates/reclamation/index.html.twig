@@ -36,6 +36,12 @@
                         <img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">
                     </span>
                 </div>
+                <div class="label-with-icon">
+                    {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
+                    <span id="voiceInputBtn" class="voice-input-label">
+                        <img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">
+                    </span>
+                </div>
                 <div class="textarea-container">
                     {{ form_widget(reclamationForm.contenu, {'attr': {'class': 'form-textarea', 'required': 'required', 'aria-describedby': 'word-counter message-error'}}) }}
                     <label for="form_imageFile" class="image-upload-label">
@@ -830,6 +836,11 @@
                 height: 20px;
             }
 
+            .voice-input-icon {
+                width: 20px;
+                height: 20px;
+            }
+
             .image-file-name {
                 font-size: 13px;
                 margin-top: 6px;
@@ -850,6 +861,7 @@
                 gap: 8px;
             }
 
+            .btn-correct-text {
             .btn-correct-text {
                 font-size: 13px;
                 padding: 8px 18px;
@@ -937,6 +949,7 @@
             const correctTextBtn = document.getElementById('correctTextBtn');
             const voiceInputBtn = document.getElementById('voiceInputBtn');
             const imageFileInput = form.querySelector('#form_imageFile');
+            const imageFileName = document.getElementById('imageFileName');
             const imageFileName = document.getElementById('imageFileName');
             const imageUploadLabel = form.querySelector('.image-upload-label');
             const submitButton = form.querySelector('.btn-submit');

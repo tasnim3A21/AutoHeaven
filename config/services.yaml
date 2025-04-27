@@ -1,11 +1,17 @@
+# This file is the entry point to configure your own services.  
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    pusher.app_id: '%env(PUSHER_APP_ID)%'
-    pusher.key: '%env(PUSHER_KEY)%'
-    pusher.secret: '%env(PUSHER_SECRET)%'
-    pusher.cluster: '%env(PUSHER_CLUSTER)%'
-    gemini.api_key: '%env(GOOGLE_GEMINI_API_KEY)%'
+    profile_directory: '%kernel.project_dir%/public/uploads'
+
+    voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
+
+
 
 services:
+
     _defaults:
         autowire: true
         autoconfigure: true
@@ -17,22 +23,41 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    Symfony\Component\Finder\Finder: ~
-
-    Pusher\Pusher:
-        class: Pusher\Pusher
-        arguments:
-            $auth_key: '74385132812fd01535d9'
-            $secret: '4937fbe3b81792e1a3cf'
-            $app_id: '1981315'
-            $options:
-                cluster: 'eu'
-                useTLS: true
-
-    App\Service\GeminiTranslationService:
-        arguments:
-            $apiKey: '%gemini.api_key%'
-
-    App\EventListener\ReclamationNotificationListener:
+    App\EventListener\StockDepletedListener:
         tags:
-            - { name: kernel.event_listener, event: reclamation.submitted, method: onReclamationSubmitted }
+            - { name: kernel.event_listener, event: stock.depleted, method: onStockDepleted }
+    # Custom AuthenticationSuccessHandler service definition
+    App\Security\AuthenticationSuccessHandler:
+        arguments:
+            $router: '@router'
+
+   
+    # config/services.yaml
+
+    App\Service\NotificationService:
+        arguments:
+            $pusherKey: 'a57746eaf2c89e4593e9'
+            $pusherSecret: 'dacc11e11452323c90b9'
+            $pusherAppId: '1980718'
+            $pusherCluster: 'eu'
+    App\Service\PusherService:
+        arguments:
+            $appId: '1980718'
+            $key: 'a57746eaf2c89e4593e9'
+            $secret: 'dacc11e11452323c90b9'
+            $cluster: 'eu'
+            $host: 'api-eu.pusher.com'
+            $port: '443'
+            $scheme: 'https'
+    App\Controller\PusherAuthController:
+        arguments:
+            $pusherKey: 'a57746eaf2c89e4593e9'
+            $pusherSecret: 'dacc11e11452323c90b9'
+     # Twilio Client service
+         
+     # Symfony Finder service (already configured)
+    Symfony\Component\Finder\Finder: ~
+    App\Service\StripeService:
+        arguments:
+            $privateKey: 'sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk'
+            $currency: 'eur'

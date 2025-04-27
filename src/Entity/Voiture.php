@@ -7,12 +7,17 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Categorie;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Reservation;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Voiture
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_v;
 
@@ -21,25 +26,63 @@ class Voiture
     private Categorie $id_c;
 
     #[ORM\Column(type: "string", length: 45)]
-    private string $marque;
+    #[Assert\NotBlank(message: "La marque est obligatoire.")]
+    #[Assert\Length(max: 45, maxMessage: "La marque ne doit pas dépasser 45 caractères.")]
+    private ?string $marque = null;
 
     #[ORM\Column(type: "text")]
-    private string $description;
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    private ?string $description = null;
 
     #[ORM\Column(type: "integer")]
-    private int $kilometrage;
+    #[Assert\NotBlank(message: "Le kilométrage est obligatoire.")]
+#[Assert\PositiveOrZero(message: "Le kilométrage doit être un nombre positif.")]
+    private ?int $kilometrage = null;
 
     #[ORM\Column(type: "string", length: 45)]
-    private string $couleur;
+    #[Assert\NotBlank(message: "La couleur est obligatoire.")]
+#[Assert\Length(max: 45, maxMessage: "La couleur ne doit pas dépasser 45 caractères.")]
+    private ?string $couleur = null;
 
     #[ORM\Column(type: "float")]
-    private float $prix;
+    #[Assert\NotBlank(message: "Le prix est obligatoire.")]
+#[Assert\Positive(message: "Le prix doit être un nombre positif.")]
+    private ?float $prix = null;
 
     #[ORM\Column(type: "text")]
+    //#[Assert\NotBlank(message: "L'image est obligatoire.")]
     private string $image;
 
     #[ORM\Column(type: "string")]
-    private string $disponibilite;
+    #[Assert\Choice(choices: ["oui", "non"], message: "La disponibilité doit être 'oui' ou 'non'.")]
+    private ?string $disponibilite = null;
+
+    private ?File $imageFile = null;
+
+    /**
+ * @return File|null
+ */
+public function getImageFile(): ?File
+{
+    return $this->imageFile;
+}
+
+/**
+ * @param File|UploadedFile|null $imageFile
+ */
+public function setImageFile(?File $imageFile): void
+{
+    $this->imageFile = $imageFile;
+}
+public function getIdV()
+{
+    return $this->id_v;
+}
+
+public function setIdV($value)
+{
+    $this->id_v = $value;
+}
 
     public function getId_v()
     {
@@ -50,6 +93,16 @@ class Voiture
     {
         $this->id_v = $value;
     }
+     
+    public function getIdC()
+    {
+        return $this->id_c;
+    }
+
+    public function setIdC($value)
+    {
+        $this->id_c = $value;
+    } 
 
     public function getId_c()
     {

@@ -1,0 +1,289 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Statistiques{% endblock %}
+
+{% block content %}
+<style>
+    /* Styles pour les cartes */
+    .card {
+        border: none;
+        border-radius: 0.35rem;
+        transition: all 0.3s;
+        margin-bottom: 20px;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem 1.35rem;
+        font-weight: 600;
+    }
+    
+    /* Styles pour les graphiques */
+    .chart-container {
+        position: relative;
+        min-height: 300px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 250px !important;
+        }
+    }
+    
+    /* Style de débogage */
+    .debug-panel {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 300px;
+        max-height: 200px;
+        overflow-y: auto;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 10px;
+        z-index: 9999;
+        font-size: 12px;
+        display: none; /* Caché par défaut */
+    }
+</style>
+
+<div class="container-fluid">
+    <h1 class="my-4">Tableau de bord statistique</h1>
+
+    <div class="row">
+        <!-- Carte 1: Répartition par statut -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Statut des commandes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height:300px;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carte 2: Ventes mensuelles -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Évolution des ventes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height:300px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carte 3: Produits les plus vendus -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Top des équipements vendus</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="height:400px;">
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panel de débogage (peut être désactivé en production) -->
+<div class="debug-panel" id="debugPanel">
+    <button onclick="document.getElementById('debugPanel').style.display='none'" 
+            style="float:right; background:red; color:white; border:none; padding:2px 5px;">X</button>
+    <h5>Debug Data</h5>
+    <div id="debugContent"></div>
+</div>
+
+<!-- Scripts JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fonction pour afficher les données de débogage
+    function showDebugData() {
+        const debugContent = document.getElementById('debugContent');
+        debugContent.innerHTML = `
+            <strong>Status Stats:</strong><br>
+            Labels: ${JSON.stringify({{ statusStats.labels|json_encode|raw }})}<br>
+            Data: ${JSON.stringify({{ statusStats.data|json_encode|raw }})}<br><br>
+            
+            <strong>Monthly Sales:</strong><br>
+            Months: ${JSON.stringify({{ monthlySales.months|json_encode|raw }})}<br>
+            Amounts: ${JSON.stringify({{ monthlySales.amounts|json_encode|raw }})}<br><br>
+            
+            <strong>Top Products:</strong><br>
+            Names: ${JSON.stringify({{ topProducts.names|json_encode|raw }})}<br>
+            Quantities: ${JSON.stringify({{ topProducts.quantities|json_encode|raw }})}
+        `;
+        document.getElementById('debugPanel').style.display = 'block';
+    }
+
+    // Attendre que le DOM soit chargé
+    document.addEventListener('DOMContentLoaded', function() {
+        // Afficher les données de débogage (peut être commenté en production)
+        showDebugData();
+        
+        // Vérifier que Chart.js est chargé
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js n\'est pas chargé');
+            return;
+        }
+
+        // 1. Graphique circulaire - Statut des commandes
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: {{ statusStats.labels|json_encode|raw }},
+                    datasets: [{
+                        data: {{ statusStats.data|json_encode|raw }},
+                        backgroundColor: [
+                            '#4e73df', // En attente
+                            '#1cc88a', // Confirmé
+                            '#e74a3b', // Annulé
+                            '#f6c23e', // Autre
+                        ],
+                        hoverBackgroundColor: [
+                            '#2e59d9',
+                            '#17a673',
+                            '#be2617',
+                            '#dda20a',
+                        ],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Element #statusChart non trouvé');
+        }
+
+        // 2. Graphique linéaire - Ventes mensuelles
+        const salesCtx = document.getElementById('salesChart');
+        if (salesCtx) {
+            new Chart(salesCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: {{ monthlySales.months|json_encode|raw }},
+                    datasets: [{
+                        label: "Chiffre d'affaires",
+                        lineTension: 0.3,
+                        backgroundColor: "rgba(78, 115, 223, 0.05)",
+                        borderColor: "rgba(78, 115, 223, 1)",
+                        pointRadius: 3,
+                        pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                        pointBorderColor: "rgba(78, 115, 223, 1)",
+                        pointHoverRadius: 3,
+                        pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                        pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                        pointHitRadius: 10,
+                        pointBorderWidth: 2,
+                        data: {{ monthlySales.amounts|json_encode|raw }},
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' €';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' €';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Element #salesChart non trouvé');
+        }
+
+        // 3. Graphique à barres - Produits les plus vendus
+        const productsCtx = document.getElementById('productsChart');
+        if (productsCtx) {
+            new Chart(productsCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {{ topProducts.names|json_encode|raw }},
+                    datasets: [{
+                        label: "Quantité vendue",
+                        backgroundColor: "#1cc88a",
+                        hoverBackgroundColor: "#17a673",
+                        borderColor: "#1cc88a",
+                        data: {{ topProducts.quantities|json_encode|raw }},
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return Number.isInteger(value) ? value : '';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + ' unités';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Element #productsChart non trouvé');
+        }
+    });
+</script>
+{% endblock %}

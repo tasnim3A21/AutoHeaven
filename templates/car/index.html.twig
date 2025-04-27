@@ -1,21 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Car{% endblock %}
+{% block title %}Nos Voitures{% endblock %}
 
 {% block content %}
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
-<h6> ici l'affichage de voitures<h6>
+    <h1 class="mb-4">Découvrez Nos Voitures</h1>
+
+    <div class="row">
+        {% for voiture in voitures %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if voiture.image %}
+                        <img src="{{ asset('uploads/voitures/' ~ voiture.image) }}" class="card-img-top" alt="Image de {{ voiture.marque }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ voiture.marque }}</h5>
+                        <p class="card-text">
+                            <strong>Couleur:</strong> {{ voiture.couleur }}<br>
+                            <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
+                            <strong>Prix:</strong> {{ voiture.prix }} TND<br>
+                            <strong>Disponibilité:</strong> {{ voiture.disponibilite }}
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{{ path('car_details', { id: voiture.id_v }) }}" class="btn btn-outline-primary">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <p>Aucune voiture disponible pour le moment.</p>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

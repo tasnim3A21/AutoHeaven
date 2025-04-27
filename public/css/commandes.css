@@ -1,0 +1,110 @@
+/* Style général */
+.commandes-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* En-tête */
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eaecef;
+}
+
+/* Tableau */
+.table {
+    font-size: 0.9rem;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    border-top: none;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+}
+
+/* Lignes */
+.table-warning {
+    background-color: rgba(255, 193, 7, 0.05);
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+/* Boutons */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+/* Pagination */
+.pagination {
+    font-size: 0.9rem;
+}
+
+.page-item.active .page-link {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.page-link {
+    color: #6c757d;
+}
+
+/* Input recherche */
+#searchInput {
+    border-right: none;
+}
+
+.input-group-text {
+    background-color: transparent;
+    border-left: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-responsive {
+        border: none;
+    }
+    
+    #commandesTable td:nth-child(3),
+    #commandesTable th:nth-child(3) {
+        display: none;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.25rem;
+    }
+}

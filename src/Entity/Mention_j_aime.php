@@ -19,7 +19,7 @@ class Mention_j_aime
     private User $id_user;
 
         #[ORM\ManyToOne(targetEntity: Avis::class, inversedBy: "mention_j_aimes")]
-    #[ORM\JoinColumn(name: 'id_a', referencedColumnName: 'id_a', onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'id_a', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Avis $id_a;
 
     public function getId_mention()
