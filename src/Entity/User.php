@@ -264,7 +264,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
+
     private Collection $commandes;
 
     public function getCommandes(): Collection
@@ -279,6 +281,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $commande->setId($this);
         }
 
+
         return $this;
     }
 
@@ -289,6 +292,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $commande->setId(null);
             }
         }
+
 
         return $this;
     }

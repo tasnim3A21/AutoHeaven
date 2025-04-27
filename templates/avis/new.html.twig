@@ -2,55 +2,117 @@
 
 {% block title %}Créer un Avis{% endblock %}
 {% block spinner %}{% endblock %}
+
 {% block content %}
     <div class="container mt-4">
         <h1 class="mb-4">Créer un nouvel avis</h1>
+{% if errorMessage is defined and errorMessage is not null %}
+        <div class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+        </div>
+    {% endif %}
 
-        {% if errorMessage is defined and errorMessage is not null %}
-            <div class="alert alert-danger" role="alert">
-                {{ errorMessage }}
+    <div class="card shadow p-4">
+        {# Formulaire sans référence à la voiture #}
+        {{ form_start(form, {
+            'attr': {'novalidate': 'novalidate'}
+        }) }}
+
+        <div class="form-group mb-3">
+            {{ form_label(form.commentaire) }}
+            {{ form_widget(form.commentaire, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">
+                {{ form_errors(form.commentaire) }}
             </div>
-        {% endif %}
-
-        <div class="card shadow p-4">
-            {{ form_start(form, {
-                'action': path('app_avis_new', {'id': voiture.id_v}),
-                'attr': {'novalidate': 'novalidate'}
-            }) }}
-
-            <div class="form-group mb-3">
-                {{ form_label(form.commentaire) }}
-                {{ form_widget(form.commentaire, {'attr': {'class': 'form-control'}}) }}
-                <div class="text-danger">
-                    {{ form_errors(form.commentaire) }}
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form_label(form.note) }}
-                <div class="form-check">
-                    {{ form_widget(form.note) }}
-                </div>
-                <div class="text-danger">
-                    {{ form_errors(form.note) }}
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
-                {{ form_label(form.dateavis) }}
-                {{ form_widget(form.dateavis, {'attr': {'class': 'form-control'}}) }}
-                <div class="text-danger">
-                    {{ form_errors(form.dateavis) }}
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary w-100">Soumettre</button>
-            </div>
-
-            {{ form_end(form) }}
         </div>
 
-        <a href="{{ path('app_avis_index') }}" class="btn btn-link mt-3">← Retour à la liste des avis</a>
+        <div class="form-group mb-3">
+            {{ form_label(form.note) }}
+            <div class="form-check">
+                {{ form_widget(form.note) }}
+            </div>
+            <div class="text-danger">
+                {{ form_errors(form.note) }}
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            {{ form_label(form.dateavis) }}
+            {{ form_widget(form.dateavis, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">
+                {{ form_errors(form.dateavis) }}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary w-100">Soumettre</button>
+        </div>
+
+        {{ form_end(form) }}
     </div>
+
+    <a href="{{ path('app_avis_index') }}" class="btn btn-link mt-3">← Retour à la liste des avis</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% for message in app.flashes('success') %}
+    <script>
+        Swal.fire({
+            icon: 'info',
+            title: 'Merci !',
+            text: '{{ message }}',
+            confirmButtonColor: '#3085d6'
+        });
+    </script>
+{% endfor %}
+
+<script>
+async function rechercherSimilarite() {
+    const input = document.querySelector('#avis_commentaire');
+    const comment = input.value.trim();
+    if (comment.length < 5) return;
+
+    try {
+        const res  = await fetch('/avis/similar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({comment})
+        });
+        const { similar, error } = await res.json();
+        if (error) {
+            console.warn('API similar error:', error);
+            return;
+        }
+
+        console.log('Similar raw:', similar);
+
+        if (similar.length === 0) {
+            console.log('Aucun vrai similaire (>50%)');
+            return;
+        }
+
+        // Construire le message
+        const msg = similar
+            .map(a => ➤ [${a.similarity*100}%] (${a.note}) ${a.commentaire})
+            .join('\n\n');
+
+        Swal.fire({
+            icon: 'info',
+            title: 'Commentaires vraiment similaires',
+            html: <pre style="text-align:left">${msg}</pre>,
+            confirmButtonColor: '#3085d6'
+        });
+
+    } catch (e) {
+        console.error('Erreur fetch similar:', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.querySelector('#avis_commentaire');
+    if (input) input.addEventListener('blur', rechercherSimilarite);
+});
+</script>
+
 {% endblock %}

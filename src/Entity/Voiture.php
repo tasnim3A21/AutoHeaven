@@ -100,6 +100,7 @@ public function setIdV($value)
         return $this->id_c;
     }
 
+
     public function setIdC($value)
     {
         $this->id_c = $value;
@@ -109,6 +110,7 @@ public function setIdV($value)
     {
         return $this->id_c;
     }
+
 
     public function setId_c($value)
     {
