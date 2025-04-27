@@ -27,6 +27,21 @@ class AvisRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function getStatsParNote(): array
+{
+    $conn = $this->getEntityManager()->getConnection();
+    $sql = '
+        SELECT note, COUNT(*) AS total
+        FROM avis
+        GROUP BY note
+        ORDER BY note ASC
+    ';
+    $stmt = $conn->prepare($sql);
+    $resultSet = $stmt->executeQuery();
+
+    return $resultSet->fetchAllAssociative();
+}
+
     
     
 }
