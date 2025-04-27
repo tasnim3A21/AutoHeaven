@@ -3,67 +3,135 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\Common\Collections\Collection;
 
-
-use App\Entity\Reservation;
-
-
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-class User
+#[UniqueEntity(
+    fields: ['username'],
+    message: 'Cet username existe déjà.'
+)]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cet email existe déjà.'
+)]
+#[UniqueEntity(
+    fields: ['cin'],
+    message: 'Cet CIN existe déjà.'
+)]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
-    private int $id;
+    private ?int $id = null;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "integer", unique: true)]
+    #[Assert\NotBlank(message: "Le CIN est obligatoire.")]
+    #[Assert\Length(
+        exactMessage: "Le CIN doit contenir exactement 8 chiffres.",
+        min: 8,
+        max: 8
+    )]
+    #[Assert\Regex(
+        pattern: "/^\d{8}$/",
+        message: "Le CIN doit contenir uniquement des chiffres."
+    )]
     private int $cin;
 
     #[ORM\Column(type: "string", length: 45)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
     private string $nom;
 
     #[ORM\Column(type: "string", length: 45)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
     private string $prenom;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "integer", unique: true)]
+    #[Assert\NotBlank(message: "Le téléphone est obligatoire.")]
+    #[Assert\Length(
+        exactMessage: "Le téléphone doit contenir exactement 8 chiffres.",
+        min: 8,
+        max: 8
+    )]
+    #[Assert\Regex(
+        pattern: "/^\d{8}$/",
+        message: "Le téléphone doit contenir uniquement des chiffres."
+    )]
     private int $tel;
 
-    #[ORM\Column(type: "string", length: 45)]
+    #[ORM\Column(type: "string", length: 45, unique: true)]
+    #[Assert\NotBlank(message: "L'email est obligatoire.")]
+    #[Assert\Email(message: "L'email doit être valide.")]
     private string $email;
 
-    #[ORM\Column(type: "string", length: 45)]
+    #[ORM\Column(type: "string", length: 255)]
+    #[Assert\Length(
+        min: 6,
+        minMessage: "Le mot de passe doit contenir au moins 6 caractères.",
+        
+    )]
     private string $password;
 
-    #[ORM\Column(type: "string")]
-    private string $role;
+    #[ORM\Column(type: "string", nullable: true)]
+    private ?string $role = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\Regex(
+        pattern: "/^\d+\sRue\s.*$/",
+        message: "L'adresse doit contenir un numéro suivi d'un nom de rue valide."
+    )]
     private string $adresse;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[Assert\NotBlank(message: "Le nom d'utilisateur est obligatoire.")]
     private string $username;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $photo_profile;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $photo_profile = null;
 
-    #[ORM\Column(type: "string", length: 10)]
-    private string $ban;
+    #[ORM\Column(type: "string", length: 10, nullable: true)]
+    private ?string $ban = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $question;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $question = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $reponse;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $reponse = null;
+
+    // === Symfony Security required methods ===
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        $roleFormatted = 'ROLE_' . strtoupper($this->role);
+        return [$roleFormatted];
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    // === Getters and Setters ===
 
     public function getId()
     {
         return $this->id;
     }
-
-
 
     public function setId($value)
     {
@@ -118,11 +186,6 @@ class User
     public function setEmail($value)
     {
         $this->email = $value;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     public function setPassword($value)
@@ -202,80 +265,71 @@ class User
 
 
 
-    /*#[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
+    #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
+
     private Collection $commandes;
 
-        public function getCommandes(): Collection
-        {
-            return $this->commandes;
-        }
-    
-        public function addCommande(Commande $commande): self
-        {
-            if (!$this->commandes->contains($commande)) {
-                $this->commandes[] = $commande;
-                $commande->setId($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeCommande(Commande $commande): self
-        {
-            if ($this->commandes->removeElement($commande)) {
-                // set the owning side to null (unless already changed)
-                if ($commande->getId() === $this) {
-                    $commande->setId(null);
-                }
-            }
-    
-            return $this;
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes[] = $commande;
+            $commande->setId($this);
         }
 
-*/
 
-    #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
-    private Collection $reclamations;
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            if ($commande->getId() === $this) {
+                $commande->setId(null);
+            }
+        }
+
+
+        return $this;
+    }
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
 
 
 
-    #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
-    private Collection $commandes;
-
-
-
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]
     private Collection $mention_j_aimes;
 
-        public function getMention_j_aimes(): Collection
-        {
-            return $this->mention_j_aimes;
+    public function getMention_j_aimes(): Collection
+    {
+        return $this->mention_j_aimes;
+    }
+
+    public function addMention_j_aime(Mention_j_aime $mention_j_aime): self
+    {
+        if (!$this->mention_j_aimes->contains($mention_j_aime)) {
+            $this->mention_j_aimes[] = $mention_j_aime;
+            $mention_j_aime->setId_user($this);
         }
-    
-        public function addMention_j_aime(Mention_j_aime $mention_j_aime): self
-        {
-            if (!$this->mention_j_aimes->contains($mention_j_aime)) {
-                $this->mention_j_aimes[] = $mention_j_aime;
-                $mention_j_aime->setId_user($this);
+
+        return $this;
+    }
+
+    public function removeMention_j_aime(Mention_j_aime $mention_j_aime): self
+    {
+        if ($this->mention_j_aimes->removeElement($mention_j_aime)) {
+            if ($mention_j_aime->getId_user() === $this) {
+                $mention_j_aime->setId_user(null);
             }
-    
-            return $this;
         }
-    
-        public function removeMention_j_aime(Mention_j_aime $mention_j_aime): self
-        {
-            if ($this->mention_j_aimes->removeElement($mention_j_aime)) {
-                // set the owning side to null (unless already changed)
-                if ($mention_j_aime->getId_user() === $this) {
-                    $mention_j_aime->setId_user(null);
-                }
-            }
-    
-            return $this;
-        }
+
+        return $this;
+    }
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Messagerie::class)]
     private Collection $messageries;
@@ -285,4 +339,7 @@ class User
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reservation::class)]
     private Collection $reservations;
+
+    #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
+    private Collection $reclamations;
 }

@@ -74,7 +74,8 @@ public function addToCart(int $id, Request $request, EntityManagerInterface $ent
         ]);
     }
 
-    $user = $entityManager->getRepository(User::class)->find(3);
+     /** @var \App\Entity\User $user */
+     $user = $this->getUser();
     if (!$user) {
         return new JsonResponse([
             'success' => false,
@@ -150,4 +151,5 @@ public function search(Request $request, EntityManagerInterface $entityManager):
         ], 500);
     }
 }
+
 }

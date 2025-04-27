@@ -1,9 +1,78 @@
 {% extends 'base_admin.html.twig' %}
 
-{% block title %}Voiture{% endblock %}
+{% block title %}Liste des Voitures{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+    <h1>Liste des Voitures</h1>
 
+    <!-- Search Bar -->
+   <form method="get" action="{{ path('app_voiture') }}">
+    <input type="text" name="search" placeholder="Rechercher par marque" value="{{ app.request.query.get('search') }}">
+    
+    <select name="couleur">
+        <option value="">-- Toutes les couleurs --</option>
+        {% for couleur in couleurs %}
+            <option value="{{ couleur }}" {% if app.request.query.get('couleur') == couleur %}selected{% endif %}>{{ couleur }}</option>
+        {% endfor %}
+    </select>
 
+    <select name="sort">
+        <option value="">-- Trier par --</option>
+        <option value="prix_asc" {% if app.request.query.get('sort') == 'prix_asc' %}selected{% endif %}>Prix croissant</option>
+        <option value="prix_desc" {% if app.request.query.get('sort') == 'prix_desc' %}selected{% endif %}>Prix décroissant</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+        <a href="{{ path('app_voiture') }}" class="btn btn-secondary" style="margin-left: 10px;">❌ Effacer</a>
+
+</form>
+
+       <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Marque</th>
+                <th>Kilométrage</th>
+                <th>Couleur</th>
+                <th>Prix</th>
+                <th>Disponibilité</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for voiture in voitures %}
+            <tr>
+                <td>{{ voiture.marque }}</td>
+                <td>{{ voiture.kilometrage }}</td>
+                <td>{{ voiture.couleur }}</td>
+                <td>{{ voiture.prix }} TND</td>
+                <td>{{ voiture.disponibilite }}</td>
+                <td>
+                    <a href="{{ path('voiture_edit', { id: voiture.id_v }) }}">Modifier</a>
+                    |
+                    <a href="{{ path('voiture_details', { id: voiture.id_v }) }}">Details</a>
+                    |
+                    <form action="{{ path('voiture_delete', {'id': voiture.id_v}) }}" method="post" id="delete-form-{{ voiture.id_v }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ voiture.id_v) }}">
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete({{ voiture.id_v }})">Supprimer</button>
+                    </form> 
+
+                    <script>
+                        function confirmDelete(id) {
+                            if (confirm('Êtes-vous sûr de vouloir supprimer cette voiture ?')) {
+                                // If the user confirms, submit the form
+                                document.getElementById('delete-form-' + id).submit();
+                            }
+                        }
+                    </script>
+                </td>
+            </tr>
+            
+        {% else %}
+            <tr>
+                <td colspan="8">Aucune voiture trouvée.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ path('voiture_new') }}">Ajouter une voiture</a>
 {% endblock %}

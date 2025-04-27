@@ -6,6 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Panier;
+use App\Entity\Notification;
+
+
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -17,6 +20,7 @@ class Equipement
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
 
+
     #[ORM\GeneratedValue(strategy: "AUTO")]
     private int $id;
 
@@ -26,6 +30,8 @@ class Equipement
 
     #[ORM\Column(type: "text")]
     #[Assert\NotBlank(message: "Description est obligatoire.")]
+    #[Assert\Length(min: 10, minMessage: "La description doit contenir au moins {{ limit }} caractères.")]
+    #[Assert\Length(max: 1000, maxMessage: "La description ne doit pas dépasser {{ limit }} caractères.")]
     private string $description;
 
     #[ORM\Column(type: "text")]
@@ -51,6 +57,35 @@ class Equipement
 
     #[ORM\OneToMany(mappedBy: "id_e", targetEntity: Panier::class)]
     private Collection $paniers;
+    #[ORM\OneToMany(mappedBy: "equipement", targetEntity: Notification::class, cascade: ["remove"])]
+    private Collection $notifications;
+    public function getNotifications(): Collection
+{
+    return $this->notifications;
+}
+
+public function addNotification(Notification $notification): self
+{
+    if (!$this->notifications->contains($notification)) {
+        $this->notifications[] = $notification;
+        $notification->setEquipement($this);
+    }
+
+    return $this;
+}
+
+public function removeNotification(Notification $notification): self
+{
+    if ($this->notifications->removeElement($notification)) {
+        if ($notification->getEquipement() === $this) {
+            $notification->setEquipement(null);
+        }
+    }
+
+    return $this;
+}
+
+
 
     public function getOffres(): Collection
     {

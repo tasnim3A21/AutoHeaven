@@ -3,7 +3,120 @@
 {% block title %}Camion Remorquage{% endblock %}
 
 {% block content %}
-<!-- Affichage du contenu de la page -->
+<div class="container">
+    <h1>Camion Remorquage</h1>
+    {# Search Bar #}
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
+    </div>
 
+    <table class="table" id="camionTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-sort="id">ID</th>
+                <th class="sortable" data-sort="modele">Modèle</th>
+                <th class="sortable" data-sort="annee">Année</th>
+                <th class="sortable" data-sort="numtel">Numéro de téléphone</th>
+                <th class="sortable" data-sort="statut">Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for camion in camions %}
+            <tr>
+                <td>{{ camion.id_cr }}</td>
+                <td>{{ camion.modele }}</td>
+                <td>{{ camion.annee }}</td>
+                <td>{{ camion.numTel }}</td>
+                <td>{{ camion.statut }}</td>
+                <td>
+                    <a href="{{ path('app_camion_remorquage_edit', {'id': camion.id_cr}) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ path('app_camion_remorquage_delete', {'id': camion.id_cr}) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mb-4">
+        <h2>Nouveau Camion</h2>
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {{ form_widget(form) }}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Create Camion</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('camionTable');
+    const rows = table.getElementsByTagName('tr');
+    const sortableHeaders = document.querySelectorAll('.sortable');
+
+    // Search functionality
+    searchInput.addEventListener('keyup', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        for(let i = 1; i < rows.length; i++) {
+            let found = false;
+            const cells = rows[i].getElementsByTagName('td');
+            
+            for(let j = 0; j < cells.length - 1; j++) {
+                const cellText = cells[j].textContent.toLowerCase();
+                if(cellText.includes(searchTerm)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            rows[i].style.display = found ? '' : 'none';
+        }
+    });
+
+    // Sorting functionality
+    let sortDirection = 1; // 1 for ascending, -1 for descending
+
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const column = this.dataset.sort;
+            const columnIndex = Array.from(this.parentElement.children).indexOf(this);
+            
+            const rowsArray = Array.from(table.getElementsByTagName('tr')).slice(1);
+            
+            rowsArray.sort((a, b) => {
+                const aValue = a.getElementsByTagName('td')[columnIndex].textContent;
+                const bValue = b.getElementsByTagName('td')[columnIndex].textContent;
+                
+                if (column === 'annee' || column === 'id') {
+                    return sortDirection * (parseInt(aValue) - parseInt(bValue));
+                } else {
+                    return sortDirection * aValue.localeCompare(bValue, 'fr');
+                }
+            });
+            
+            sortDirection *= -1;
+            
+            const tbody = table.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            rowsArray.forEach(row => tbody.appendChild(row));
+        });
+    });
+});
+</script>
+{% endblock %}
+
+<style>
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+.sortable:hover {
+    background-color: #f8f9fa;
+}
+</style>
 
 {% endblock %}

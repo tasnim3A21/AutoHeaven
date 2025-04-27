@@ -4,91 +4,119 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Categorie;
-use App\Entity\Avis;
-
+use Doctrine\Common\Collections\Collection;
 use App\Entity\Reservation;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Voiture
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id_v;
-    #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Avis::class, cascade: ["persist", "remove"])]
-    private Collection $avis;
-    
-    #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: "voitures")]
 
+        #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: "voitures")]
     #[ORM\JoinColumn(name: 'id_c', referencedColumnName: 'id_c', onDelete: 'CASCADE')]
     private Categorie $id_c;
 
     #[ORM\Column(type: "string", length: 45)]
-    private string $marque;
+    #[Assert\NotBlank(message: "La marque est obligatoire.")]
+    #[Assert\Length(max: 45, maxMessage: "La marque ne doit pas dépasser 45 caractères.")]
+    private ?string $marque = null;
 
     #[ORM\Column(type: "text")]
-    private string $description;
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    private ?string $description = null;
 
     #[ORM\Column(type: "integer")]
-    private int $kilometrage;
+    #[Assert\NotBlank(message: "Le kilométrage est obligatoire.")]
+#[Assert\PositiveOrZero(message: "Le kilométrage doit être un nombre positif.")]
+    private ?int $kilometrage = null;
 
     #[ORM\Column(type: "string", length: 45)]
-    private string $couleur;
+    #[Assert\NotBlank(message: "La couleur est obligatoire.")]
+#[Assert\Length(max: 45, maxMessage: "La couleur ne doit pas dépasser 45 caractères.")]
+    private ?string $couleur = null;
 
     #[ORM\Column(type: "float")]
-    private float $prix;
+    #[Assert\NotBlank(message: "Le prix est obligatoire.")]
+#[Assert\Positive(message: "Le prix doit être un nombre positif.")]
+    private ?float $prix = null;
 
     #[ORM\Column(type: "text")]
+   // #[Assert\NotBlank(message: "L'image est obligatoire.")]
     private string $image;
 
     #[ORM\Column(type: "string")]
-    private string $disponibilite;
+    #[Assert\NotBlank(message: "La disponibilité est obligatoire.")]
+    #[Assert\Choice(choices: ["oui", "non"], message: "La disponibilité doit être 'oui' ou 'non'.")]
+    private ?string $disponibilite = null;
 
+    private ?File $imageFile = null;
 
-    #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Avis::class, cascade: ["persist", "remove"])]
-    private Collection $aviss;
+    /**
+ * @return File|null
+ */
+public function getImageFile(): ?File
+{
+    return $this->imageFile;
+}
 
-    #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Reservation::class, cascade: ["persist", "remove"])]
-    private Collection $reservations;
+/**
+ * @param File|UploadedFile|null $imageFile
+ */
+public function setImageFile(?File $imageFile): void
+{
+    $this->imageFile = $imageFile;
+}
+public function getIdV()
+{
+    return $this->id_v;
+}
 
-    public function __construct()
-    {
-        $this->aviss = new ArrayCollection();
-        $this->reservations = new ArrayCollection();
-    }
+public function setIdV($value)
+{
+    $this->id_v = $value;
+}
 
-    // Getters et Setters
-
-    public function getId_v(): int
+    public function getId_v()
     {
         return $this->id_v;
     }
 
-    public function setId_v(int $id_v): self
+    public function setId_v($value)
     {
-        $this->id_v = $id_v;
-        return $this;
+        $this->id_v = $value;
+    }
+     
+    public function getIdC()
+    {
+        return $this->id_c;
     }
 
-    public function getAviss(): Collection
+
+    public function setIdC($value)
     {
-        return $this->aviss;
+        $this->id_c = $value;
+    } 
+
+    public function getId_c()
+    {
+        return $this->id_c;
     }
 
-   
 
-    public function removeAvis(Avis $avis): self
+    public function setId_c($value)
     {
-        if ($this->aviss->removeElement($avis)) {
-            // Vous n'avez pas besoin de définir l'id_v à null si vous gérez autrement la suppression
-            // Vous pouvez laisser cette partie vide ou ajouter une logique spécifique si nécessaire
-        }
-    
-        return $this;
+        $this->id_c = $value;
     }
+
     public function getMarque()
     {
         return $this->marque;
@@ -98,6 +126,97 @@ class Voiture
     {
         $this->marque = $value;
     }
-    // Méthodes pour Reservation sont aussi ici, comme dans la version précédente
-}
 
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($value)
+    {
+        $this->description = $value;
+    }
+
+    public function getKilometrage()
+    {
+        return $this->kilometrage;
+    }
+
+    public function setKilometrage($value)
+    {
+        $this->kilometrage = $value;
+    }
+
+    public function getCouleur()
+    {
+        return $this->couleur;
+    }
+
+    public function setCouleur($value)
+    {
+        $this->couleur = $value;
+    }
+
+    public function getPrix()
+    {
+        return $this->prix;
+    }
+
+    public function setPrix($value)
+    {
+        $this->prix = $value;
+    }
+
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    public function setImage($value)
+    {
+        $this->image = $value;
+    }
+
+    public function getDisponibilite()
+    {
+        return $this->disponibilite;
+    }
+
+    public function setDisponibilite($value)
+    {
+        $this->disponibilite = $value;
+    }
+
+    #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Avis::class)]
+    private Collection $aviss;
+
+        public function getAviss(): Collection
+        {
+            return $this->aviss;
+        }
+    
+        public function addAvis(Avis $avis): self
+        {
+            if (!$this->aviss->contains($avis)) {
+                $this->aviss[] = $avis;
+                $avis->setIdV($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeAvis(Avis $avis): self
+        {
+            if ($this->aviss->removeElement($avis)) {
+                // set the owning side to null (unless already changed)
+                if ($avis->getIdV() === $this) {
+                    $avis->setIdV(null);
+                }
+            }
+    
+            return $this;
+        }
+
+    #[ORM\OneToMany(mappedBy: "id_v", targetEntity: Reservation::class)]
+    private Collection $reservations;
+}

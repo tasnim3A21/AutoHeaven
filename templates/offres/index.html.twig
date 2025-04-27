@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %} 
+
+{% block title %}Offres{% endblock %}
+
+{% block content %}
+<!-- Page Header Start -->
+<div class="container-fluid page-header mb-5 p-0" style="background-image: url('{{ asset('img/carousel-bg-1.jpg') }}');">
+    <div class="container-fluid page-header-inner py-5">
+        <div class="container text-center">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Nos Offres</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center text-uppercase">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_home') }}" class="{{ app.request.get('_route') == 'app_home' ? 'active' : '' }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Offres</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4" style="font-size: 2.5rem; color: #ff0000; font-weight: bold;"></h1>
+    
+    <div class="row">
+        {% for item in offresWithCoupons %}
+            {% set offre = item.offre %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-lg border-light rounded">
+                    <!-- Image avec étiquette de réduction -->
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal{{ offre.getIdOffre() }}" class="position-relative">
+                        <img src="{{ offre.getImage() }}" class="card-img-top rounded-top" alt="{{ offre.getImage() }}" style="height: 250px; object-fit: cover;" />
+                        
+                        <!-- Etiquette Taux de réduction -->
+                        <div class="reduction-badge position-absolute top-0 start-0 m-3">
+                            {{ offre.getTauxReduction() }}%
+                        </div>
+                    </a>
+
+                    <div class="card-body bg-light rounded-bottom">
+                        <h5 class="card-title text-center text-dark">{{ offre.getTypeOffre() }}</h5>
+                        <p class="card-text text-muted" style="font-size: 14px; line-height: 1.5;">{{ offre.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <p class="mb-0"><strong>Validité:</strong> {{ offre.getDateDebut() | date('d/m/Y') }} - {{ offre.getDateFin() | date('d/m/Y') }}</p>
+                        </div>
+                        <!-- Affichage du code de coupon -->
+                        <div class="mt-3 text-center">
+                            <p class="mb-0"><strong>Code Coupon:</strong> <span class="badge bg-success">{{ item.couponCode }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Image -->
+            <div class="modal fade" id="imageModal{{ offre.getIdOffre() }}" tabindex="-1" aria-labelledby="imageModalLabel{{ offre.getIdOffre() }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imageModalLabel{{ offre.getIdOffre() }}">Image de l'Offre</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Larger Image -->
+                            <img src="{{ offre.getImage() }}" class="img-fluid" alt="{{ offre.getImage() }}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center col-12">Aucune offre disponible.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

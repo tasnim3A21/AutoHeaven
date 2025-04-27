@@ -17,6 +17,24 @@
     bottom: 45px;
     z-index: 99;
 }
+/* Add this in your base CSS file */
+.card-header {
+    background-color: #dc3545; /* Red background */
+}
+
+.card-body {
+    background-color: #f8f9fa; /* Light grey background */
+}
+
+.btn-dark {
+    background-color: #343a40; /* Dark button */
+    border-color: #343a40;
+}
+
+.btn-dark:hover {
+    background-color: #23272b; /* Darker hover effect */
+    border-color: #23272b;
+}
 
 
 /*** Spinner ***/
@@ -312,6 +330,7 @@
 }
 
 
+
 /*** Footer ***/
 .footer {
     background: linear-gradient(rgba(0, 0, 0, .9), rgba(0, 0, 0, .9)), url(../img/carousel-bg-1.jpg) center center no-repeat;
@@ -380,4 +399,13 @@
     margin-right: 0;
     padding-right: 0;
     border-right: none;
+}
+.reduction-badge {
+    background-color: #ff0000; /* Rouge */
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 14px;
+    z-index: 10;
 }

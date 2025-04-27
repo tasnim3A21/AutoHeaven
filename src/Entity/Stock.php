@@ -17,6 +17,7 @@ class Stock
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
 
+
     #[ORM\GeneratedValue(strategy: "AUTO")]
     private int $id_s;
 
@@ -26,19 +27,19 @@ class Stock
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(message: "Quantité est obligatoire.")]
+    #[Assert\Positive(message: "La quantité doit être positive.")]
     private int $quantite;
 
     #[ORM\Column(type: "float")]
     #[Assert\NotBlank(message: "Prix de vente est obligatoire.")]
+    #[Assert\Positive(message: "Le prix de vente doit être positif.")]
     private float $prixvente;
 
     public function getIdS(): ?int
 
-
     {
         return $this->id_s;
     }
-
 
 
     public function setIdS(int $id_s): self
@@ -67,6 +68,7 @@ class Stock
 
 
 
+
     public function setQuantite(int $quantite): self
     {
         $this->quantite = $quantite;
@@ -76,9 +78,11 @@ class Stock
     public function getPrixvente(): float
 
 
+
     {
         return $this->prixvente;
     }
+
 
 
 

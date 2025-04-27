@@ -1,0 +1,239 @@
+{% extends 'base_signup.html.twig' %}
+
+{% block title %}Register Form{% endblock %}
+
+{% block body %}
+  <link rel="stylesheet" href="{{ asset('style.css') }}">
+
+  <style>
+    /* CSS for error messages */
+    .error-message {
+      color: red;  /* Red color for error messages */
+      margin-top: 5px;  /* Ensure error message has some spacing */
+    }
+    /* CSS for username suggestion */
+    .username-suggestion {
+      display: inline-flex;  /* Use flex to align text and icon */
+      align-items: center;  /* Center vertically */
+      margin-top: 15px;  /* Spacing to make the username field clearly visible */
+      padding: 8px 12px;
+      border: 1px solid #ccc;  /* Subtle border for the frame */
+      border-radius: 4px;  /* Rounded corners */
+      background-color: #f9f9f9;  /* Light background */
+      color: #333;  /* Darker text for readability */
+      font-size: 14px;  /* Smaller font for minimalism */
+      font-weight: normal;  /* Remove italic for a cleaner look */
+      cursor: pointer;  /* Pointer cursor to indicate the entire box is clickable */
+      transition: background-color 0.2s ease;  /* Smooth transition for hover effect */
+    }
+    .username-suggestion:hover {
+      background-color: #e9ecef;  /* Slightly darker background on hover */
+    }
+    .username-suggestion .suggestion-text {
+      color: #007bff;  /* Blue color for the suggested username */
+    }
+    .username-suggestion .regenerate-icon {
+      margin-left: 8px;  /* Space between text and icon */
+      cursor: pointer;  /* Pointer cursor for the icon */
+      color: #666;  /* Subtle color for the icon */
+      transition: color 0.2s ease;  /* Smooth transition for hover effect */
+    }
+    .username-suggestion .regenerate-icon:hover {
+      color: #007bff;  /* Blue on hover to match the suggestion text */
+    }
+  </style>
+
+  <div class="wrapper">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+      <h2>Register</h2>
+
+      <div class="input-field">
+        {{ form_widget(form.prenom) }}
+        <div class="error-message">
+          {{ form_errors(form.prenom) }}
+        </div>
+        <label>Votre prénom</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.nom) }}
+        <div class="error-message">
+          {{ form_errors(form.nom) }}
+        </div>
+        <label>Votre nom</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.cin) }}
+        <div class="error-message">
+          {{ form_errors(form.cin) }}
+        </div>
+        <label>Votre CIN</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.tel) }}
+        <div class="error-message">
+          {{ form_errors(form.tel) }}
+        </div>
+        <label>Votre numéro de téléphone</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.email) }}
+        <div class="error-message">
+          {{ form_errors(form.email) }}
+        </div>
+        <label>Votre email</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.adresse) }}
+        <div class="error-message">
+          {{ form_errors(form.adresse) }}
+        </div>
+        <label>Votre adresse</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.username, suggested_username is defined ? {'value': suggested_username} : {}) }}
+        <div class="error-message">
+          {# Filter out the "Cet username existe déjà." error message #}
+          {% for error in form.username.vars.errors %}
+            {% if error.message != 'Cet username existe déjà.' %}
+              <div>{{ error.message }}</div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% if username_taken %}
+          <div class="username-suggestion" data-username="{{ suggested_username }}">
+            Nom d'utilisateur pris. Suggestion : <span class="suggestion-text">{{ suggested_username }}</span>
+            <span class="regenerate-icon" title="Regenerate username">
+              <!-- SVG Refresh Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M21 3v5h-5"></path>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M8 16H3v5"></path>
+              </svg>
+            </span>
+          </div>
+        {% endif %}
+        <label>Votre username</label>
+      </div>
+
+      <div class="input-field">
+        {{ form_widget(form.password) }}
+        <div class="error-message">
+          {{ form_errors(form.password) }}
+        </div>
+        <label>Votre mot de passe</label>
+      </div>
+
+      {{ form_row(form._token) }}
+
+      <button type="submit">Register</button>
+
+      <div class="login">
+        <p>Already have an account? <a href="{{ path('app_login') }}">Login</a></p>
+      </div>
+    {{ form_end(form) }}
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Handle clicking the suggestion box to fill the username field
+      const suggestionBoxes = document.querySelectorAll('.username-suggestion');
+      suggestionBoxes.forEach(function (box) {
+        box.addEventListener('click', function (e) {
+          // Prevent the click event on the regenerate icon from triggering the box click
+          if (e.target.closest('.regenerate-icon')) {
+            return;
+          }
+          // Use a more reliable selector for the username field
+          const usernameInput = document.querySelector('input[id$="_username"]');
+          
+          // Debug: Log the username input and values
+          console.log('Username input:', usernameInput);
+          console.log('Username input name:', usernameInput ? usernameInput.name : 'Not found');
+          console.log('Suggestion box data-username:', box.getAttribute('data-username'));
+
+          if (usernameInput) {
+            usernameInput.value = box.getAttribute('data-username') || '';
+            console.log('Username field updated to:', usernameInput.value);
+          } else {
+            console.error('Username input field not found');
+          }
+        });
+      });
+
+      // Handle clicking the regenerate icon
+      const regenerateIcons = document.querySelectorAll('.regenerate-icon');
+      regenerateIcons.forEach(function (icon) {
+        icon.addEventListener('click', function (e) {
+          // Stop the event from bubbling up to the suggestion box
+          e.stopPropagation();
+
+          const suggestionBox = icon.closest('.username-suggestion');
+          // Use more generic selectors to find the prenom and nom fields
+          const prenomInput = document.querySelector('input[id$="_prenom"]');
+          const nomInput = document.querySelector('input[id$="_nom"]');
+          
+          // Debug: Log the input elements and their attributes
+          console.log('Prenom input:', prenomInput);
+          console.log('Prenom input name:', prenomInput ? prenomInput.name : 'Not found');
+          console.log('Nom input:', nomInput);
+          console.log('Nom input name:', nomInput ? nomInput.name : 'Not found');
+          
+          const prenom = prenomInput ? prenomInput.value : '';
+          const nom = nomInput ? nomInput.value : '';
+          const currentUsername = suggestionBox.getAttribute('data-username'); // Get the current username
+
+          // Debug: Log the values being sent
+          console.log('Sending prenom:', prenom);
+          console.log('Sending nom:', nom);
+          console.log('Sending currentUsername:', currentUsername);
+
+          // Make an AJAX request to regenerate the username
+          fetch('{{ path('app_regenerate_username') }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ prenom: prenom, nom: nom, currentUsername: currentUsername }),
+          })
+            .then(response => {
+              // Debug: Log the response status and raw body
+              console.log('Response status:', response.status);
+              return response.text().then(text => {
+                console.log('Raw response:', text);
+                try {
+                  return JSON.parse(text);
+                } catch (error) {
+                  console.error('Failed to parse JSON:', error);
+                  throw new Error('Invalid JSON response');
+                }
+              });
+            })
+            .then(data => {
+              // Debug: Log the parsed response data
+              console.log('Parsed response data:', data);
+              if (data.username) {
+                // Update the suggestion box and input field with the new username
+                suggestionBox.setAttribute('data-username', data.username);
+                suggestionBox.querySelector('.suggestion-text').textContent = data.username;
+                document.querySelector('input[id$="_username"]').value = data.username;
+              } else {
+                console.error('No username returned in response:', data);
+              }
+            })
+            .catch(error => {
+              // Debug: Log any errors
+              console.error('Error regenerating username:', error);
+            });
+        });
+      });
+    });
+  </script>
+{% endblock %}

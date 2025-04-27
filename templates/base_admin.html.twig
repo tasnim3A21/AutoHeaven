@@ -12,13 +12,147 @@
     {% block css %}
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}" id="theme-style">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-     {% endblock %}
-     {%block fontjs %}
+    <style>
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            padding: 0;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .notification-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        .mark-all-read {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+
+        .time-group {
+            margin-bottom: 0;
+        }
+
+        .time-group h3 {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0.5rem 1rem;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 4px;
+            padding: 0.8rem 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification.unread {
+            background-color: #fff;
+        }
+
+        .notification.read {
+            opacity: 0.8;
+        }
+
+        .notification img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 0.8rem;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-content p {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .notification small {
+            color: #7f8c8d;
+            font-size: 0.75rem;
+        }
+
+        .clear-all {
+            display: block;
+            text-align: center;
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.8rem;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .clear-all:hover {
+            text-decoration: underline;
+        }
+
+        .bell-icon {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+    </style>
+    {% endblock %}
+    {% block fontjs %}
     <!-- FontAwesome JS -->
     <script defer src="{{ asset('plugins/fontawesome/js/all.min.js') }}"></script>
+    <style>
+        .reduction-badge { 
+            background-color: #ff0000;
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 14px;
+            z-index: 10;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-{% endblock %}
+    {% endblock %}
 </head>
 <body class="app">
 {% block body %}
@@ -38,8 +172,16 @@
                         </div>
                         <!-- Bloc pour personnaliser la navbar -->
                         {% block navbar %}
-                            <!-- Contenu par défaut de la navbar -->
-                            
+                            <div class="col-auto">
+                                <div class="bell-icon" id="notification-bell">
+                                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #2c3e50;"></i>
+                                    {% set notifications = render(controller('App\\Controller\\NotificationController::dropdown'))|trim %}
+                                    <span id="unread-count-container"></span> {# Placeholder for badge #}
+                                </div>
+                            </div>
+                            <div class="notification-dropdown" id="notification-dropdown">
+                                {{ notifications|raw }}
+                            </div>
                         {% endblock %}
                     </div>
                 </div>
@@ -72,7 +214,6 @@
             </li>
             <li class="nav-item">
                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_client' %}active{% endif %}" href="{{ path('app_client') }}">
-
                     <span class="nav-icon">
                         <i class="fas fa-users"></i>
                     </span>
@@ -159,31 +300,35 @@
                     <span class="nav-link-text">Réservation Remorquage</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_test_drive' %}active{% endif %}" href="{{ path('app_reservation_test_drive') }}">
+                    <span class="nav-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </span>
+                    <span class="nav-link-text">Réservation TestDrive</span>
+                </a>
+            </li>
            <li class="nav-item">
-  <a class="nav-link {% if app.request.attributes.get('_route') == 'app_statistique' %}active{% endif %}" href="{{ path('app_statistique') }}">
-    <span class="nav-icon">
-        <i class="fas fa-chart-bar"></i>
-    </span>
-    <span class="nav-link-text">Statistique Avis</span>
-</a>
-
-
-
-</li>
-
+                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_statistique' %}active{% endif %}" href="{{ path('app_statistique') }}">
+                    <span class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                    <span class="nav-link-text">Statistique Avis</span>
+                </a>
+            </li>
         </ul>
     </nav>
-
-   <div class="app-sidepanel-footer">
+<div class="app-sidepanel-footer"> 
     <nav class="app-nav app-nav-footer">
         <ul class="app-menu footer-menu list-unstyled">
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
                     <span class="nav-icon">
                         <i class="fas fa-sign-out-alt"></i>
                     </span>
                     <span class="nav-link-text">Logout</span>
                 </a>
+                <form id="logout-form" action="/logout" method="post" style="display: none;"></form>
             </li>
         </ul>
     </nav>
@@ -199,13 +344,113 @@
                 {% block content %}{% endblock %}
             </div>
         </div>
-
-       
     </div>
 
-   
- 
-    {% endblock %}
+    <!-- Add Bootstrap JS (and Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+<script>
+    const pusher = new Pusher('a57746eaf2c89e4593e9', {
+        cluster: 'eu',
+        encrypted: true
+    });
+    const channel = pusher.subscribe('stock-channel');
+</script>
+    <script>
+        // Toggle notification dropdown
+        const bellIcon = document.getElementById('notification-bell');
+        const dropdown = document.getElementById('notification-dropdown');
+        bellIcon.addEventListener('click', () => {
+            dropdown.classList.toggle('show');
+        });
 
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!bellIcon.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Set initial unread count
+        document.addEventListener('DOMContentLoaded', () => {
+            const unreadCount = document.getElementById('unreadCount')?.value;
+            if (unreadCount && parseInt(unreadCount) > 0) {
+                document.getElementById('unread-count-container').innerHTML = `<span class="badge" id="unread-count">${unreadCount}</span>`;
+            }
+        });
+
+        // Mark all as read
+        document.getElementById('mark-all-read').addEventListener('click', (e) => {
+            e.preventDefault();
+            fetch('{{ path('app_notifications_mark_all_read') }}', {
+                method: 'POST'
+            }).then(response => response.json()).then(data => {
+                if (data.status === 'success') {
+                    const notifications = document.querySelectorAll('.notification.unread');
+                    notifications.forEach(notification => {
+                        notification.classList.remove('unread');
+                        notification.classList.add('read');
+                    });
+                    const badge = document.getElementById('unread-count');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            });
+        });
+
+        // Clear all notifications
+        document.getElementById('clear-all').addEventListener('click', (e) => {
+            e.preventDefault();
+            fetch('{{ path('app_notifications_clear_all') }}', {
+                method: 'POST'
+            }).then(response => response.json()).then(data => {
+                if (data.status === 'success') {
+                    const notifications = document.querySelectorAll('.notification');
+                    notifications.forEach(notification => notification.remove());
+                    const badge = document.getElementById('unread-count');
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            });
+        });
+
+        // Real-time notifications
+        if (typeof channel !== 'undefined') {
+            channel.bind('stock-depleted', function(data) {
+                // Save the notification to the database
+                fetch('{{ path('app_notifications_save') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: data.message })
+                }).then(response => response.json()).then(result => {
+                    if (result.status === 'success') {
+                        const container = document.getElementById('realtime-notifications-today');
+                        container.innerHTML += `
+                            <div class="notification unread" data-id="${result.id}">
+                                <img src="{{ asset('images/notification-icon.png') }}" alt="Icon">
+                                <div class="notification-content">
+                                    <p>${data.message}</p>
+                                    <small>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+                                </div>
+                            </div>
+                        `;
+                        // Update badge count
+                        const badge = document.getElementById('unread-count');
+                        if (badge) {
+                            badge.textContent = parseInt(badge.textContent) + 1;
+                        } else {
+                            const unreadCountContainer = document.getElementById('unread-count-container');
+                            unreadCountContainer.innerHTML = '<span class="badge" id="unread-count">1</span>';
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+{% endblock %}
 </body>
 </html>

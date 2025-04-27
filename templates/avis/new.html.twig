@@ -1,136 +1,118 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des Avis{% endblock %}
+{% block title %}Créer un Avis{% endblock %}
 {% block spinner %}{% endblock %}
 
 {% block content %}
     <div class="container mt-4">
+        <h1 class="mb-4">Créer un nouvel avis</h1>
+{% if errorMessage is defined and errorMessage is not null %}
+        <div class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+        </div>
+    {% endif %}
 
-        <h1 class="mb-4" style="text-align: center; color: #0a0a23;">Liste des Avis</h1>
+    <div class="card shadow p-4">
+        {# Formulaire sans référence à la voiture #}
+        {{ form_start(form, {
+            'attr': {'novalidate': 'novalidate'}
+        }) }}
 
-        {# Recherche par mot-clé #}
         <div class="form-group mb-3">
-            <label for="searchKeyword">Rechercher un mot-clé</label>
-            <input type="text" id="searchKeyword" name="searchKeyword" class="form-control" placeholder="Entrez un mot-clé pour la recherche">
-        </div>
-
-        <button id="btnRechercher" class="btn btn-primary mb-3">Rechercher</button>
-
-        {# Tableau des avis #}
-        <table class="table table-bordered" style="border-collapse: collapse;">
-            <thead class="table-light">
-                <tr>
-                    <th>Note</th>
-                    <th>Commentaire</th>
-                    <th>Date</th>
-                    <th>Utilisateur</th>
-                </tr>
-            </thead>
-            <tbody id="avisTableBody">
-                {% for avis in avis %}
-                    {% set note = avis.note %}
-                    {% set color = note >= 4 ? '#d4edda' : (note == 3 ? '#fff3cd' : '#f8d7da') %}
-                    {% set smile = note >= 4 ? '😊' : (note == 3 ? '😐' : '😞') %}
-
-                    <tr style="background-color: {{ color }};">
-                        <td>{{ note }} {{ smile }}</td>
-                        <td>{{ avis.commentaire }}</td>
-                        <td>{{ avis.dateavis ? avis.dateavis|date('Y-m-d') : 'Aucune date' }}</td>
-                        <td>{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <a href="{{ path('app_avis_new', {'id': 1}) }}"
-           class="btn btn-success d-block w-25 mx-auto my-4">Ajouter un avis</a>
-
-        {# Section Top Clients #}
-        <div class="card mt-5">
-            <div class="card-header">
-                <h2 class="h5 mb-0">Top Clients (les plus actifs)</h2>
-            </div>
-            <div class="card-body">
-                <ul id="topClients" class="list-group"></ul>
+            {{ form_label(form.commentaire) }}
+            {{ form_widget(form.commentaire, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">
+                {{ form_errors(form.commentaire) }}
             </div>
         </div>
 
+        <div class="form-group mb-3">
+            {{ form_label(form.note) }}
+            <div class="form-check">
+                {{ form_widget(form.note) }}
+            </div>
+            <div class="text-danger">
+                {{ form_errors(form.note) }}
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            {{ form_label(form.dateavis) }}
+            {{ form_widget(form.dateavis, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">
+                {{ form_errors(form.dateavis) }}
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary w-100">Soumettre</button>
+        </div>
+
+        {{ form_end(form) }}
     </div>
-{% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
+    <a href="{{ path('app_avis_index') }}" class="btn btn-link mt-3">← Retour à la liste des avis</a>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% for message in app.flashes('success') %}
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('btnRechercher');
-        const tbody = document.getElementById('avisTableBody');
+        Swal.fire({
+            icon: 'info',
+            title: 'Merci !',
+            text: '{{ message }}',
+            confirmButtonColor: '#3085d6'
+        });
+    </script>
+{% endfor %}
 
-        btn.addEventListener('click', () => {
-            const keyword = document.getElementById('searchKeyword').value.trim();
-            if (!keyword) {
-                alert('Veuillez entrer un mot-clé pour la recherche.');
-                return;
-            }
+<script>
+async function rechercherSimilarite() {
+    const input = document.querySelector('#avis_commentaire');
+    const comment = input.value.trim();
+    if (comment.length < 5) return;
 
-            fetch(`/avis/search?searchKeyword=${keyword}`)
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                })
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `
-                            <tr>
-                              <td colspan="4" class="text-center p-3">
-                                Aucun avis trouvé pour "${keyword}".
-                              </td>
-                            </tr>`;
-                        return;
-                    }
+    try {
+        const res  = await fetch('/avis/similar', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({comment})
+        });
+        const { similar, error } = await res.json();
+        if (error) {
+            console.warn('API similar error:', error);
+            return;
+        }
 
-                    data.forEach(a => {
-                        const note = a.note;
-                        const color = note >= 4 ? '#d4edda' : (note === 3 ? '#fff3cd' : '#f8d7da');
-                        const smile = note >= 4 ? '😊' : (note === 3 ? '😐' : '😞');
+        console.log('Similar raw:', similar);
 
-                        tbody.innerHTML += `
-                            <tr style="background-color: ${color};">
-                              <td>${note} ${smile}</td>
-                              <td>${a.commentaire}</td>
-                              <td>${a.dateavis}</td>
-                              <td>${a.utilisateur}</td>
-                            </tr>`;
-                    });
-                })
-                .catch(err => {
-                    console.error('Erreur API :', err);
-                    alert('Impossible de récupérer les avis (voir console).');
-                });
+        if (similar.length === 0) {
+            console.log('Aucun vrai similaire (>50%)');
+            return;
+        }
+
+        // Construire le message
+        const msg = similar
+            .map(a => ➤ [${a.similarity*100}%] (${a.note}) ${a.commentaire})
+            .join('\n\n');
+
+        Swal.fire({
+            icon: 'info',
+            title: 'Commentaires vraiment similaires',
+            html: <pre style="text-align:left">${msg}</pre>,
+            confirmButtonColor: '#3085d6'
         });
 
-        // Chargement Top Clients
-        fetch('/avis/api/avis/top-clients?limit=5')
-            .then(res => res.json())
-            .then(data => {
-                const ul = document.getElementById('topClients');
-                if (data.length === 0) {
-                    ul.innerHTML = '<li class="list-group-item">Aucun client trouvé.</li>';
-                    return;
-                }
-                data.forEach(c => {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    li.textContent = `${c.prenom} ${c.nom}`;
-                    const span = document.createElement('span');
-                    span.className = 'badge bg-primary rounded-pill';
-                    span.textContent = `${c.nbAvis} avis`;
-                    li.append(span);
-                    ul.append(li);
-                });
-            })
-            .catch(err => console.error('Erreur Top Clients :', err));
-    });
-    </script>
+    } catch (e) {
+        console.error('Erreur fetch similar:', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.querySelector('#avis_commentaire');
+    if (input) input.addEventListener('blur', rechercherSimilarite);
+});
+</script>
+
 {% endblock %}

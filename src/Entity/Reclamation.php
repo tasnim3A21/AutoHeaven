@@ -1,7 +1,4 @@
 <?php
-
-
-
 // src/Entity/Reclamation.php
 
 namespace App\Entity;
@@ -84,6 +81,12 @@ class Reclamation
     #[ORM\OneToMany(mappedBy: "id_rec", targetEntity: Messagerie::class, cascade: ["persist", "remove"])]
     private Collection $messageries;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default": false})
+     */
+    #[ORM\Column(type: "boolean", nullable: true, options: ["default" => false])]
+    private ?bool $urgent = false;
+
     public function __construct()
     {
         $this->messageries = new ArrayCollection();
@@ -99,9 +102,11 @@ class Reclamation
     public function getId(): ?int
 
 
+
     {
         return $this->id;
     }
+
 
 
     public function setId(?int $id): self
@@ -128,9 +133,11 @@ class Reclamation
     public function getContenu(): ?string
 
 
+
     {
         return $this->contenu;
     }
+
 
 
 
@@ -171,6 +178,7 @@ class Reclamation
 
 
 
+
     public function setStatus(?string $status): self
     {
         $this->status = $status;
@@ -180,9 +188,11 @@ class Reclamation
     public function getDatecreation(): ?\DateTimeInterface
 
 
+
     {
         return $this->datecreation;
     }
+
 
 
 
@@ -219,10 +229,22 @@ class Reclamation
         return $this;
     }
 
+    public function isUrgent(): ?bool
+    {
+        return $this->urgent;
+    }
+
+    public function setUrgent(?bool $urgent): self
+    {
+        $this->urgent = $urgent;
+        return $this;
+    }
+
     public function __toString(): string
     {
         return $this->titre ?? 'Réclamation #' . $this->id_rec;
     }
 }
+
 
 

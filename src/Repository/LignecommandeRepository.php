@@ -38,6 +38,5 @@ class LignecommandeRepository extends ServiceEntityRepository
         return $data;
     }
 
-
     // Add custom methods as needed
 }
