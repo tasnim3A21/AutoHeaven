@@ -13,11 +13,18 @@ use App\Entity\Equipement;
 use App\Entity\Stock;
 use App\Form\EquipType;
 use App\Form\EditEquipType;
+use App\Service\NotificationService;
 use Psr\Log\LoggerInterface;
 use  Knp\Component\Pager\PaginatorInterface;
 
 final class EquipementsController extends AbstractController
 {
+   private NotificationService $notificationService;
+
+public function __construct(NotificationService $notificationService)
+{
+    $this->notificationService = $notificationService;
+}
     #[Route('/equipements', name: 'app_equipements')]
     public function index(EquipementRepository $equipementRepository, EntityManagerInterface $entityManager , PaginatorInterface $paginator ,Request $request): Response
     {
@@ -175,6 +182,12 @@ public function edit(Request $request, Equipement $equipement, EntityManagerInte
             $stock->setEquipement($equipement);
         }
         $stock->setQuantite($form->get('quantite')->getData());
+      if ($stock->getQuantite() <= 0) {
+        $this->notificationService->notifyStockDepleted(
+            $equipement,          // Passez l'objet Equipement complet
+            $entityManager        // Passez l'EntityManager
+        );
+        }
         $stock->setPrixvente($form->get('prixvente')->getData());
 
         $entityManager->persist($equipement);

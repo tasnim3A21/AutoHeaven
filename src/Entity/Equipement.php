@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Panier;
+use App\Entity\Notification;
+
 
 
 use Symfony\Component\Validator\Constraints as Assert;
@@ -55,6 +57,35 @@ class Equipement
 
     #[ORM\OneToMany(mappedBy: "id_e", targetEntity: Panier::class)]
     private Collection $paniers;
+    #[ORM\OneToMany(mappedBy: "equipement", targetEntity: Notification::class, cascade: ["remove"])]
+    private Collection $notifications;
+    public function getNotifications(): Collection
+{
+    return $this->notifications;
+}
+
+public function addNotification(Notification $notification): self
+{
+    if (!$this->notifications->contains($notification)) {
+        $this->notifications[] = $notification;
+        $notification->setEquipement($this);
+    }
+
+    return $this;
+}
+
+public function removeNotification(Notification $notification): self
+{
+    if ($this->notifications->removeElement($notification)) {
+        if ($notification->getEquipement() === $this) {
+            $notification->setEquipement(null);
+        }
+    }
+
+    return $this;
+}
+
+
 
     public function getOffres(): Collection
     {
