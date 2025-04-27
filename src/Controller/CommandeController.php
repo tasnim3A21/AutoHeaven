@@ -12,7 +12,7 @@ use App\Repository\CommandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Commande;
 use Knp\Component\Pager\PaginatorInterface;
-use Twilio\Rest\Client;
+use Twilio\Rest\Client as TwilioClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -23,11 +23,11 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Common\Entity\Cell; // Added for cell-specific styling
 use OpenSpout\Common\Entity\Style\Color; // Added for color definitions
 
-class CommandeController extends AbstractController
+final class CommandeController extends AbstractController
 {
-    private $twilioClient;
-    
-    public function __construct(Client $twilioClient)
+    private TwilioClient $twilioClient;
+
+    public function __construct(TwilioClient $twilioClient)
     {
         $this->twilioClient = $twilioClient;
     }
