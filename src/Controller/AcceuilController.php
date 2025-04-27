@@ -14,15 +14,14 @@ final class AcceuilController extends AbstractController
     public function index(CommandeRepository $commandeRepository, LignecommandeRepository $ligneCommandeRepo): Response
     {
         // Statistiques par statut
-    
         $statusStats = $commandeRepository->getCountByStatus();
-
-        // Statistiques mensuelles
-        $monthlySales = $commandeRepository->getMonthlySales(6); // 6 derniers mois
-
+    
+        // Statistiques mensuelles pour toute l'année en cours
+        $monthlySales = $commandeRepository->getMonthlySales();
+    
         // Produits les plus vendus
         $topProducts = $ligneCommandeRepo->getTopSoldProducts(5); // Top 5
-
+    
         return $this->render('acceuil/index.html.twig', [
             'statusStats' => $statusStats,
             'monthlySales' => $monthlySales,

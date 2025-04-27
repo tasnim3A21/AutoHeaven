@@ -75,7 +75,7 @@
         <div class="col-md-8 mb-4">
             <div class="card shadow">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Évolution des ventes</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Évolution des ventes en {{ "now"|date("Y") }}</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-container" style="height:300px;">
@@ -213,6 +213,7 @@
                         pointHitRadius: 10,
                         pointBorderWidth: 2,
                         data: {{ monthlySales.amounts|json_encode|raw }},
+                        spanGaps: true
                     }],
                 },
                 options: {
@@ -231,9 +232,19 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.parsed.y + ' €';
+                                    return context.parsed.y !== null ? context.parsed.y + ' €' : 'Pas de données';
                                 }
                             }
+                        }
+                    },
+                    elements: {
+                        line: {
+                            segment: {
+                                borderColor: ctx => ctx.p0.parsed.y === null || ctx.p1.parsed.y === null ? 'transparent' : 'rgba(78, 115, 223, 1)'
+                            }
+                        },
+                        point: {
+                            radius: ctx => ctx.parsed.y === null ? 0 : 3
                         }
                     }
                 }

@@ -59,10 +59,12 @@ return $this->createQueryBuilder('c')
     return $data;
 }
 
-public function getMonthlySales(int $months = 6): array
+public function getMonthlySales(): array
 {
-    $endDate = new \DateTime();
-    $startDate = (clone $endDate)->modify("-$months months");
+    $currentYear = date('Y');
+    $currentMonth = date('n'); // Mois actuel (1-12)
+    $startDate = new \DateTime("$currentYear-01-01");
+    $endDate = new \DateTime("$currentYear-12-31");
 
     $results = $this->createQueryBuilder('c')
         ->select("
@@ -77,7 +79,7 @@ public function getMonthlySales(int $months = 6): array
         ->getQuery()
         ->getResult();
 
-    // Générer tous les mois de la période
+    // Générer tous les mois de l'année
     $period = new \DatePeriod(
         $startDate,
         new \DateInterval('P1M'),
@@ -85,24 +87,31 @@ public function getMonthlySales(int $months = 6): array
     );
 
     $data = ['months' => [], 'amounts' => []];
+    $monthCounter = 1;
     
     foreach ($period as $date) {
         $monthKey = $date->format('Y-m');
-        $monthLabel = $date->format('M Y');
+        $monthLabel = $date->format('M');
         $data['months'][] = $monthLabel;
         
-        $total = 0;
-        foreach ($results as $row) {
-            if ($row['month'] === $monthKey) {
-                $total = (float) $row['total'];
-                break;
+        // Si le mois est dans le futur, on met null pour ne pas afficher de point
+        if ($monthCounter > $currentMonth) {
+            $data['amounts'][] = null;
+        } else {
+            $total = 0;
+            foreach ($results as $row) {
+                if ($row['month'] === $monthKey) {
+                    $total = (float) $row['total'];
+                    break;
+                }
             }
+            $data['amounts'][] = $total;
         }
         
-        $data['amounts'][] = $total;
+        $monthCounter++;
     }
 
     return $data;
-} 
+}
 
 }
