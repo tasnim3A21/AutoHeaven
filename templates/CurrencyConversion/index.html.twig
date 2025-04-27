@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Convertisseur de Devises{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">Convertisseur de Devises</h1>
+
+    <!-- Conversion Form -->
+    <form method="get" action="{{ path('currency_conversion') }}" class="mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="amount" class="form-label">Montant en TND</label>
+                <input type="number" name="amount" id="amount" class="form-control" value="{{ amount }}" min="0" step="0.01" required>
+            </div>
+            <div class="col-md-4">
+                <label for="currency" class="form-label">Devise</label>
+               <select name="currency" id="currency" class="form-select" onchange="this.form.submit()">
+    {% set mainCurrencies = ['EUR','USD','DZD','MAD','GBP'] %}
+
+    {# Main currencies first #}
+    {% for code in mainCurrencies %}
+        {% if currencies[code] is defined %}
+            <option value="{{ code }}" {{ selectedCurrency == code ? 'selected' : '' }}>
+                {{ code }}
+            </option>
+        {% endif %}
+    {% endfor %}
+
+    <option disabled>──────────</option>
+
+    {# Remaining currencies sorted alphabetically (excluding main ones) #}
+    {% for code in currencies|keys|sort %}
+        {% if code not in mainCurrencies %}
+            <option value="{{ code }}" {{ selectedCurrency == code ? 'selected' : '' }}>
+                {{ code }}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Convertir</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Result or Error -->
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% elseif convertedAmount is not null %}
+        <div class="alert alert-success" role="alert">
+            {{ amount }} TND = {{ convertedAmount }} {{ selectedCurrency }}
+        </div>
+    {% endif %}
+
+    <!-- Link to Car Listings -->
+    <a href="{{ path('app_car') }}" class="btn btn-outline-secondary">Retour aux Voitures</a>
+{% endblock %}

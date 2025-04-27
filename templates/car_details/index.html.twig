@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche de Voiture{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Title -->
+                <h1 class="mb-4 text-center">Recherche de Voiture</h1>
+
+                <!-- Search Form -->
+                <form method="get" action="{{ path('car_details_index') }}" class="row g-3 mb-5 justify-content-center">
+                    <div class="col-md-5">
+                        <label for="make" class="form-label">Marque</label>
+                        <input type="text" name="make" id="make" class="form-control text-center" value="{{ make }}" placeholder="Ex: Toyota">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="model" class="form-label">Modèle</label>
+                        <input type="text" name="model" id="model" class="form-control text-center" value="{{ model }}" placeholder="Ex: Yaris">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Chercher</button>
+                    </div>
+                </form>
+
+                <!-- Error -->
+                {% if error %}
+                    <div class="alert alert-danger text-center mx-auto" style="max-width: 600px;">{{ error }}</div>
+                {% endif %}
+
+                <!-- Results -->
+                {% if carDetails %}
+                    <h2 class="mb-4 text-center">Résultats</h2>
+                    <div class="row justify-content-center">
+                        {% for car in carDetails %}
+                            <div class="col-md-8 mb-4">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body text-center">
+                                        <h3 class="card-title mb-4">{{ car.make|capitalize }} {{ car.model|capitalize }} ({{ car.year ?? 'Année inconnue' }})</h3>
+                                        
+                                        <div class="row justify-content-center">
+                                            <!-- Basic Info -->
+                                            <div class="col-md-5 mb-3">
+                                                <h5 class="text-primary mb-3">Informations de base</h5>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2"><strong>Cylindrée:</strong> {{ car.displacement ?? 'N/A' }} L</li>
+                                                    <li class="mb-2"><strong>Cylindres:</strong> {{ car.cylinders ?? 'N/A' }}</li>
+                                                    <li class="mb-2"><strong>Carburant:</strong> {{ car.fuel_type ?? 'N/A' }}</li>
+                                                    <li class="mb-2"><strong>Transmission:</strong> {{ car.transmission ?? 'N/A' }}</li>
+                                                    <li class="mb-2"><strong>Traction:</strong> {{ car.drive ?? 'N/A' }}</li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <!-- Performance -->
+                                            <div class="col-md-5 mb-3">
+                                                <h5 class="text-primary mb-3">Performances</h5>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2"><strong>Consommation Ville:</strong> {{ car.city_mpg ?? 'Premium 🔒' }}</li>
+                                                    <li class="mb-2"><strong>Autoroute:</strong> {{ car.highway_mpg ?? 'Premium 🔒' }}</li>
+                                                    <li class="mb-2"><strong>Mixte:</strong> {{ car.combination_mpg ?? 'Premium 🔒' }}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Additional Specs -->
+                                        <div class="mt-4">
+                                            <h5 class="text-primary mb-3">Spécifications supplémentaires</h5>
+                                            <div class="row justify-content-center">
+                                                <div class="col-md-5">
+                                                    <ul class="list-unstyled">
+                                                        <li class="mb-2"><strong>Puissance:</strong> {{ car.engine_power_hp ?? 'Premium 🔒' }} HP</li>
+                                                        <li class="mb-2"><strong>Couple:</strong> {{ car.engine_torque_lbft ?? 'Premium 🔒' }} lb-ft</li>
+                                                        <li class="mb-2"><strong>Vitesse Max:</strong> {{ car.top_speed_mph ?? 'Premium 🔒' }} mph</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <ul class="list-unstyled">
+                                                        <li class="mb-2"><strong>Poids:</strong> {{ car.weight_lbs ?? 'Premium 🔒' }} lbs</li>
+                                                        <li class="mb-2"><strong>Sièges:</strong> {{ car.seats ?? 'Premium 🔒' }}</li>
+                                                        <li class="mb-2"><strong>Portes:</strong> {{ car.doors ?? 'Premium 🔒' }}</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if carDetails %}
+    <div class="text-center mb-4">
+        <a href="{{ path('car_details_export_pdf', {'make': make, 'model': model}) }}" 
+           class="btn btn-success">
+            <i class="fas fa-file-pdf me-2"></i>Exporter en PDF
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
