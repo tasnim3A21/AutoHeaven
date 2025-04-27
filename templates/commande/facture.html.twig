@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Facture #{{ commande.id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .info-client { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .total { font-weight: bold; text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Facture #{{ commande.id }}</h1>
+        <p>Date: {{ commande.dateCom|date('d/m/Y H:i') }}</p>
+    </div>
+
+    <div class="info-client">
+        <h3>Client</h3>
+        <p>{{ commande.id.nom }} {{ commande.id.prenom }}</p>
+        <p>{{ commande.id.adresse }}</p>
+        <p>Téléphone: {{ commande.id.tel }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in commande.ligneCommandes %}
+            <tr>
+                <td>{{ ligne.id_e.nom }}</td>
+                <td>{{ ligne.quantite }}</td>
+                <td>{{ ligne.prixUnitaire|number_format(2) }} €</td>
+                <td>{{ (ligne.prixUnitaire * ligne.quantite)|number_format(2) }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">
+        <p>Total: {{ commande.montantTotal|number_format(2) }} €</p>
+    </div>
+</body>
+</html>
