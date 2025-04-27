@@ -53,7 +53,7 @@
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
-        "twilio/sdk": "*"
+        "twilio/sdk": "^8.5"
     },
     "config": {
     "allow-plugins": {

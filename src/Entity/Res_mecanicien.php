@@ -137,23 +137,8 @@ class Res_mecanicien
     }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: "id_u", referencedColumnName: "id")]
-    private ?User $client = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_mec", referencedColumnName: "id")]
     private ?User $mecanicien = null;
-
-    public function getClient(): ?User
-    {
-        return $this->client;
-    }
-
-    public function setClient(?User $client): self
-    {
-        $this->client = $client;
-        return $this;
-    }
 
     public function getMecanicien(): ?User
     {

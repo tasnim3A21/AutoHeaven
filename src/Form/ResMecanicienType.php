@@ -15,6 +15,14 @@ class ResMecanicienType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('id_u', NumberType::class, [
+                'label' => 'ID Utilisateur',
+                'attr' => ['class' => 'form-control']
+            ])
+            ->add('id_mec', NumberType::class, [
+                'label' => 'ID Mécanicien',
+                'attr' => ['class' => 'form-control']
+            ])
             ->add('adresse', TextType::class, [
                 'label' => 'Adresse',
                 'attr' => ['class' => 'form-control']

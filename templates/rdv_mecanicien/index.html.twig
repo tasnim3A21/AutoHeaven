@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Réservations Mécaniciens</h1>
+    <h1>Réservations Mécanicien</h1>
 
     {# Search Bar #}
     <div class="mb-3">
@@ -15,8 +15,8 @@
         <thead>
             <tr>
                 <th class="sortable" data-sort="id">ID</th>
-                <th class="sortable" data-sort="user">Nom utilisateur</th>
-                <th class="sortable" data-sort="mec">Nom mécanicien</th>
+                <th class="sortable" data-sort="user">ID Utilisateur</th>
+                <th class="sortable" data-sort="mec">ID Mécanicien</th>
                 <th class="sortable" data-sort="adresse">Adresse</th>
                 <th class="sortable" data-sort="note">Note</th>
                 <th class="sortable" data-sort="date">Date</th>
@@ -27,20 +27,20 @@
         <tbody>
             {% for reservation in reservations %}
             <tr>
-                <td>{{ reservation.getId_res_m() }}</td>
-                <td>{{ reservation.client.nom }} {{ reservation.client.prenom }} ({{ reservation.client.id }})</td>
-                <td>{{ reservation.mecanicien.nom }} {{ reservation.mecanicien.prenom }} ({{ reservation.mecanicien.id }})</td>
+                <td>{{ reservation.id_res_m }}</td>
+                <td>{{ reservation.idU }}</td>
+                <td>{{ reservation.idMec }}</td>
                 <td>{{ reservation.adresse }}</td>
                 <td>{{ reservation.note }}</td>
                 <td>{{ reservation.date|date('Y-m-d') }}</td>
                 <td>{{ reservation.status }}</td>
                 <td>
                     {% if reservation.status == 'en_cours_de_traitement' %}
-                        <a href="{{ path('app_rdv_mecanicien_confirm', {'id': reservation.getId_res_m()}) }}" class="btn btn-sm btn-success">Confirmée</a>
-                        <a href="{{ path('app_rdv_mecanicien_reject', {'id': reservation.getId_res_m()}) }}" class="btn btn-sm btn-warning">Rejetée</a>
+                        <a href="{{ path('app_rdv_mecanicien_confirm', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-success">Confirmée</a>
+                        <a href="{{ path('app_rdv_mecanicien_reject', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-warning">Rejetée</a>
                     {% else %}
-                        <a href="{{ path('app_rdv_mecanicien_edit', {'id': reservation.getId_res_m()}) }}" class="btn btn-sm btn-primary">Modifier</a>
-                        <a href="{{ path('app_rdv_mecanicien_delete', {'id': reservation.getId_res_m()}) }}" class="btn btn-sm btn-danger">Supprimer</a>
+                        <a href="{{ path('app_rdv_mecanicien_edit', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ path('app_rdv_mecanicien_delete', {'id': reservation.id_res_m}) }}" class="btn btn-sm btn-danger">Delete</a>
                     {% endif %}
                 </td>
             </tr>
