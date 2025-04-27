@@ -1,0 +1,17 @@
+hwi_oauth:
+    firewall_names: [main]
+    resource_owners:
+        google:
+            type: google
+            client_id: "%env(GOOGLE_CLIENT_ID)%"
+            client_secret: "%env(GOOGLE_CLIENT_SECRET)%"
+            scope: "email profile"
+            options:
+                prompt: select_account
+        facebook:
+            type: facebook
+            client_id: "%env(FACEBOOK_APP_ID)%"
+            client_secret: "%env(FACEBOOK_APP_SECRET)%"
+            scope: "email public_profile"
+            options:
+                auth_type: rerequest

@@ -1,0 +1,10 @@
+framework:
+    rate_limiter:
+        sms:
+            policy: sliding_window
+            limit: 5
+            interval: '1 hour'
+        security_question:
+            policy: sliding_window
+            limit: 5
+            interval: '1 hour'

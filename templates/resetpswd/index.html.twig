@@ -1,0 +1,162 @@
+{% extends 'base_login.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block body %}
+  <div class="wrapper">
+    {{ form_start(form, {'action': path('app_password'), 'method': 'POST', 'attr': {'id': 'reset-form'}}) }}
+      <h2>Mot de passe oublié</h2>
+
+      <!-- Flash Message -->
+      {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <!-- Error Message -->
+      {% if error %}
+        <div class="alert alert-danger">
+          <p>{{ error|e }}</p>
+        </div>
+      {% endif %}
+
+      <!-- Email Field -->
+      <div class="input-field">
+        {{ form_widget(form.email, {'attr': {'required': 'required', 'placeholder': ' '}}) }}
+        <label>Entrez votre email</label>
+        {{ form_errors(form.email) }}
+      </div>
+
+      <!-- Reset Method Selection -->
+      <div class="reset-method">
+        <label>
+          <input type="radio" name="reset_method" value="sms" checked onclick="toggleResetFields('sms')">
+          Réinitialiser via SMS
+        </label>
+        <label>
+          <input type="radio" name="reset_method" value="question" onclick="toggleResetFields('question')">
+          Réinitialiser via question de sécurité
+        </label>
+      </div>
+
+      <!-- SMS Fields -->
+      <div id="sms-fields" class="reset-fields">
+        <div class="input-field">
+          {{ form_widget(form.phone, {'attr': {'placeholder': ' '}}) }}
+          <label>Entrez votre numéro de téléphone</label>
+          {{ form_errors(form.phone) }}
+        </div>
+      </div>
+
+      <!-- Security Question Fields -->
+      <div id="question-fields" class="reset-fields hidden">
+        <div class="input-field">
+          {{ form_widget(form.security_question, {'attr': {'placeholder': ' '}}) }}
+          {{ form_errors(form.security_question) }}
+        </div>
+        <div class="input-field">
+          {{ form_widget(form.security_answer, {'attr': {'placeholder': ' '}}) }}
+          <label>Entrez votre réponse</label>
+          {{ form_errors(form.security_answer) }}
+        </div>
+      </div>
+
+      <button type="submit">Soumettre</button>
+
+      <div class="links">
+        <p>Mot de passe retrouvé ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+        <p>Pas de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
+      </div>
+    {{ form_end(form) }}
+  </div>
+
+  <style>
+    .reset-method {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .reset-method label {
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    .links {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .links a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+    .input-field select:focus + label,
+    .input-field select:not([value=""]) + label {
+      top: -20px;
+      left: 0;
+      font-size: 12px;
+      color: #333;
+    }
+
+     .input-field select{
+      width: 100%;
+      box-sizing: border-box; /* Ensure padding doesn’t cause overflow */
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+  </style>
+
+  <script>
+    function toggleResetFields(method) {
+      const smsFields = document.getElementById('sms-fields');
+      const questionFields = document.getElementById('question-fields');
+      
+      if (method === 'sms') {
+        smsFields.classList.remove('hidden');
+        questionFields.classList.add('hidden');
+        smsFields.querySelector('input').setAttribute('required', 'required');
+        questionFields.querySelectorAll('input, select').forEach(el => el.removeAttribute('required'));
+      } else {
+        smsFields.classList.add('hidden');
+        questionFields.classList.remove('hidden');
+        smsFields.querySelector('input').removeAttribute('required');
+        questionFields.querySelectorAll('input, select').forEach(el => el.setAttribute('required', 'required'));
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const select = document.querySelector('#form_security_question');
+      if (select && select.value !== '') {
+        select.nextElementSibling.classList.add('moved');
+      }
+      select.addEventListener('change', function() {
+        if (this.value !== '') {
+          this.nextElementSibling.classList.add('moved');
+        } else {
+          this.nextElementSibling.classList.remove('moved');
+        }
+      });
+
+      // Valider le formulaire avant soumission
+      const form = document.getElementById('reset-form');
+      form.addEventListener('submit', function(event) {
+        const resetMethod = document.querySelector('input[name="reset_method"]:checked').value;
+        if (resetMethod === 'question') {
+          const question = document.getElementById('form_security_question').value;
+          const answer = document.getElementById('form_security_answer').value;
+          if (!question || !answer) {
+            event.preventDefault();
+            alert('Veuillez sélectionner une question et entrer une réponse.');
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}

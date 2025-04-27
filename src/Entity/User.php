@@ -3,15 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\Common\Collections\Collection;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
-
 
 #[ORM\Entity]
 #[UniqueEntity(
@@ -26,118 +23,111 @@ use Symfony\Component\Validator\Constraints as Assert;
     fields: ['cin'],
     message: 'Cet CIN existe déjà.'
 )]
-
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-        #[ORM\Id]
-        #[ORM\GeneratedValue(strategy: "AUTO")]
-        #[ORM\Column(type: "integer")]
-        private ?int $id = null; // Make sure the ID is nullable initially.
-    
-        #[ORM\Column(type: "integer", unique: true)]
-        #[Assert\NotBlank(message: "Le CIN est obligatoire.")]
-        #[Assert\Length(
-            exactMessage: "Le CIN doit contenir exactement 8 chiffres.",
-            min: 8,
-            max: 8
-        )]
-        #[Assert\Regex(
-            pattern: "/^\d{8}$/",
-            message: "Le CIN doit contenir uniquement des chiffres."
-        )]
-        private int $cin;
-    
-        #[ORM\Column(type: "string", length: 45)]
-        #[Assert\NotBlank(message: "Le nom est obligatoire.")]
-        private string $nom;
-    
-        #[ORM\Column(type: "string", length: 45)]
-        #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
-        private string $prenom;
-    
-        #[ORM\Column(type: "integer")]
-        #[Assert\NotBlank(message: "Le téléphone est obligatoire.")]
-        #[Assert\Length(
-            exactMessage: "Le téléphone doit contenir exactement 8 chiffres.",
-            min: 8,
-            max: 8
-        )]
-        #[Assert\Regex(
-            pattern: "/^\d{8}$/",
-            message: "Le téléphone doit contenir uniquement des chiffres."
-        )]
-        private int $tel;
-    
-        #[ORM\Column(type: "string", length: 45, unique: true)]
-        #[Assert\NotBlank(message: "L'email est obligatoire.")]
-        #[Assert\Email(message: "L'email doit être valide.")]
-        private string $email;
-    
-        #[ORM\Column(type: "string", length: 255)]
-        #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
-        private string $password;
-    
-        #[ORM\Column(type: "string", nullable: true)]
-        private ?string $role = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(type: "integer")]
+    private ?int $id = null;
 
-        #[ORM\Column(type: "string", length: 255)]
-#[Assert\NotBlank(message: "L'adresse est obligatoire.")]
-#[Assert\Regex(
-    pattern: "/^\d+\sRue\s.*$/",
-    message: "L'adresse doit contenir un numéro suivi d'un nom de rue valide."
-)]
-private string $adresse;
-    
-        #[ORM\Column(type: "string", length: 255, unique: true)]
-        #[Assert\NotBlank(message: "Le nom d'utilisateur est obligatoire.")]
-        private string $username;
-    
-        #[ORM\Column(type: "string", length: 255)]
-        private ?string $photo_profile = null;
-    
-        #[ORM\Column(type: "string", length: 10, nullable: true)]
-private ?string $ban = null;
+    #[ORM\Column(type: "integer", unique: true)]
+    #[Assert\NotBlank(message: "Le CIN est obligatoire.")]
+    #[Assert\Length(
+        exactMessage: "Le CIN doit contenir exactement 8 chiffres.",
+        min: 8,
+        max: 8
+    )]
+    #[Assert\Regex(
+        pattern: "/^\d{8}$/",
+        message: "Le CIN doit contenir uniquement des chiffres."
+    )]
+    private int $cin;
 
-    
-        #[ORM\Column(type: "string", length: 255, nullable: true)]
+    #[ORM\Column(type: "string", length: 45)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    private string $nom;
+
+    #[ORM\Column(type: "string", length: 45)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
+    private string $prenom;
+
+    #[ORM\Column(type: "integer", unique: true)]
+    #[Assert\NotBlank(message: "Le téléphone est obligatoire.")]
+    #[Assert\Length(
+        exactMessage: "Le téléphone doit contenir exactement 8 chiffres.",
+        min: 8,
+        max: 8
+    )]
+    #[Assert\Regex(
+        pattern: "/^\d{8}$/",
+        message: "Le téléphone doit contenir uniquement des chiffres."
+    )]
+    private int $tel;
+
+    #[ORM\Column(type: "string", length: 45, unique: true)]
+    #[Assert\NotBlank(message: "L'email est obligatoire.")]
+    #[Assert\Email(message: "L'email doit être valide.")]
+    private string $email;
+
+    #[ORM\Column(type: "string", length: 255)]
+    #[Assert\Length(
+        min: 6,
+        minMessage: "Le mot de passe doit contenir au moins 6 caractères.",
+        
+    )]
+    private string $password;
+
+    #[ORM\Column(type: "string", nullable: true)]
+    private ?string $role = null;
+
+    #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\Regex(
+        pattern: "/^\d+\sRue\s.*$/",
+        message: "L'adresse doit contenir un numéro suivi d'un nom de rue valide."
+    )]
+    private string $adresse;
+
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    #[Assert\NotBlank(message: "Le nom d'utilisateur est obligatoire.")]
+    private string $username;
+
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $photo_profile = null;
+
+    #[ORM\Column(type: "string", length: 10, nullable: true)]
+    private ?string $ban = null;
+
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $question = null;
 
-#[ORM\Column(type: "string", length: 255, nullable: true)]
-private ?string $reponse = null;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $reponse = null;
 
+    // === Symfony Security required methods ===
 
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
 
-    
-        // === Symfony Security required methods ===
-    
-        public function getUserIdentifier(): string
-        {
-            return $this->email; // or you can use username if that's the identifier
-        }
-    
-        public function getRoles(): array
-{
-    // Map your custom role to Symfony role format
-    return ['ROLE_' . strtoupper($this->role)];
-    dump($roleFormatted); // 👈 This will show in Symfony debug toolbar or terminal
-    return [$roleFormatted];
-}
+    public function getRoles(): array
+    {
+        $roleFormatted = 'ROLE_' . strtoupper($this->role);
+        return [$roleFormatted];
+    }
 
-        
-    
-        public function eraseCredentials()
-        {
-            // Clear any sensitive data if stored temporarily
-        }
-    
-        // Already implemented
-        public function getPassword(): string
-        {
-            return $this->password;
-        }
-    
-        // === Your existing getters/setters ===
-    
+    public function eraseCredentials()
+    {
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    // === Getters and Setters ===
+
     public function getId()
     {
         return $this->id;
@@ -197,7 +187,6 @@ private ?string $reponse = null;
     {
         $this->email = $value;
     }
-
 
     public function setPassword($value)
     {
@@ -304,8 +293,6 @@ private ?string $reponse = null;
         return $this;
     }
 
-
-
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
 
@@ -340,7 +327,6 @@ private ?string $reponse = null;
         return $this;
     }
 
-
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Messagerie::class)]
     private Collection $messageries;
 
@@ -350,8 +336,6 @@ private ?string $reponse = null;
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reservation::class)]
     private Collection $reservations;
 
-
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Reclamation::class)]
     private Collection $reclamations;
-
 }

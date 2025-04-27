@@ -4,3 +4,36 @@ controllers:
         namespace: App\Controller
     type: attribute
 
+
+hwi_oauth_redirect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
+    prefix: /connect
+
+hwi_oauth_connect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/connect.xml"
+    prefix: /connect
+
+google_login:
+    path: /connect/google
+    defaults: { _controller: HWIOAuthBundle:Connect:connect, resource_owner: google }
+
+facebook_login:
+    path: /connect/facebook
+    defaults: { _controller: HWIOAuthBundle:Connect:connect, resource_owner: facebook }
+
+google_check:
+    path: /connect/google/check
+    defaults: { _controller: HWIOAuthBundle:Connect:connect, resource_owner: google }
+
+facebook_check:
+    path: /connect/facebook/check
+    defaults: { _controller: HWIOAuthBundle:Connect:connect, resource_owner: facebook }
+
+app_acceuil:
+    path: /admin
+    controller: App\Controller\AcceuilController::index
+
+app_home:
+    path: /
+    controller: App\Controller\HomeController::index
+
