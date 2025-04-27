@@ -135,3 +135,14 @@ button:hover {
   margin-top: 30px;
   color: #fff;
 }
+.g-recaptcha {
+  margin: 20px auto; /* Increased margin and centered */
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.2); /* Subtle white background with transparency */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  display: block !important;
+  visibility: visible !important;
+  z-index: 10 !important;
+  width: fit-content; /* Adjust width to fit content */
+}

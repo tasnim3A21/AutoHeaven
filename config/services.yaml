@@ -1,17 +1,12 @@
-
-# This file is the entry point to configure your own services.  
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    google_recaptcha_secret_key: '%env(GOOGLE_RECAPTCHA_SECRET_KEY)%'
+    twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio_phone_number: '%env(TWILIO_PHONE_NUMBER)%'
 
 services:
-    # default configuration for services in this file
-
-services:
-
     _defaults:
         autowire: true
         autoconfigure: true
@@ -23,12 +18,32 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # Override FOSUserBundle SecurityController
+    fos_user.security.controller:
+        class: App\Controller\SecurityController
+        arguments: ['@security.authentication_utils']
 
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:
         arguments:
-            $router: '@router'
+            - '@router'
 
-    # Symfony Finder service (already configured)
+    # Custom LoginFormAuthenticator for reCAPTCHA validation
+    App\Security\LoginFormAuthenticator:
+        arguments:
+            - '@router'
+
+    # Symfony Finder service
     Symfony\Component\Finder\Finder: ~
 
+    # Social User Provider for HWIOAuthBundle
+    app.social_user_provider:
+        class: App\Security\SocialUserProvider
+        arguments: ['@App\Repository\UserRepository']
+
+    # OAuth Success Listener for custom redirects after social login
+    app.oauth_success_listener:
+        class: App\EventListener\OAuthSuccessListener
+        arguments: ['@router']
+        tags:
+            - { name: kernel.event_subscriber }
