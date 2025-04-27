@@ -1,0 +1,1 @@
+<?php $context = stream_context_create(['ssl' =, 'verify_peer' =, 'verify_peer_name' =,]]); $result = file_get_contents('https://www.google.com', false, $context); echo $result ? "Connexion SSL r‚ussie" : "chec de la connexion SSL"; > test_ssl.php

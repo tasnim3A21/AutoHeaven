@@ -1,61 +1,175 @@
-{% extends 'base_admin.html.twig' %}
+{% extends 'base_envoyer.html.twig' %}
 
-{% block title %}Clients{% endblock %}
+{% block title %}Historique des Réclamations{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Liste des Clients</h1>
-        </div>
+    <h1>Historique de vos Réclamations</h1>
 
-        <table class="table table-bordered table-striped text-center align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Photo</th>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Email</th>
-                    <th>Téléphone</th>
-                    <th>Adresse</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for m in clients %}
-                    <tr>
-                        <td>
-                            {% if m.photo_profile %}
-                                <img src="{{ asset('uploads/' ~ m.photo_profile) }}"
-                                     alt="Photo de {{ m.nom }}"
-                                     class="rounded-circle mb-3"
-                                     style="width: 100px; height: 100px; object-fit: cover;">
-                            {% else %}
-                                <img src="{{ asset('images/default-photo.png') }}"
-                                     alt="Photo par défaut"
-                                     class="rounded-circle mb-3"
-                                     style="width: 50px; height: 50px; object-fit: cover;">
-                            {% endif %}
-                        </td>
-                        <td>{{ m.nom }}</td>
-                        <td>{{ m.prenom }}</td>
-                        <td>{{ m.email }}</td>
-                        <td>{{ m.tel }}</td>
-                        <td>{{ m.adresse }}</td>
-                     <td>
-    <div class="d-flex justify-content-center gap-2">
-        <a href="{{ path('bannir_client', {'id': m.id}) }}" class="btn btn-warning btn-sm w-100">Bannir</a>
-        <a href="{{ path('supprimer_client', {'id': m.id}) }}" class="btn btn-danger btn-sm w-100" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')">Supprimer</a>
+    <div class="reclamations-list">
+        {% if reclamations is empty %}
+            <p class="text-muted">Vous n'avez soumis aucune réclamation.</p>
+        {% else %}
+            {% for reclamation in reclamations %}
+                <div class="reclamation-card">
+                    <div class="reclamation-header">
+                        <h3>{{ reclamation.titre }}</h3>
+                        <span class="date">Soumise le {{ reclamation.datecreation | date('d/m/Y H:i') }}</span>
+                    </div>
+                    <div class="reclamation-body">
+                        <p><strong>Contenu :</strong> {{ reclamation.contenu }}</p>
+                        {% if reclamation.image %}
+                            <p><strong>Image :</strong> <img src="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" alt="Image de la réclamation" style="max-width: 200px;"></p>
+                        {% endif %}
+                        <p><strong>Statut :</strong> {{ reclamation.status == 'en_attente' ? 'En attente' : 'Répondue' }}</p>
+                    </div>
+                    <div class="reclamation-responses">
+                        <h4>Réponses</h4>
+                        {% set responses = reclamation.messageries|filter(m => m.sender == 'admin') %}
+                        {% if responses is empty %}
+                            <p class="text-muted">Aucune réponse pour le moment.</p>
+                        {% else %}
+                            {% for response in responses %}
+                                <div class="response">
+                                    <p><strong>Admin :</strong> {{ response.message }}</p>
+                                    <p class="text-muted"><small>Envoyé le {{ response.datemessage | date('d/m/Y H:i') }}</small></p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="contact-admin">
+                        <h4>Contacter l'Admin</h4>
+                        <form action="{{ path('envoyer_send_message', {'id_rec': reclamation.idRec}) }}" method="POST">
+                            <div class="form-group">
+                                <label for="message-{{ reclamation.idRec }}">Votre message :</label>
+                                <textarea id="message-{{ reclamation.idRec }}" name="message" class="form-textarea" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit">Envoyer</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
-</td>
+{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            margin: 0 auto 30px;
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc3545;
+            width: fit-content;
+        }
 
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">Aucun mécanicien trouvé.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        .reclamations-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .reclamation-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .reclamation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .reclamation-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .reclamation-header .date {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .reclamation-body p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .reclamation-responses {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .reclamation-responses h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .response {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .response p {
+            margin: 0;
+        }
+
+        .contact-admin {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .contact-admin h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #dc3545, #e4606d);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #c82333, #d44d5a);
+        }
+    </style>
 {% endblock %}
