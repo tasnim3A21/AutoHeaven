@@ -18,16 +18,24 @@ use App\Entity\LignecommandeRepository;
 use App\Entity\StockRepository;
 use App\Entity\CommandeRepository;
 use App\Service\StripeService;
+use App\Service\NotificationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 final class PanierController extends AbstractController
 {
+    private NotificationService $notificationService;
+
+public function __construct(NotificationService $notificationService)
+{
+    $this->notificationService = $notificationService;
+}
     #[Route('/panier', name: 'app_panier')]
     public function index(EntityManagerInterface $entityManager): Response
     {
-        $user = $entityManager->getRepository(User::class)->find(3);
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -59,7 +67,8 @@ final class PanierController extends AbstractController
         }
 
       
-        $user = $entityManager->getRepository(User::class)->find(3);
+        /** @var \App\Entity\User $user */
+       $user = $this->getUser();
         if ($panier->getId() !== $user) {
             throw $this->createAccessDeniedException('You are not allowed to remove this item.');
         }
@@ -73,7 +82,8 @@ final class PanierController extends AbstractController
     #[Route('/checkout', name: 'app_checkout')]
     public function checkout(EntityManagerInterface $entityManager, StripeService $stripeService): Response
     {
-        $user = $entityManager->getRepository(User::class)->find(3);
+        /** @var \App\Entity\User $user */
+    $user = $this->getUser();
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -120,7 +130,8 @@ final class PanierController extends AbstractController
     #[Route('/payment/success', name: 'app_payment_success')]
     public function paymentSuccess(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $user = $entityManager->getRepository(User::class)->find(3);
+         /** @var \App\Entity\User $user */
+    $user = $this->getUser();
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -158,6 +169,13 @@ final class PanierController extends AbstractController
                 $entityManager->persist($ligneCommande);
                 
                 $stock->setQuantite($stock->getQuantite() - $panier->getQuantite());
+                 // Vérifier si le stock est épuisé après la mise à jour
+            if ($stock->getQuantite() <= 0) {
+                $this->notificationService->notifyStockDepleted(
+                    $equipement,
+                    $entityManager,
+                );
+            }
                 
                 $entityManager->remove($panier);
             }

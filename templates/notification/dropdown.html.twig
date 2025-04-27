@@ -1,0 +1,88 @@
+{% set today = "now"|date("Y-m-d") %}
+{% set yesterday = "now -1 day"|date("Y-m-d") %}
+
+<div class="notification-header">
+    <h2>Notifications</h2>
+    <a href="#" class="mark-all-read" id="mark-all-read">Mark all read</a>
+</div>
+
+{# Today Notifications #}
+<div class="time-group">
+    <h3>Today</h3>
+    <div id="stored-notifications-today">
+        {% set hasTodayNotifications = false %}
+        {% for notification in notifications %}
+            {% if notification.createdAt|date("Y-m-d") == today %}
+                {% set hasTodayNotifications = true %}
+                <div class="notification {% if notification.isRead %}read{% else %}unread{% endif %}" data-id="{{ notification.id }}">
+                    <img src="{{ asset('images/stock.png') }}" alt="Icon">
+                    <div class="notification-content">
+                        <p>{{ notification.message|slice(0, 50) }}...</p>
+                        <small>{{ notification.createdAt|date('H:i') }}</small>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% if not hasTodayNotifications %}
+            <div class="notification-content">
+                <p>No notifications for today.</p>
+            </div>
+        {% endif %}
+    </div>
+    <div id="realtime-notifications-today"></div>
+</div>
+
+{# Yesterday Notifications #}
+<div class="time-group">
+    <h3>Yesterday</h3>
+    <div id="stored-notifications-yesterday">
+        {% set hasYesterdayNotifications = false %}
+        {% for notification in notifications %}
+            {% if notification.createdAt|date("Y-m-d") == yesterday %}
+                {% set hasYesterdayNotifications = true %}
+                <div class="notification {% if notification.isRead %}read{% else %}unread{% endif %}" data-id="{{ notification.id }}">
+                    <img src="{{ asset('images/stock.png') }}" alt="Icon">
+                    <div class="notification-content">
+                        <p>{{ notification.message|slice(0, 50) }}...</p>
+                        <small>{{ notification.createdAt|date('H:i') }}</small>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% if not hasYesterdayNotifications %}
+            <div class="notification-content">
+                <p>No notifications for yesterday.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{# Older Notifications #}
+<div class="time-group">
+    <h3>Older</h3>
+    <div id="stored-notifications-older">
+        {% set hasOlderNotifications = false %}
+        {% for notification in notifications %}
+            {% if notification.createdAt|date("Y-m-d") < yesterday %}
+                {% set hasOlderNotifications = true %}
+                <div class="notification {% if notification.isRead %}read{% else %}unread{% endif %}" data-id="{{ notification.id }}">
+                    <img src="{{ asset('images/stock-icon.png') }}" alt="Icon">
+                    <div class="notification-content">
+                        <p>{{ notification.message|slice(0, 50) }}...</p>
+                        <small>{{ notification.createdAt|date('d M Y H:i') }}</small>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% if not hasOlderNotifications %}
+            <div class="notification-content">
+                <p>No older notifications.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<a href="#" class="clear-all" id="clear-all">Clear all notifications</a>
+
+{# Hidden input to pass unreadCount to the parent template #}
+<input type="hidden" id="unreadCount" value="{{ unreadCount }}">

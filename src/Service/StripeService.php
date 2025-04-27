@@ -7,8 +7,7 @@ use Stripe\Exception\ApiErrorException;
 
 class StripeService
 {
-    private $privateKey='sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk';
-    private $currency='eur';
+    
 
     public function __construct(string $privateKey, string $currency)
     {

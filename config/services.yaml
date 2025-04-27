@@ -1,4 +1,3 @@
-
 # This file is the entry point to configure your own services.  
 # Files in the packages/ subdirectory configure your dependencies.
 
@@ -9,8 +8,7 @@ parameters:
 
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
 
-services:
-    # default configuration for services in this file
+
 
 services:
 
@@ -25,16 +23,41 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-
+    App\EventListener\StockDepletedListener:
+        tags:
+            - { name: kernel.event_listener, event: stock.depleted, method: onStockDepleted }
     # Custom AuthenticationSuccessHandler service definition
     App\Security\AuthenticationSuccessHandler:
         arguments:
             $router: '@router'
 
-    # Symfony Finder service (already configured)
+   
+    # config/services.yaml
+
+    App\Service\NotificationService:
+        arguments:
+            $pusherKey: 'a57746eaf2c89e4593e9'
+            $pusherSecret: 'dacc11e11452323c90b9'
+            $pusherAppId: '1980718'
+            $pusherCluster: 'eu'
+    App\Service\PusherService:
+        arguments:
+            $appId: '1980718'
+            $key: 'a57746eaf2c89e4593e9'
+            $secret: 'dacc11e11452323c90b9'
+            $cluster: 'eu'
+            $host: 'api-eu.pusher.com'
+            $port: '443'
+            $scheme: 'https'
+    App\Controller\PusherAuthController:
+        arguments:
+            $pusherKey: 'a57746eaf2c89e4593e9'
+            $pusherSecret: 'dacc11e11452323c90b9'
+     # Twilio Client service
+         
+     # Symfony Finder service (already configured)
     Symfony\Component\Finder\Finder: ~
     App\Service\StripeService:
         arguments:
             $privateKey: 'sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk'
             $currency: 'eur'
-
