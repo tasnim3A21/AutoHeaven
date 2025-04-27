@@ -20,23 +20,19 @@ final class RdvMecanicienController extends AbstractController
     }
 
     #[Route('/rdv/mecanicien', name: 'app_rdv_mecanicien')]
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $reservations = $this->entityManager->getRepository(Res_mecanicien::class)->findAll();
-        $reservation = new Res_mecanicien();
-        $form = $this->createForm(ResMecanicienType::class, $reservation);
-        
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $reservation->setStatus('en_cours_de_traitement');
-            $this->entityManager->persist($reservation);
-            $this->entityManager->flush();
-            return $this->redirectToRoute('app_rdv_mecanicien');
-        }
+        $reservations = $this->entityManager->getRepository(Res_mecanicien::class)
+            ->createQueryBuilder('r')
+            ->select('r, client, mec')
+            ->leftJoin('r.client', 'client')
+            ->leftJoin('r.mecanicien', 'mec')
+            ->orderBy('r.date', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('rdv_mecanicien/index.html.twig', [
-            'reservations' => $reservations,
-            'form' => $form->createView(),
+            'reservations' => $reservations
         ]);
     }
 

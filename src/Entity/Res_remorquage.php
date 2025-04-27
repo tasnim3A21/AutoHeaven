@@ -167,4 +167,19 @@ class Res_remorquage
         return $this;
     }
 
+    // Add this near your other relationship definitions
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    private ?User $user = null;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
 }
