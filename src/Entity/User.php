@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -262,6 +263,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reponse = $value;
     }
 
+
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -293,6 +295,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: "id", targetEntity: Avis::class)]
     private Collection $aviss;
+
+
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Mention_j_aime::class)]
     private Collection $mention_j_aimes;

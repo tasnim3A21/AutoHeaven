@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Convertisseur de Devises{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">Chat with Bot</div>
+    <div class="chat-box" id="chat-box">
+        {% for message in conversation %}
+            <div class="message {{ message.role }}">
+                {{ message.text | nl2br }}
+                <div class="timestamp">{{ message.timestamp }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <form class="chat-input" id="chat-form">
+        <input type="text" id="message" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+        <button type="button" class="clear" onclick="clearChat()">Clear</button>
+    </form>
+    <div class="chat-footer">
+        <a href="{{ path('app_car') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
+
+<style>
+    /* Your full CSS remains unchanged here */
+    /* Move your <style> content here */
+    body {
+        background-color: #f4f4f9;
+    }
+    .chat-container {
+        margin: 50px auto;
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        overflow: hidden;
+    }
+    .chat-header {
+    background: #dc3545; /* Bootstrap red */
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+    .chat-box {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .message {
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 15px;
+        line-height: 1.4;
+        position: relative;
+    }
+    .message.user {
+        background: #6200ea;
+        color: white;
+        align-self: flex-end;
+    }
+    .message.bot {
+        background: #e0e0e0;
+        color: #333;
+        align-self: flex-start;
+    }
+    .timestamp {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 5px;
+        text-align: right;
+    }
+    .chat-input {
+        display: flex;
+        padding: 15px;
+        border-top: 1px solid #ddd;
+        background: #f9f9f9;
+    }
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 1em;
+        outline: none;
+        margin-right: 10px;
+    }
+    .chat-input button {
+        padding: 10px 20px;
+        background: #6200ea;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    .chat-input button:hover {
+        background: #4500a0;
+    }
+    .chat-input button.clear {
+        background: #d32f2f;
+        margin-left: 5px;
+    }
+    .chat-input button.clear:hover {
+        background: #b71c1c;
+    }
+    .chat-footer {
+        text-align: center;
+        padding: 15px;
+    }
+    .chat-footer a {
+        padding: 10px 20px;
+        background-color: #6200ea;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+    .chat-footer a:hover {
+        background-color: #4500a0;
+    }
+</style>
+
+<script>
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message');
+
+    function scrollToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addMessage(role, text, timestamp) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', role);
+        messageDiv.innerHTML = `${text.replace(/\n/g, '<br>')}<div class="timestamp">${timestamp}</div>`;
+        chatBox.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        const userTimestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        addMessage('user', message, userTimestamp);
+        messageInput.value = '';
+
+        try {
+            const response = await fetch('{{ path('chatbot_message') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ message }),
+            });
+
+            const data = await response.json();
+            if (data.conversation) {
+                const lastMessage = data.conversation[data.conversation.length - 1];
+                if (lastMessage.role === 'assistant') {
+                    addMessage('bot', lastMessage.text, lastMessage.timestamp);
+                }
+            }
+        } catch (error) {
+            addMessage('bot', 'Error: Could not reach the server.', new Date().toISOString().slice(0, 19).replace('T', ' '));
+        }
+    });
+
+    async function clearChat() {
+        try {
+            await fetch('{{ path('chatbot_clear') }}', {
+                method: 'POST',
+            });
+            chatBox.innerHTML = '';
+        } catch (error) {
+            addMessage('bot', 'Error: Could not clear chat.', new Date().toISOString().slice(0, 19).replace('T', ' '));
+        }
+    }
+
+    scrollToBottom();
+</script>
+{% endblock %}

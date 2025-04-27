@@ -102,4 +102,34 @@ class Res_testdrive
     {
         $this->status = $value;
     }
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Voiture::class)]
+    #[ORM\JoinColumn(name: 'id_v', referencedColumnName: 'id_v')]
+    private ?Voiture $voiture = null;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getVoiture(): ?Voiture
+    {
+        return $this->voiture;
+    }
+
+    public function setVoiture(?Voiture $voiture): self
+    {
+        $this->voiture = $voiture;
+        return $this;
+    }
 }

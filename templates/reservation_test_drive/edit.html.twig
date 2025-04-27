@@ -4,21 +4,21 @@
 
 {% block content %}
 <div class="container">
-    <h1>Edit Réservation Test Drive</h1>
+    <h1>Modifier Réservation TestDrive</h1>
 
     {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
         {{ form_widget(form._token) }}
         
         <div class="mb-3">
-            {{ form_label(form.id_u) }}
-            {{ form_widget(form.id_u) }}
-            {{ form_errors(form.id_u) }}
+            <label class="form-label">Client</label>
+            <input type="text" class="form-control" value="{{ reservation.user.nom }} {{ reservation.user.prenom }} ({{ reservation.idU }})" readonly>
+            {{ form_widget(form.id_u, {'attr': {'class': 'd-none'}}) }}
         </div>
         
         <div class="mb-3">
-            {{ form_label(form.id_v) }}
-            {{ form_widget(form.id_v) }}
-            {{ form_errors(form.id_v) }}
+            <label class="form-label">Véhicule</label>
+            <input type="text" class="form-control" value="{{ reservation.voiture.marque }} ({{ reservation.idV }})" readonly>
+            {{ form_widget(form.id_v, {'attr': {'class': 'd-none'}}) }}
         </div>
         
         <div class="mb-3">
@@ -27,9 +27,9 @@
             {{ form_errors(form.date) }}
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
     {{ form_end(form, {'render_rest': false}) }}
 
-    <a href="{{ path('app_reservation_test_drive') }}" class="btn btn-secondary mt-3">Back to list</a>
+    <a href="{{ path('app_reservation_test_drive') }}" class="btn btn-secondary mt-3">Annuler</a>
 </div>
 {% endblock %}

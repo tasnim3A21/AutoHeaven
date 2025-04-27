@@ -4,6 +4,7 @@ controllers:
         namespace: App\Controller
     type: attribute
 
+
 hwi_oauth_redirect:
     resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
     prefix: /connect
@@ -35,3 +36,4 @@ app_acceuil:
 app_home:
     path: /
     controller: App\Controller\HomeController::index
+

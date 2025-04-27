@@ -12,23 +12,32 @@
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+
         "hwi/oauth-bundle": "*",
-        "knplabs/knp-paginator-bundle": "*",
+      
+        "dompdf/dompdf": "^3.1",
+        "knplabs/knp-paginator-bundle": "^6.8",
+        "openspout/openspout": "^4.25",
+        "php-ai/php-ml": "*",
+
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.1",
+        "pusher/pusher-php-server": "^7.2",
+        "stripe/stripe-php": "^17.1",
         "symfony/asset": "6.4.*",
         "symfony/asset-mapper": "6.4.*",
         "symfony/console": "6.4.*",
         "symfony/doctrine-messenger": "6.4.*",
         "symfony/dotenv": "6.4.*",
         "symfony/expression-language": "6.4.*",
-        "symfony/flex": "^2",
         "symfony/form": "6.4.*",
         "symfony/framework-bundle": "6.4.*",
+        "symfony/google-mailer": "*",
         "symfony/http-client": "6.4.*",
         "symfony/intl": "6.4.*",
         "symfony/lock": "6.4.*",
         "symfony/mailer": "6.4.*",
+        "symfony/mercure-bundle": "^0.3.9",
         "symfony/mime": "6.4.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "6.4.*",
@@ -50,16 +59,22 @@
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0",
+
         "twilio/sdk": "^8.5"
+
+
+
     },
     "config": {
-        "allow-plugins": {
-            "php-http/discovery": true,
-            "symfony/flex": true,
-            "symfony/runtime": true
-        },
-        "sort-packages": true
+    "allow-plugins": {
+        "php-http/discovery": true,
+        "symfony/flex": true,
+        "symfony/runtime": true
     },
+    "sort-packages": true,
+    "secure-http": true,
+    "disable-tls": false
+},
     "autoload": {
         "psr-4": {
             "App\\": "src/"
@@ -110,5 +125,11 @@
         "symfony/phpunit-bridge": "^7.2",
         "symfony/stopwatch": "6.4.*",
         "symfony/web-profiler-bundle": "6.4.*"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://repo.packagist.org"
+        }
     }
 }
