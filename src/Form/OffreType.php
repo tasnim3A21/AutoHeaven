@@ -30,13 +30,6 @@ class OffreType extends AbstractType
             ->add('taux_reduction', NumberType::class, [
                 'label' => 'Taux de réduction (%)',
                 'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 99.99,
-                        'notInRangeMessage' => 'La réduction doit être comprise entre 0% et 99,99%',
-                    ]),
-                ],
             ])
             ->add('date_debut', DateType::class, [
                 'widget' => 'single_text',
