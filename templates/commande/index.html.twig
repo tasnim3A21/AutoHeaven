@@ -48,7 +48,11 @@
                             </a></li>
                         </ul>
                     </div>
+                     <a href="{{ path('app_commande_export_excel') }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Exporter en Excel
+                </a>
                 </div>
+                
             </div>
             
             <div class="card-body">
@@ -108,7 +112,6 @@
                                                class="btn btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            
                                             {% if commande.status == 'en attente' %}
                                                 <a href="{{ path('app_commande_confirm', {'id': commande.id_com}) }}" 
                                                    class="btn btn-success"
@@ -116,6 +119,10 @@
                                                     <i class="fas fa-check"></i>
                                                 </a>
                                             {% endif %}
+                                            <a href="{{ path('app_commande_pdf', {'id': commande.id_com}) }}" 
+                                               class="btn btn-danger">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -129,22 +136,20 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <div class="navigation d-flex justify-content-center">
+    {{ knp_pagination_render(commandes) }}
+</div>
                 </div>
 
                 <!-- Pagination -->
-                {% if commandes|length > 0 %}
-                    <nav aria-label="Pagination">
-                        {{ knp_pagination_render(commandes) }}
-                    </nav>
-                {% endif %}
+               
             </div>
         </div>
     </div>
 
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Remplacez tout le code JavaScript par : -->
-<script>
+    <script>
 $(document).ready(function() {
     const $searchInput = $('#searchInput');
     const $tableBody = $('#commandesTable tbody');
@@ -193,6 +198,10 @@ $(document).ready(function() {
                                 <i class="fas fa-check"></i>
                             </a>
                             ` : ''}
+                            <a href="/commande/pdf/${commande.id}" 
+                               class="btn btn-danger">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -255,11 +264,11 @@ $(document).ready(function() {
 
     $searchInput.on('keypress', function(e) {
         if (e.which === 13) {
-            performSearch($(this).val());
+            performSearch($searchInput.val());
         }
     });
 });
-</script>
+    </script>
 
     <style>
         .search-container {

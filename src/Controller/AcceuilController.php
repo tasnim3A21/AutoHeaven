@@ -21,12 +21,15 @@ final class AcceuilController extends AbstractController
     
         // Produits les plus vendus
         $topProducts = $ligneCommandeRepo->getTopSoldProducts(5); // Top 5
+         // Prédiction avec PHP-ML
+        $mlPrediction = $commandeRepository->getSalesPredictionWithPHPML();
     
         return $this->render('acceuil/index.html.twig', [
             'statusStats' => $statusStats,
             'monthlySales' => $monthlySales,
             'topProducts' => $topProducts,
             'controller_name' => 'AccueilController',
+            'mlPrediction' => $mlPrediction,
         ]);
     }
 }

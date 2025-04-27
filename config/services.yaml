@@ -54,7 +54,7 @@ services:
             $pusherKey: 'a57746eaf2c89e4593e9'
             $pusherSecret: 'dacc11e11452323c90b9'
      # Twilio Client service
-     
+         
      # Symfony Finder service (already configured)
     Symfony\Component\Finder\Finder: ~
     App\Service\StripeService:

@@ -60,7 +60,7 @@ final class CommandeController extends AbstractController
         $commandes = $paginator->paginate(
             $queryBuilder,
             $request->query->getInt('page', 1),
-            10,
+            5,
             [
                 'wrap-queries' => true,
                 'sortFieldWhitelist' => $validSortFields
