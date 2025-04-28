@@ -1,0 +1,68 @@
+{% extends 'base_security_question.html.twig' %}
+
+{% block title %}Choisir une question de sécurité{% endblock %}
+
+{% block body %}
+  <div class="wrapper">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+      <h2>Question de Sécurité</h2>
+      <p class="text-center mb-4" style="color: #fafafa;">
+        Pour des raisons de sécurité, veuillez choisir une question et fournir une réponse. <strong>Ne jamais oublier cette réponse.</strong>
+      </p>
+
+      <!-- Question Dropdown -->
+      <div class="input-field">
+        {{ form_widget(form.question, {'attr': {'required': 'required', 'class': 'form-select'}}) }}
+     
+        <div class="error-message">
+          {{ form_errors(form.question) }}
+        </div>
+      </div>
+      
+
+      <!-- Answer Field -->
+      <div class="input-field">
+        {{ form_widget(form.reponse, {'attr': {'required': 'required'}}) }}
+        <label>Votre réponse</label>
+        <div class="error-message">
+          {{ form_errors(form.reponse) }}
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit">Enregistrer</button>
+
+    {{ form_end(form) }}
+  </div>
+
+  <style>
+    .wrapper {
+      max-width: 400px;
+      margin: 50px auto;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    p.text-center {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.875rem;
+      margin-top: 5px;
+    }
+   
+
+    .input-field select{
+      width: 100%;
+      box-sizing: border-box; /* Ensure padding doesn’t cause overflow */
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+  </style>
+{% endblock %}

@@ -1,0 +1,34 @@
+{
+    "candidates": [
+        {
+            "content": {
+                "parts": [
+                    {
+                        "text": "The latest Tesla models available are the Model S, Model 3, Model X, and Model Y.  Tesla periodically updates its models, so features and specifications can change.  If you're looking for the absolute latest version, I recommend checking the official Tesla website for the most up-to-date information.\n"
+                    }
+                ],
+                "role": "model"
+            },
+            "finishReason": "STOP",
+            "avgLogprobs": -0.1586475519033579
+        }
+    ],
+    "usageMetadata": {
+        "promptTokenCount": 42,
+        "candidatesTokenCount": 65,
+        "totalTokenCount": 107,
+        "promptTokensDetails": [
+            {
+                "modality": "TEXT",
+                "tokenCount": 42
+            }
+        ],
+        "candidatesTokensDetails": [
+            {
+                "modality": "TEXT",
+                "tokenCount": 65
+            }
+        ]
+    },
+    "modelVersion": "gemini-1.5-pro-002"
+}

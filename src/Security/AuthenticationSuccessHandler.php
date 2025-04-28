@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -8,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use App\Entity\User;
 
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
@@ -24,7 +24,14 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         /** @var User $user */
         $user = $token->getUser();
 
-        $role = $user->getRole(); // assuming getRole() returns 'admin', 'client', or 'mecanicien'
+        // Check if user is banned
+        if ($user->getBan() === 'oui') {
+            // Throw exception to prevent authentication and display error
+            throw new CustomUserMessageAuthenticationException('Vous êtes définitivement banni du site.');
+        }
+
+        // Get the user's role (custom method)
+        $role = $user->getRole();
 
         switch ($role) {
             case 'admin':

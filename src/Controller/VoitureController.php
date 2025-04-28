@@ -26,29 +26,57 @@ final class VoitureController extends AbstractController
     }
 
     #[Route('/voiture', name: 'app_voiture', methods: ['GET'])]
-public function index(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $searchTerm = $request->query->get('search', ''); // Retrieve the search term
-
-    // Create a query builder for the Voiture repository
-    $queryBuilder = $entityManager->getRepository(Voiture::class)->createQueryBuilder('v');
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $searchTerm = $request->query->get('search', '');
+        $selectedCouleur = $request->query->get('couleur', '');
+        $sort = $request->query->get('sort', '');
     
-    // If there is a search term, apply filters to the query
-    if (!empty($searchTerm)) {
-        $queryBuilder
-            ->where('v.marque LIKE :searchTerm')
-            ->orWhere('v.couleur LIKE :searchTerm')
-            ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        $repo = $entityManager->getRepository(Voiture::class);
+        $queryBuilder = $repo->createQueryBuilder('v');
+    
+        // Filtering by search
+        if (!empty($searchTerm)) {
+            $queryBuilder
+                ->andWhere('v.marque LIKE :searchTerm OR v.couleur LIKE :searchTerm')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        }
+    
+        // Filtering by couleur
+        if (!empty($selectedCouleur)) {
+            $queryBuilder
+                ->andWhere('v.couleur = :couleur')
+                ->setParameter('couleur', $selectedCouleur);
+        }
+    
+        // Sorting logic
+        if ($sort === 'prix_asc') {
+            $queryBuilder->orderBy('v.prix', 'ASC');
+        } elseif ($sort === 'prix_desc') {
+            $queryBuilder->orderBy('v.prix', 'DESC');
+        }
+    
+        // Get the results
+        $voitures = $queryBuilder->getQuery()->getResult();
+    
+        // Get all unique couleurs for the filter dropdown
+        $couleurs = array_column(
+            $repo->createQueryBuilder('v')
+                ->select('DISTINCT v.couleur')
+                ->orderBy('v.couleur', 'ASC')
+                ->getQuery()
+                ->getScalarResult(),
+            'couleur'
+        );
+    
+        return $this->render('voiture/index.html.twig', [
+            'voitures' => $voitures,
+            'search' => $searchTerm,
+            'couleurs' => $couleurs,
+        ]);
     }
+    
 
-    // Execute the query and get the result
-    $voitures = $queryBuilder->getQuery()->getResult();
-
-    return $this->render('voiture/index.html.twig', [
-        'voitures' => $voitures,
-        'search' => $searchTerm,  // Pass the search term to the view to populate the input field
-    ]);
-}
 
 #[Route('/voiture/new', name: 'voiture_new')]
 public function new(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): Response

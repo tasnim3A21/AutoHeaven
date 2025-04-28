@@ -12,7 +12,8 @@ class StatistiqueController extends AbstractController
     public function index(AvisRepository $avisRepository): Response
     {
         // Récupérer les statistiques par voiture
-        $stats = $avisRepository->getStatsParVoiture();
+        $stats = $avisRepository->getStatsParNote();
+
 
         // Retourner la vue avec les statistiques
         return $this->render('statistique/index.html.twig', [

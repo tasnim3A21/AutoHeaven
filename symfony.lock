@@ -26,6 +26,19 @@
             "./migrations/.gitignore"
         ]
     },
+    "hwi/oauth-bundle": {
+        "version": "2.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "20154480d558409ad3eb9de3644817c81fad2268"
+        },
+        "files": [
+            "./config/packages/hwi_oauth.yaml",
+            "./config/routes/hwi_oauth_routing.yaml"
+        ]
+    },
     "knplabs/knp-paginator-bundle": {
         "version": "v6.7.0"
     },
@@ -126,6 +139,18 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/lock": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.2",
+            "ref": "8e937ff2b4735d110af1770f242c1107fdab4c8e"
+        },
+        "files": [
+            "./config/packages/lock.yaml"
+        ]
+    },
     "symfony/mailer": {
         "version": "6.4",
         "recipe": {
@@ -146,6 +171,18 @@
             "version": "1.0",
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
+    },
+    "symfony/mercure-bundle": {
+        "version": "0.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.3",
+            "ref": "528285147494380298f8f991ee8c47abebaf79db"
+        },
+        "files": [
+            "./config/packages/mercure.yaml"
+        ]
     },
     "symfony/messenger": {
         "version": "6.4",

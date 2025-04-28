@@ -1,0 +1,10 @@
+<?php
+$context = stream_context_create([
+    'ssl' => [
+        'cafile' => 'C:\xampp\apache\bin\curl-ca-bundle.crt',
+        'verify_peer' => true,
+        'verify_peer_name' => true,
+    ],
+]);
+$result = file_get_contents('https://www.google.com', false, $context);
+echo $result ? "Connexion SSL réussie" : "Échec de la connexion SSL";

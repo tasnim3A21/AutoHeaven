@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Envoyer Dashboard{% endblock %}</title>
+        <link rel="stylesheet" href="/css/portal.css">
+        <link rel="shortcut icon" href="/favicon.ico">
+        <script defer src="/plugins/fontawesome/js/all.min.js"></script>
+        <!-- Ajout de SweetAlert2 pour les notifications -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- Ajout de Pusher pour les notifications en temps réel -->
+        <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body class="app">
+        <header class="app-header fixed-top">
+            <div class="app-header-inner">
+                <div class="container-fluid py-2">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col-auto">
+                            <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img">
+                                    <title>Menu</title>
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <!-- Bouton de notification -->
+                            <div class="notification-icon position-relative">
+                                <i class="fas fa-bell fa-lg"></i>
+                                {% set newResponses = 0 %}
+                                {% if app.user %}
+                                    {% set newResponses = app.user.getNewResponses()|length %}
+                                {% endif %}
+                                {% if newResponses > 0 %}
+                                    <span class="badge badge-danger position-absolute top-0 start-100 translate-middle">{{ newResponses }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="app-wrapper">
+            <div class="app-content pt-3 p-md-3 p-lg-4">
+                <div class="container-xl">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="flash-{{ label }}" style="padding: 10px; margin: 10px 0; border-radius: 4px; color: #fff;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        {% block javascripts %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Initialisation de Pusher pour les notifications
+                    const pusher = new Pusher('{{ pusher_key }}', {
+                        cluster: '{{ pusher_cluster }}',
+                        encrypted: true
+                    });
+
+                    pusher.connection.bind('connected', function() {
+                        console.log('Connecté à Pusher avec succès');
+                    });
+                    pusher.connection.bind('error', function(err) {
+                        console.error('Erreur de connexion Pusher :', err);
+                    });
+
+                    const channel = pusher.subscribe('reclamation-channel');
+                    channel.bind('reclamation-responded', function(data) {
+                        // Mettre à jour le badge de notification
+                        fetch('/envoyer/notifications/count')
+                            .then(response => response.json())
+                            .then(data => {
+                                const badge = document.querySelector('.notification-icon .badge');
+                                if (data.count > 0) {
+                                    if (badge) {
+                                        badge.textContent = data.count;
+                                    } else {
+                                        const newBadge = document.createElement('span');
+                                        newBadge.className = 'badge badge-danger position-absolute top-0 start-100 translate-middle';
+                                        newBadge.textContent = data.count;
+                                        document.querySelector('.notification-icon').appendChild(newBadge);
+                                    }
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Nouvelle Réponse',
+                                        text: 'Vous avez reçu une réponse à votre réclamation.',
+                                        confirmButtonColor: '#28a745',
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 3000,
+                                        timerProgressBar: true
+                                    });
+                                }
+                            });
+                    });
+                });
+            </script>
+        {% endblock %}
+    </body>
+</html>
+
+<style>
+    .flash-success { background-color: #28a745; }
+    .flash-error { background-color: #dc3545; }
+
+    .notification-icon {
+        color: #333;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .notification-icon .badge {
+        font-size: 0.75rem;
+        padding: 0.25em 0.5em;
+    }
+</style>

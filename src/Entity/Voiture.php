@@ -50,10 +50,11 @@ class Voiture
     private ?float $prix = null;
 
     #[ORM\Column(type: "text")]
-    //#[Assert\NotBlank(message: "L'image est obligatoire.")]
+   // #[Assert\NotBlank(message: "L'image est obligatoire.")]
     private string $image;
 
     #[ORM\Column(type: "string")]
+    #[Assert\NotBlank(message: "La disponibilité est obligatoire.")]
     #[Assert\Choice(choices: ["oui", "non"], message: "La disponibilité doit être 'oui' ou 'non'.")]
     private ?string $disponibilite = null;
 
@@ -99,6 +100,7 @@ public function setIdV($value)
         return $this->id_c;
     }
 
+
     public function setIdC($value)
     {
         $this->id_c = $value;
@@ -108,6 +110,7 @@ public function setIdV($value)
     {
         return $this->id_c;
     }
+
 
     public function setId_c($value)
     {
@@ -196,7 +199,7 @@ public function setIdV($value)
         {
             if (!$this->aviss->contains($avis)) {
                 $this->aviss[] = $avis;
-                $avis->setId_v($this);
+                $avis->setIdV($this);
             }
     
             return $this;
@@ -206,8 +209,8 @@ public function setIdV($value)
         {
             if ($this->aviss->removeElement($avis)) {
                 // set the owning side to null (unless already changed)
-                if ($avis->getId_v() === $this) {
-                    $avis->setId_v(null);
+                if ($avis->getIdV() === $this) {
+                    $avis->setIdV(null);
                 }
             }
     

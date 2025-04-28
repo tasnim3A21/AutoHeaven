@@ -1,6 +1,5 @@
-# config/packages/security.yaml
-
 security:
+    enable_authenticator_manager: true
     password_hashers:
         App\Entity\User:
             algorithm: bcrypt
@@ -10,6 +9,11 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        oauth_user_provider:
+            id: app.social_user_provider
+        chain_provider:
+            chain:
+                providers: [app_user_provider, oauth_user_provider]
 
     firewalls:
         dev:
@@ -18,8 +22,10 @@ security:
 
         main:
             lazy: true
-            provider: app_user_provider
-
+            provider: chain_provider
+            entry_point: App\Security\LoginFormAuthenticator
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -29,12 +35,34 @@ security:
                 username_parameter: email
                 password_parameter: password
                 success_handler: App\Security\AuthenticationSuccessHandler
-
             logout:
                 path: app_logout
                 target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week
+            oauth:
+                resource_owners:
+                    google: "/connect/google/check"
+                    facebook: "/connect/facebook/check"
+                login_path: app_login
+                use_forward: false
+                failure_path: app_login
+                oauth_user_provider:
+                    service: app.social_user_provider
+                # Ensure OAuth respects custom success handling
+                success_handler: App\Security\AuthenticationSuccessHandler
 
     access_control:
-       
-        - { path: ^/, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: ROLE_USER }
+
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/connect, roles: PUBLIC_ACCESS }
+        - { path: ^/offres, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+        - { path: ^/acceuil, roles: ROLE_ADMIN }
+        - { path: ^/offre, roles: ROLE_ADMIN }
+        - { path: ^/client, roles: ROLE_ADMIN }
+        - { path: ^/mecanicien, roles: ROLE_ADMIN }
+        - { path: ^/home, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+        - { path: ^/profile, roles: [ROLE_CLIENT, ROLE_MECANICIEN] }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

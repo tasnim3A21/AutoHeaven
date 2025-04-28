@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Login{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('css/Loginstyle.css') }}">
+  
 </head>
 <body>
     {% block body %}{% endblock %}
+    {% block javascripts %}
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script> {# reCAPTCHA script #}
+    {% endblock %}
 </body>
 </html>

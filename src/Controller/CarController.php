@@ -22,9 +22,14 @@ final class CarController extends AbstractController
     }
     #[Route('/car/{id}/details', name: 'car_details', methods: ['GET'])]
     public function details(Voiture $voiture): Response
-    {
-        return $this->render('car/details.html.twig', [
-            'voiture' => $voiture,
-        ]);
+{
+    if (!$voiture) {
+        return new Response('Car not found', 404);
     }
+
+    dump($voiture);  // Ensure the voiture data is being passed correctly
+    return $this->render('car/details.html.twig', [
+        'voiture' => $voiture,
+    ]);
+}
 }

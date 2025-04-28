@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier Demande de Remorquage{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid page-header mb-5 p-0" style="background-image: url(img/carousel-bg-1.jpg);">
+    <div class="container-fluid page-header-inner py-5">
+        <div class="container text-center">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Mes Réservations</h1>
+            <nav aria-label="breadcrumb">
+                
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1 class="mb-4">Modifier Demande de Remorquage</h1>
+
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+        <div class="mb-3">
+            <label class="form-label">Client</label>
+            <div class="form-control-plaintext">
+                {% if remorquage.user %}
+                    {{ remorquage.user.username }} (ID: {{ remorquage.user.id }})
+                {% else %}
+                    Utilisateur non trouvé (ID: {{ remorquage.id_u }})
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.id_u) }}
+            </div>
+            {{ form_errors(form.id_u) }}
+        </div>
+
+        {# Display Towing Truck Info (Non-Editable) #}
+        <div class="mb-3">
+            <label class="form-label">Camion de Remorquage</label>
+            <div class="form-control-plaintext">
+                {% if remorquage.camionRemorquage %}
+                    {{ remorquage.camionRemorquage.nomAgence }} (ID: {{ remorquage.camionRemorquage.id_cr }})
+                {% else %}
+                    Camion non trouvé (ID: {{ remorquage.id_cr }})
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.id_cr) }}
+            </div>
+            {{ form_errors(form.id_cr) }}
+        </div>
+
+        {# Keep the Date field editable #}
+        <div class="mb-3">
+            {{ form_label(form.date) }}
+            {{ form_widget(form.date) }}
+            {{ form_errors(form.date) }}
+        </div>
+
+        {# Render other form fields if any #}
+        {{ form_rest(form) }} 
+
+        <button type="submit" class="btn btn-primary mt-3">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+    <a href="{{ path('app_booking') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+</div>
+{% endblock %}

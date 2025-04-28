@@ -2,19 +2,16 @@
 
 namespace App\Entity;
 
+// Assert is already imported below, removing duplicate import
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
-
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 #[ORM\Entity]
 class Res_mecanicien
 {
-
     #[ORM\Id]
-
     #[ORM\GeneratedValue]
-
     #[ORM\Column(type: "integer")]
     private int $id_res_m;
 
@@ -67,40 +64,28 @@ class Res_mecanicien
     {
         return $this->id_res_m;
     }
-
-
+    public function setIdU($id_u)
+    {
+        $this->id_u = $id_u;
+    }
     public function getIdU()
-
     {
         return $this->id_u;
     }
 
-
-    public function setIdU($value)
-
-    {
-        $this->id_u = $value;
-    }
-
-
     public function getIdMec()
-
     {
-        return $this->id_mec;
+        return $this->id_mec;  
     }
-
-
-    public function setIdMec($value)
-
+    public function setIdMec($id_mec)
     {
-        $this->id_mec = $value;
+        $this->id_mec = $id_mec;
     }
 
     public function getAdresse()
     {
         return $this->adresse;
     }
-
     public function setAdresse($value)
     {
         $this->adresse = $value;
@@ -110,7 +95,6 @@ class Res_mecanicien
     {
         return $this->note;
     }
-
     public function setNote($value)
     {
         $this->note = $value;
@@ -120,7 +104,6 @@ class Res_mecanicien
     {
         return $this->date;
     }
-
     public function setDate($value)
     {
         $this->date = $value;
@@ -130,25 +113,37 @@ class Res_mecanicien
     {
         return $this->status;
     }
-
     public function setStatus($value)
     {
         $this->status = $value;
     }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: "id_mec", referencedColumnName: "id")]
+    #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    private ?User $client = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_mec', referencedColumnName: 'id')]
     private ?User $mecanicien = null;
 
-    public function getMecanicien(): ?User
+    public function getClient(): User
+    {
+        return $this->client;
+    }
+    public function setClient(User $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    public function getMecanicien(): User
     {
         return $this->mecanicien;
     }
 
-    public function setMecanicien(?User $mecanicien): self
+    public function setMecanicien(User $mecanicien): self
     {
         $this->mecanicien = $mecanicien;
         return $this;
     }
-
 }
