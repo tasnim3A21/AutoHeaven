@@ -16,6 +16,8 @@
         .btn-primary:hover { background-color: #4a5aa8; border-color: #4a5aa8; }
         .btn-secondary { background-color: #e0e0e0; border-color: #e0e0e0; color: #333; border-radius: 5px; }
         .btn-secondary:hover { background-color: #d0d0d0; border-color: #d0d0d0; }
+        .btn-ai { background-color: #28a745; border-color: #28a745; color: white; border-radius: 5px; }
+        .btn-ai:hover { background-color: #218838; border-color: #218838; }
         label { font-weight: 500; color: #333; }
         .custom-file-upload { display: flex; align-items: center; gap: 10px; }
         .custom-file-upload input[type="file"] { display: none; }
@@ -45,7 +47,7 @@
     <div class="container mt-5">
         <div class="card p-4">
             <h2 class="mb-4">Ajouter un Équipement</h2>
-               {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+            {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
                 <div class="mb-3">
                     <label>Image de l'équipement</label>
                     <div class="image-section">
@@ -63,69 +65,66 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="form-group">
-    {{ form_label(form.nom) }}
-    {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.nom) }}
-    </div>
-</div>
-                       
+                            {{ form_label(form.nom) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.nom) }}
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                       <div class="form-group">
-    {{ form_label(form.marque) }}
-    {{ form_widget(form.marque, {'attr': {'class': 'form-control' ~ (form.marque.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.marque) }}
-    </div>
-</div>
-                       
+                        <div class="form-group">
+                            {{ form_label(form.marque) }}
+                            {{ form_widget(form.marque, {'attr': {'class': 'form-control' ~ (form.marque.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.marque) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="form-group">
-    {{ form_label(form.reference) }}
-    {{ form_widget(form.reference, {'attr': {'class': 'form-control' ~ (form.reference.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.reference) }}
-    </div>
-</div>
-                        
+                            {{ form_label(form.reference) }}
+                            {{ form_widget(form.reference, {'attr': {'class': 'form-control' ~ (form.reference.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.reference) }}
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                       <div class="form-group">
-    {{ form_label(form.quantite) }}
-    {{ form_widget(form.quantite, {'attr': {'class': 'form-control' ~ (form.quantite.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.quantite) }}
-    </div>
-</div>
-                       
+                        <div class="form-group">
+                            {{ form_label(form.quantite) }}
+                            {{ form_widget(form.quantite, {'attr': {'class': 'form-control' ~ (form.quantite.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.quantite) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="form-group">
-    {{ form_label(form.prixvente) }}
-    {{ form_widget(form.prixvente, {'attr': {'class': 'form-control' ~ (form.prixvente.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.prixvente) }}
-    </div>
-</div>
-                       
+                            {{ form_label(form.prixvente) }}
+                            {{ form_widget(form.prixvente, {'attr': {'class': 'form-control' ~ (form.prixvente.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.prixvente) }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12 mb-3">
-                      <div class="form-group">
-    {{ form_label(form.description) }}
-    {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid')}}) }}
-    <div class="invalid-feedback">
-        {{ form_errors(form.description) }}
-    </div>
-</div>
-                        
+                        <div class="form-group">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid')}}) }}
+                            <div class="invalid-feedback">
+                                {{ form_errors(form.description) }}
+                            </div>
+                            <button type="button" class="btn btn-ai mt-2" onclick="generateDescription()">
+                                <i class="fas fa-magic mr-2"></i> Générer avec IA
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
@@ -144,7 +143,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        // Image preview (fonctionnalité visuelle uniquement, pas de validation)
+        // Image preview
         document.getElementById('{{ form.image.vars.id }}').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const previewImage = document.getElementById('previewImage');
@@ -168,6 +167,46 @@
             previewImage.src = '#';
             previewImage.style.display = 'none';
             imagePreview.style.backgroundColor = '#e0e0e0';
+        }
+
+        // Generate description with AI
+        function generateDescription() {
+            const nom = document.getElementById('{{ form.nom.vars.id }}').value;
+            const marque = document.getElementById('{{ form.marque.vars.id }}').value;
+            const descriptionField = document.getElementById('{{ form.description.vars.id }}');
+
+            if (!nom || !marque) {
+                alert('Veuillez remplir les champs Nom et Marque avant de générer une description.');
+                return;
+            }
+
+            // Show loading state
+            const generateButton = document.querySelector('.btn-ai');
+            generateButton.disabled = true;
+            generateButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Génération...';
+
+            // Make AJAX request to backend
+            $.ajax({
+                url: '/generate-description', // Backend endpoint
+                method: 'POST',
+                data: JSON.stringify({ nom, marque }),
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.description) {
+                        descriptionField.value = response.description;
+                    } else {
+                        alert('Erreur lors de la génération de la description.');
+                    }
+                },
+                error: function() {
+                    alert('Erreur lors de la communication avec le serveur.');
+                },
+                complete: function() {
+                    // Reset button state
+                    generateButton.disabled = false;
+                    generateButton.innerHTML = '<i class="fas fa-magic mr-2"></i> Générer avec IA';
+                }
+            });
         }
     </script>
 {% endblock %}
