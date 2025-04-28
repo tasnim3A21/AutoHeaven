@@ -4,16 +4,27 @@
 
 {% block content %}
 <div class="container">
-    <h1>Camion Remorquage</h1>
+    <div class="mb-4">
+        <h1>Nouveau Camion</h1>
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {{ form_widget(form) }}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Ajouter Camion</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+
     {# Search Bar #}
     <div class="mb-3">
+    <h2>Liste Camions</h2>
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
     </div>
 
     <table class="table" id="camionTable">
         <thead>
             <tr>
-                <th class="sortable" data-sort="id">ID</th>
+                <th class="sortable" data-sort="nomagence">Nom Agence</th>
                 <th class="sortable" data-sort="modele">Modèle</th>
                 <th class="sortable" data-sort="annee">Année</th>
                 <th class="sortable" data-sort="numtel">Numéro de téléphone</th>
@@ -24,29 +35,19 @@
         <tbody>
             {% for camion in camions %}
             <tr>
-                <td>{{ camion.id_cr }}</td>
+                <td>{{ camion.nomAgence }}</td>
                 <td>{{ camion.modele }}</td>
                 <td>{{ camion.annee }}</td>
                 <td>{{ camion.numTel }}</td>
                 <td>{{ camion.statut }}</td>
                 <td>
-                    <a href="{{ path('app_camion_remorquage_edit', {'id': camion.id_cr}) }}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{{ path('app_camion_remorquage_delete', {'id': camion.id_cr}) }}" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="{{ path('app_camion_remorquage_edit', {'id': camion.id_cr}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                    <a href="{{ path('app_camion_remorquage_delete', {'id': camion.id_cr}) }}" class="btn btn-sm btn-danger">Supprimer</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="mb-4">
-        <h2>Nouveau Camion</h2>
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            {{ form_widget(form) }}
-            <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Create Camion</button>
-            </div>
-        {{ form_end(form) }}
-    </div>
 </div>
 
 {% block javascripts %}

@@ -112,34 +112,7 @@
     {% endblock %}
 
     {% block topbar %}
-    <!-- Topbar Start -->
-    <div class="container-fluid bg-light p-0">
-        <div class="row gx-0 d-none d-lg-flex">
-            <div class="col-lg-7 px-5 text-start">
-                <div class="h-100 d-inline-flex align-items-center py-3 me-4">
-                    <small class="fa fa-map-marker-alt text-primary me-2"></small>
-                    <small>123 Street, Hbib Bourguiba, Tunisia</small>
-                </div>
-                <div class="h-100 d-inline-flex align-items-center py-3">
-                    <small class="far fa-clock text-primary me-2"></small>
-                    <small>Mon - Fri : 09.00 AM - 09.00 PM</small>
-                </div>
-            </div>
-            <div class="col-lg-5 px-5 text-end">
-                <div class="h-100 d-inline-flex align-items-center py-3 me-4">
-                    <small class="fa fa-phone-alt text-primary me-2"></small>
-                    <small>+216 98036987</small>
-                </div>
-                <div class="h-100 d-inline-flex align-items-center">
-                    <a class="btn btn-sm-square bg-white text-primary me-1" href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a class="btn btn-sm-square bg-white text-primary me-1" href="#"><i class="fab fa-twitter"></i></a>
-                    <a class="btn btn-sm-square bg-white text-primary me-1" href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a class="btn btn-sm-square bg-white text-primary me-0" href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Topbar End -->
+    
     {% endblock %}
 
     <!-- Navbar Start -->
@@ -155,21 +128,19 @@
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{{ path('app_home') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_home' ? 'active' : '' }}">Home</a>
                 <a href="{{ path('app_about') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_about' ? 'active' : '' }}">About</a>
-                <a href="{{ path('app_services') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_services' ? 'active' : '' }}">Services</a>
+                <a href="{{ path('app_car') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_car' ? 'active' : '' }}">Cars</a>
                 <a href="{{ path('app_offres') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_offres' ? 'active' : '' }}">Offres</a>
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
                     <div class="dropdown-menu fade-up m-0">
                         <a href="{{ path('app_booking') }}" class="dropdown-item {{ app.request.get('_route') == 'app_booking' ? 'active' : '' }}">Reservations</a>
                         <a href="{{ path('app_technicians') }}" class="dropdown-item {{ app.request.get('_route') == 'app_technicians' ? 'active' : '' }}">Technicians</a>
                         <a href="{{ path('app_testimonial') }}" class="dropdown-item {{ app.request.get('_route') == 'app_testimonial' ? 'active' : '' }}">Testimonial</a>
-                        <a href="{{ path('app_car') }}" class="dropdown-item {{ app.request.get('_route') == 'app_car' ? 'active' : '' }}">Cars</a>
                         <a href="{{ path('app_equipement') }}" class="dropdown-item {{ app.request.get('_route') == 'app_equipement' ? 'active' : '' }}">Equipments</a>
                         <a href="{{ path('app_reclamation') }}" class="dropdown-item {{ app.request.get('_route') == 'app_reclamation' ? 'active' : '' }}">Reclamation</a>
                         <a href="{{ path('app_avis_index') }}" class="dropdown-item {{ app.request.get('_route') == 'app_avis_index' ? 'active' : '' }}">Avis</a>
                     </div>
                 </div>
-                <a href="{{ path('app_profile') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">Profile</a>
             </div>
             
             <!-- Dark Mode Toggle Switch -->
@@ -178,7 +149,8 @@
                 <label class="form-check-label" for="darkModeToggle">🌙</label>
             </div>
 
-            <a href="#" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Get A Quote<i class="fa fa-arrow-right ms-3"></i></a>
+            
+            <a href="{{ path('app_profile') }}" class="nav-item nav-link {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">Profile<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
     {% endblock %}

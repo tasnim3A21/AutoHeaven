@@ -15,6 +15,14 @@ class CamionRemorquageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('nom_agence', TextType::class, [
+                'label' => 'Nom Agence',
+                'required' => true,
+                'empty_data' => '',
+                'attr' => [
+                    'class' => 'form-control',
+                ]
+            ])
             ->add('modele', ChoiceType::class, [
                 'label' => 'Modele',
                 'choices' => [
