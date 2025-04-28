@@ -55,27 +55,21 @@ class Res_testdrive
         $this->id_td = $value;
     }
 
-
     public function getIdU()
-
     {
         return $this->id_u;
     }
 
-
     public function setIdU($value)
-
     {
         $this->id_u = $value;
     }
-
 
     public function getIdV()
 
     {
         return $this->id_v;
     }
-
 
     public function setIdV($value)
 
@@ -101,5 +95,35 @@ class Res_testdrive
     public function setStatus($value)
     {
         $this->status = $value;
+    }
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Voiture::class)]
+    #[ORM\JoinColumn(name: 'id_v', referencedColumnName: 'id_v')]
+    private ?Voiture $voiture = null;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getVoiture(): ?Voiture
+    {
+        return $this->voiture;
+    }
+
+    public function setVoiture(?Voiture $voiture): self
+    {
+        $this->voiture = $voiture;
+        return $this;
     }
 }

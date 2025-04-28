@@ -14,14 +14,11 @@ class Commande
 
     #[ORM\Id]
     #[ORM\Column(type: "integer")]
-
-
-
     #[ORM\GeneratedValue(strategy: "AUTO")] // Add this to enable auto-increment
 
     private int $id_com;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commandes")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commandes")]
     #[ORM\JoinColumn(name: 'id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private User $id;
 
