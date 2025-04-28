@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Réservations Remorquage</h1>
+    <h1>Réservations Remorquages</h1>
 
     {# Search Bar #}
     <div class="mb-3">
@@ -15,8 +15,8 @@
         <thead>
             <tr>
                 <th class="sortable" data-sort="id">ID</th>
-                <th class="sortable" data-sort="camion">ID Camion</th>
-                <th class="sortable" data-sort="user">ID Utilisateur</th>
+                <th class="sortable" data-sort="camion">Agence</th>
+                <th class="sortable" data-sort="user">Client</th>
                 <th class="sortable" data-sort="ramassage">Point de ramassage</th>
                 <th class="sortable" data-sort="depot">Point de dépôt</th>
                 <th class="sortable" data-sort="date">Date</th>
@@ -28,8 +28,20 @@
             {% for reservation in reservations %}
             <tr>
                 <td>{{ reservation.id_rem }}</td>
-                <td>{{ reservation.idCr }}</td>
-                <td>{{ reservation.idU }}</td>
+                <td>
+                    {% if reservation.camionRemorquage %}
+                        {{ reservation.camionRemorquage.nomAgence }} ({{ reservation.idCr }})
+                    {% else %}
+                        {{ reservation.idCr }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if reservation.user %}
+                        {{ reservation.user.nom }} {{ reservation.user.prenom }} ({{ reservation.idU }})
+                    {% else %}
+                        {{ reservation.idU }}
+                    {% endif %}
+                </td>
                 <td>{{ reservation.pointRamassage }}</td>
                 <td>{{ reservation.pointDepot }}</td>
                 <td>{{ reservation.date|date('Y-m-d') }}</td>
@@ -39,8 +51,8 @@
                         <a href="{{ path('app_reservation_remorquage_confirm', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-success">Confirmée</a>
                         <a href="{{ path('app_reservation_remorquage_reject', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-warning">Rejetée</a>
                     {% else %}
-                        <a href="{{ path('app_reservation_remorquage_edit', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="{{ path('app_reservation_remorquage_delete', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{{ path('app_reservation_remorquage_edit', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                        <a href="{{ path('app_reservation_remorquage_delete', {'id': reservation.id_rem}) }}" class="btn btn-sm btn-danger">Supprimer</a>
                     {% endif %}
                 </td>
             </tr>
