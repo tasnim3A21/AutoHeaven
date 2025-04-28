@@ -42,6 +42,10 @@ services:
         arguments:
             $apiKey: '%env(GEMINI_API_KEY)%' 
 
+    App\Service\GeminiTranslationService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%'
+
     App\Service\CurrencyConversionService:
         arguments:
             $apiKey: '%currencyfreaks_api_key%'
