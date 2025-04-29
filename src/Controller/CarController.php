@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Voiture;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Reservation;
 
 
 final class CarController extends AbstractController
@@ -32,4 +35,25 @@ final class CarController extends AbstractController
         'voiture' => $voiture,
     ]);
 }
+    #[Route('/car/{id}/reserver', name: 'car_reservation', methods: ['GET', 'POST'])]
+    public function reserver(Voiture $voiture, Request $request, EntityManagerInterface $entityManager)
+    {
+        if (!$voiture) {
+            return new Response('Car not found', 404);
+        }
+
+        if ($request->isMethod('POST')) {
+            $reservation = new Reservation();
+            $voiture = $entityManager->getRepository(Voiture::class)->find($request->request->get('voiture_id'));
+            $reservation->setId_v($voiture->getId_v());
+            $reservation->setId(3);
+            $reservation->setDate_res(new \DateTime($request->request->get('reservation_date')));
+
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+
+            // Return a JSON response indicating success
+            return $this->json(['status' => 'success', 'message' => 'Reservation successful']);
+        }
+    }
 }

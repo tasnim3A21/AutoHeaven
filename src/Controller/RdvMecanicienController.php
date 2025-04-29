@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 final class RdvMecanicienController extends AbstractController
@@ -73,19 +75,37 @@ final class RdvMecanicienController extends AbstractController
     }
 
     #[Route('/rdv/mecanicien/confirm/{id}', name: 'app_rdv_mecanicien_confirm')]
-    public function confirm(Res_mecanicien $reservation): Response
+    public function confirm(Res_mecanicien $reservation, MailerInterface $mailer): Response
     {
         $reservation->setStatus('confirmee');
         $this->entityManager->flush();
+
+        // Envoi de l'email de confirmation
+        $email = (new Email())
+            ->from('noreply@example.com')
+            ->to($reservation->getClient()->getEmail())
+            ->subject('Confirmation de votre réservation')
+            ->text('Votre réservation d"un rendez-vouz mecanicien a été confirmée.');
+
+        $mailer->send($email);
 
         return $this->redirectToRoute('app_rdv_mecanicien');
     }
 
     #[Route('/rdv/mecanicien/reject/{id}', name: 'app_rdv_mecanicien_reject')]
-    public function reject(Res_mecanicien $reservation): Response
+    public function reject(Res_mecanicien $reservation, MailerInterface $mailer): Response
     {
         $reservation->setStatus('rejetee');
         $this->entityManager->flush();
+
+        // Envoi de l'email de rejet
+        $email = (new Email())
+            ->from('noreply@example.com')
+            ->to($reservation->getClient()->getEmail())
+            ->subject('Rejet de votre réservation')
+            ->text('Votre réservation d"un rendez-vouz mecanicien a été rejetée.');
+
+        $mailer->send($email);
 
         return $this->redirectToRoute('app_rdv_mecanicien');
     }

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver un véhicule{% endblock %}
+
+{% block body %}
+<h1>Réserver le véhicule</h1>
+
+<form method="post">
+    <div>
+        <label for="voiture">Voiture:</label>
+        <input type="text" id="voiture" name="voiture" value="{{ voiture.marque }}" readonly>
+    </div>
+    <div>
+        <label for="client">Client:</label>
+        <input type="text" id="client" name="client" value="{{ "ABID" }}" readonly>
+    </div>
+    <button type="submit">Réserver</button>
+</form>
+
+{% endblock %}

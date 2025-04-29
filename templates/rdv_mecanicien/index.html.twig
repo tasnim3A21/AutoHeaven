@@ -79,14 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const rows = table.getElementsByTagName('tr');
     const sortableHeaders = document.querySelectorAll('.sortable');
 
-    
     searchInput.addEventListener('keyup', function() {
         const searchTerm = searchInput.value.toLowerCase();
-        
+
         for(let i = 1; i < rows.length; i++) {
             let found = false;
             const cells = rows[i].getElementsByTagName('td');
-            
+
             for(let j = 0; j < cells.length - 1; j++) {
                 const cellText = cells[j].textContent.toLowerCase();
                 if(cellText.includes(searchTerm)) {
@@ -94,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 }
             }
-            
+
             rows[i].style.display = found ? '' : 'none';
         }
     });
@@ -106,13 +105,13 @@ document.addEventListener('DOMContentLoaded', function() {
         header.addEventListener('click', function() {
             const column = this.dataset.sort;
             const columnIndex = Array.from(this.parentElement.children).indexOf(this);
-            
+
             const rowsArray = Array.from(table.getElementsByTagName('tr')).slice(1);
-            
+
             rowsArray.sort((a, b) => {
                 let aValue = a.getElementsByTagName('td')[columnIndex].textContent;
                 let bValue = b.getElementsByTagName('td')[columnIndex].textContent;
-                
+
                 if (column === 'date') {
                     aValue = new Date(aValue);
                     bValue = new Date(bValue);
@@ -123,12 +122,84 @@ document.addEventListener('DOMContentLoaded', function() {
                     return sortDirection * aValue.localeCompare(bValue, 'fr');
                 }
             });
-            
+
             sortDirection *= -1;
-            
+
             const tbody = table.getElementsByTagName('tbody')[0];
             tbody.innerHTML = '';
             rowsArray.forEach(row => tbody.appendChild(row));
+        });
+    });
+
+    // Add event listeners for confirm and reject buttons
+    const confirmButtons = document.querySelectorAll('.btn-success');
+    const rejectButtons = document.querySelectorAll('.btn-warning');
+
+    confirmButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const reservationId = this.getAttribute('href').split('/').pop();
+            sendEmail(reservationId, 'confirm');
+        });
+    });
+
+    rejectButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const reservationId = this.getAttribute('href').split('/').pop();
+            sendEmail(reservationId, 'reject');
+        });
+    });
+
+    function sendEmail(reservationId, action) {
+        fetch(`/send-email/${reservationId}/${action}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmButtons = document.querySelectorAll('.btn-success');
+    const rejectButtons = document.querySelectorAll('.btn-warning');
+
+    confirmButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const reservationId = this.getAttribute('href').split('/').pop();
+            fetch(`/rdv/mecanicien/confirm/${reservationId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+
+    rejectButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const reservationId = this.getAttribute('href').split('/').pop();
+            fetch(`/rdv/mecanicien/reject/${reservationId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     });
 });
