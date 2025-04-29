@@ -7,13 +7,13 @@
 <div class="container-fluid page-header mb-5 p-0" style="background-image: url(img/carousel-bg-1.jpg);">
     <div class="container-fluid page-header-inner py-5">
         <div class="container text-center">
-            <h1 class="display-3 text-white mb-3 animated slideInDown">Mes Réservations</h1>
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Réservations</h1>
         </div>
     </div>
 </div>
 
 <div class="container">
-    <h1 class="mb-4">Modifier Réservation Test Drive</h1>
+    <h1 class="mb-4">Modifier Ta Réservation Test Drive</h1>
 
     {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
         <div class="mb-3">
@@ -26,9 +26,9 @@
                 {% endif %}
             </div>
             <div style="display: none;">
-                 {{ form_widget(form.id_u) }}
+                 {{ form_widget(form.user) }}
             </div>
-            {{ form_errors(form.id_u) }} {# Keep errors if needed #}
+            {{ form_errors(form.user) }}
         </div>
 
         {# Display Vehicle Info (Non-Editable) #}
@@ -41,11 +41,10 @@
                     Véhicule non trouvé
                 {% endif %}
             </div>
-            {# Render the actual form field hidden to submit the value #}
             <div style="display: none;">
-                 {{ form_widget(form.id_v) }}
+                 {{ form_widget(form.voiture) }}
             </div>
-            {{ form_errors(form.id_v) }} {# Keep errors if needed #}
+            {{ form_errors(form.voiture) }}
         </div>
 
         {# Keep the Date field editable #}

@@ -3,8 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Res_testdrive;
+use App\Entity\User;
+use App\Entity\Voiture;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,24 +18,26 @@ class ResTestDriveType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id_u', NumberType::class, [
-                'label' => 'ID Utilisateur',
-                'attr' => [
-                    'class' => 'form-control',
-                    'min' => 1,
-                    'placeholder' => 'Entrez votre ID utilisateur'
-                ],
-                'required' => true
+            ->add('user', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => function (User $user) {
+                    return $user->getNom() . ' ' . $user->getPrenom() . ' : ID ' . $user->getId();
+                },
+                'label' => 'Client',
+                'attr' => ['class' => 'form-control'],
+                'placeholder' => 'Sélectionnez un client',
             ])
-            ->add('id_v', NumberType::class, [
-                'label' => 'ID Véhicule',
-                'attr' => [
-                    'class' => 'form-control',
-                    'min' => 1,
-                    'placeholder' => 'Entrez l\'ID du véhicule'
-                ],
-                'required' => true
+
+            ->add('voiture', EntityType::class, [
+                'class' => Voiture::class,
+                'choice_label' => function (Voiture $voiture) {
+                    return $voiture->getMarque() . ' : ID ' . $voiture->getId_v();
+                },
+                'label' => 'Voiture',
+                'attr' => ['class' => 'form-control'],
+                'placeholder' => 'Sélectionnez une voiture',
             ])
+
             ->add('date', DateType::class, [
                 'label' => 'Date du test drive',
                 'widget' => 'single_text',

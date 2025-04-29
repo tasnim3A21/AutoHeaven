@@ -7,34 +7,28 @@
 <div class="container-fluid page-header mb-5 p-0" style="background-image: url(img/carousel-bg-1.jpg);">
     <div class="container-fluid page-header-inner py-5">
         <div class="container text-center">
-            <h1 class="display-3 text-white mb-3 animated slideInDown">Mes Réservations</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb justify-content-center text-uppercase">
-                    <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Home</a></li>
-                    <li class="breadcrumb-item text-white active" aria-current="page">Mes Réservations</li>
-                </ol>
-            </nav>
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Réservations</h1>
         </div>
     </div>
 </div>
 
 <div class="container">
-    <h1 class="mb-4">Modifier Rendez-vous Mécanicien</h1>
+    <h1 class="mb-4">Modifier Ton Rendez-vous Mécanicien</h1>
 
     {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
         <div class="mb-3">
             <label class="form-label">Client</label>
             <div class="form-control-plaintext">
-                {% if mecanicien.idU %}
-                    ID Utilisateur: {{ mecanicien.idU }}
+                {% if mecanicien.client %}
+                    Client : {{ mecanicien.client.nom }} {{ mecanicien.client.prenom }} (ID: {{ mecanicien.client.id }})
                 {% else %}
                     Utilisateur non trouvé
                 {% endif %}
             </div>
             <div style="display: none;">
-                 {{ form_widget(form.id_u) }}
+                 {{ form_widget(form.client, {'attr': {'class': 'd-none'}}) }}
             </div>
-            {{ form_errors(form.id_u) }}
+            {{ form_errors(form.client) }}
         </div>
 
         {# Display Mechanic Info (Non-Editable) #}
@@ -48,9 +42,9 @@
                 {% endif %}
             </div>
             <div style="display: none;">
-                 {{ form_widget(form.id_mec) }}
+                 {{ form_widget(form.mecanicien, {'attr': {'class': 'd-none'}}) }}
             </div>
-            {{ form_errors(form.id_mec) }}
+            {{ form_errors(form.mecanicien) }}
         </div>
 
         {# Keep the Date field editable #}

@@ -4,14 +4,28 @@
 
 {% block content %}
 <div class="container">
-    <div class="mb-4">
-        <h1>Nouveau Camion</h1>
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            {{ form_widget(form) }}
-            <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Ajouter Camion</button>
+<h1>Camions Remorquage</h1>
+
+    {# Affichage des messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
             </div>
-        {{ form_end(form) }}
+        {% endfor %}
+    {% endfor %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Ajouter un nouveau camion
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Ajouter Camion</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
     </div>
 
 

@@ -18,9 +18,6 @@ parameters:
     twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
     twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
     twilio_phone_number: '%env(TWILIO_PHONE_NUMBER)%'
-
-
-    voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
     currencyfreaks_api_key: '%env(CURRENCYFREAKS_API_KEY)%'
     api_ninjas_api_key: '%env(APININJAS_API_KEY)%'
 
