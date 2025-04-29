@@ -20,30 +20,29 @@ class Res_testdrive
     private int $id_td;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID utilisateur ne peut pas être vide")]
+    //#[Assert\NotBlank(message: "L'ID utilisateur ne peut pas être vide")]
     private int $id_u;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID véhicule ne peut pas être vide")]
+    //#[Assert\NotBlank(message: "L'ID véhicule ne peut pas être vide")]
     private int $id_v;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: "date", nullable:true)]
     #[Assert\NotBlank(message: "La date ne peut pas être vide")]
     #[Assert\Type("\DateTimeInterface")]
     #[Assert\GreaterThanOrEqual(
         value: "today",
         message: "La date doit être aujourd'hui ou ultérieure"
     )]
-    private \DateTimeInterface $date;
+    private ?\DateTimeInterface $date=null;
 
     #[ORM\Column(type: "string")]
-    #[Assert\NotBlank(message: "Le status ne peut pas être vide")]
+    /*#[Assert\NotBlank(message: "Le status ne peut pas être vide")]
     #[Assert\Choice(
         choices: ["en_cours_de_traitement", "confirmee", "rejetee"],
         message: "Le status doit être soit en cours de traitement, confirmée ou rejetée"
-    )]
-
-    private string $status;
+    )]*/
+    private string $status = "en_cours_de_traitement";
 
     public function getId_td()
     {
@@ -77,14 +76,15 @@ class Res_testdrive
         $this->id_v = $value;
     }
 
-    public function getDate()
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate($value)
+    public function setDate(?\DateTimeInterface $date)
     {
-        $this->date = $value;
+        $this->date = $date;
+        return $this;
     }
 
     public function getStatus()
@@ -99,10 +99,12 @@ class Res_testdrive
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    #[Assert\NotBlank(message: "Le client ne peut pas être vide")]
     private ?User $user = null;
 
     #[ORM\ManyToOne(targetEntity: Voiture::class)]
     #[ORM\JoinColumn(name: 'id_v', referencedColumnName: 'id_v')]
+    #[Assert\NotBlank(message: "La voiture ne peut pas être vide")]
     private ?Voiture $voiture = null;
 
     public function getUser(): ?User

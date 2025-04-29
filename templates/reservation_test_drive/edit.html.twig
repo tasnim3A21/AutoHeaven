@@ -12,13 +12,13 @@
         <div class="mb-3">
             <label class="form-label">Client</label>
             <input type="text" class="form-control" value="{{ reservation.user.nom }} {{ reservation.user.prenom }} ({{ reservation.idU }})" readonly>
-            {{ form_widget(form.id_u, {'attr': {'class': 'd-none'}}) }}
+            {{ form_widget(form.user, {'attr': {'class': 'd-none'}}) }}
         </div>
         
         <div class="mb-3">
             <label class="form-label">Véhicule</label>
             <input type="text" class="form-control" value="{{ reservation.voiture.marque }} ({{ reservation.idV }})" readonly>
-            {{ form_widget(form.id_v, {'attr': {'class': 'd-none'}}) }}
+            {{ form_widget(form.voiture, {'attr': {'class': 'd-none'}}) }}
         </div>
         
         <div class="mb-3">

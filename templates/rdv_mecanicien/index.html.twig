@@ -6,6 +6,28 @@
 <div class="container">
     <h1>Réservations Mécaniciens</h1>
 
+    {# Display flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Add New Reservation Form #}
+    <div class="card mb-4">
+        <div class="card-header">
+            Ajouter une nouvelle réservation
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
     {# Search Bar #}
     <div class="mb-3">
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
@@ -28,8 +50,8 @@
             {% for reservation in reservations %}
             <tr>
                 <td>{{ reservation.getId_res_m() }}</td>
-                <td>{{ reservation.client.nom }} {{ reservation.client.prenom }} ({{ reservation.client.id }})</td>
-                <td>{{ reservation.mecanicien.nom }} {{ reservation.mecanicien.prenom }} ({{ reservation.mecanicien.id }})</td>
+                <td>{{ reservation.client ? reservation.client.nom ~ ' ' ~ reservation.client.prenom ~ ' (' ~ reservation.client.id ~ ')' : 'N/A' }}</td>
+                <td>{{ reservation.mecanicien ? reservation.mecanicien.nom ~ ' ' ~ reservation.mecanicien.prenom ~ ' (' ~ reservation.mecanicien.id ~ ')' : 'N/A' }}</td>
                 <td>{{ reservation.adresse }}</td>
                 <td>{{ reservation.note }}</td>
                 <td>{{ reservation.date|date('Y-m-d') }}</td>
@@ -57,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const rows = table.getElementsByTagName('tr');
     const sortableHeaders = document.querySelectorAll('.sortable');
 
-    // Search functionality
+    
     searchInput.addEventListener('keyup', function() {
         const searchTerm = searchInput.value.toLowerCase();
         

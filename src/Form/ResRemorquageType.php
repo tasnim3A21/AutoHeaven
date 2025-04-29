@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Camion_Remorquage;
 use App\Entity\Res_remorquage;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -15,13 +18,23 @@ class ResRemorquageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id_cr', NumberType::class, [
-                'label' => 'ID Camion',
-                'attr' => ['class' => 'form-control']
+            ->add('camionRemorquage', EntityType::class, [
+                'class' => Camion_Remorquage::class,
+                'choice_label' => function (Camion_Remorquage $camion) {
+                    return $camion->getNomAgence() . ' ID : ' . $camion->getId_cr();
+                },
+                'label' => 'Camion de Remorquage',
+                'attr' => ['class' => 'form-control'],
+                'placeholder' => 'Sélectionnez un camion',
             ])
-            ->add('id_u', NumberType::class, [
-                'label' => 'ID Utilisateur',
-                'attr' => ['class' => 'form-control']
+            ->add('user', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => function(User $user) {
+                    return $user->getNom() . ' ' . $user->getPrenom() . ' ID : ' . $user->getId();
+                },
+                'label' => 'Client',
+                'attr' => ['class' => 'form-control'],
+                'placeholder' => 'Sélectionnez un client',
             ])
             ->add('point_ramassage', TextType::class, [
                 'label' => 'Point de ramassage',

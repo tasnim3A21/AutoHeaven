@@ -6,7 +6,47 @@
 <div class="container">
     <h1>Réservations Remorquages</h1>
 
-    {# Search Bar #}
+    {# Formulaire de création #}
+    <div class="card mb-4">
+        <div class="card-header">
+            Ajouter une nouvelle réservation
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="mb-3">
+                {{ form_label(form.camionRemorquage) }}
+                {{ form_widget(form.camionRemorquage) }}
+                {{ form_errors(form.camionRemorquage) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.user) }}
+                {{ form_widget(form.user) }}
+                {{ form_errors(form.user) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.point_ramassage) }}
+                {{ form_widget(form.point_ramassage) }}
+                {{ form_errors(form.point_ramassage) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.point_depot) }}
+                {{ form_widget(form.point_depot) }}
+                {{ form_errors(form.point_depot) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.date) }}
+                {{ form_widget(form.date) }}
+                {{ form_errors(form.date) }}
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Ajouter</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <hr> {# Séparateur visuel #}
+
+    <h2>Liste des réservations</h2>
+
     <div class="mb-3">
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher...">
     </div>

@@ -22,14 +22,14 @@ class Res_remorquage
     private int $id_rem;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID du camion ne peut pas être vide")]
+    //#[Assert\NotBlank(message: "L'ID du camion ne peut pas être vide")]
     private int $id_cr;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID utilisateur ne peut pas être vide")]
+    //#[Assert\NotBlank(message: "L'ID utilisateur ne peut pas être vide")]
     private int $id_u;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: "string", nullable: true)]
     #[Assert\NotBlank(message: "Le point de ramassage ne peut pas être vide")]
     #[Assert\Length(
         min: 5,
@@ -37,9 +37,9 @@ class Res_remorquage
         minMessage: "Le point de ramassage doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le point de ramassage ne peut pas dépasser {{ limit }} caractères"
     )]
-    private string $point_ramassage;
+    private ?string $point_ramassage = null;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(type: "string", nullable: true)]
     #[Assert\NotBlank(message: "Le point de dépôt ne peut pas être vide")]
     #[Assert\Length(
         min: 5,
@@ -47,23 +47,23 @@ class Res_remorquage
         minMessage: "Le point de dépôt doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le point de dépôt ne peut pas dépasser {{ limit }} caractères"
     )]
-    private string $point_depot;
+    private ?string $point_depot = null;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: "date", nullable:true)]
     #[Assert\NotBlank(message: "La date ne peut pas être vide")]
     #[Assert\Type("\DateTimeInterface")]
     #[Assert\GreaterThanOrEqual(
         value: "today",
         message: "La date doit être aujourd'hui ou ultérieure"
     )]
-    private \DateTimeInterface $date;
+    private ?\DateTimeInterface $date=null;
 
     #[ORM\Column(type: "string")]
-    #[Assert\NotBlank(message: "Le status ne peut pas être vide")]
+    /*#[Assert\NotBlank(message: "Le status ne peut pas être vide")]
     #[Assert\Choice(
         choices: ["en_cours_de_traitement", "confirmee", "rejetee"],
         message: "Le status doit être soit en cours de traitement, confirmée ou rejetée"
-    )]
+    )]*/
     private string $status;
 
 
@@ -154,6 +154,7 @@ class Res_remorquage
 
     #[ORM\ManyToOne(targetEntity: Camion_remorquage::class)]
     #[ORM\JoinColumn(name: 'id_cr', referencedColumnName: 'id_cr')]
+    #[Assert\NotBlank(message: "Le camion ne peut pas être vide")]
     private ?Camion_remorquage $camionRemorquage = null;
 
     public function getCamionRemorquage(): ?Camion_remorquage
@@ -169,6 +170,7 @@ class Res_remorquage
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id')]
+    #[Assert\NotBlank(message: "Le client ne peut pas être vide")]
     private ?User $user = null;
 
     public function getUser(): ?User

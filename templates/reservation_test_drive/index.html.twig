@@ -5,6 +5,27 @@
 {% block content %}
 <div class="container">
     <h1>Réservations des TestDrives</h1>
+    {# Display flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Add New Reservation Form #}
+    <div class="card mb-4">
+        <div class="card-header">
+            Ajouter une nouvelle réservation
+        </div>
+        <div class="card-body">
+            <form method="post" {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+        </div>
+    </div>
 
     {# Search Bar #}
     <div class="mb-3">
