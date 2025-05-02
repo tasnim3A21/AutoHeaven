@@ -1,0 +1,10 @@
+# config/services.yaml
+parameters:
+    mailjet.api_key: '%env(MAILJET_API_KEY)%'
+    mailjet.secret_key: '%env(MAILJET_SECRET_KEY)%'
+
+services:
+    App\Service\MailjetService:
+        arguments:
+            $apiKey: '%mailjet.api_key%'
+            $secretKey: '%mailjet.secret_key%'
