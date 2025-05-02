@@ -14,7 +14,7 @@ class Res_testdrive
 
     #[ORM\Id]
 
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
 
     #[ORM\Column(type: "integer")]
     private int $id_td;

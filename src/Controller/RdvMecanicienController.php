@@ -86,7 +86,7 @@ final class RdvMecanicienController extends AbstractController
         $this->entityManager->flush();
 
         $clientEmail = $reservation->getClient()->getEmail();
-        $subject = 'Reservation Confirmer';
+        $subject = 'Reservation RDV Mecanicien';
         $client = $reservation->getClient();
         $mecanicien = $reservation->getMecanicien();
         $dateReservation = $reservation->getDate()->format('d-m-Y');
@@ -103,7 +103,7 @@ final class RdvMecanicienController extends AbstractController
         $this->entityManager->flush();
 
         $clientEmail = $reservation->getClient()->getEmail();
-        $subject = 'Reservation Rejecter';
+        $subject = 'Reservation RDV Mecanicien';
         $client = $reservation->getClient();
         $mecanicien = $reservation->getMecanicien();
         $dateReservation = $reservation->getDate()->format('d-m-Y');
@@ -132,7 +132,7 @@ final class RdvMecanicienController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-    
+
     #[Route('/send-email/{reservationId}/{action}', name: 'app_send_email')]
     public function sendEmail($reservationId, $action): Response {
         $reservation = $this->entityManager->getRepository(Res_mecanicien::class)->find($reservationId);

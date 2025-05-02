@@ -5,18 +5,25 @@ namespace App\Controller;
 use App\Entity\Res_testdrive;
 use App\Form\ResTestDriveType;
 use Doctrine\ORM\EntityManagerInterface;
+use Mailjet\Client;
+use Mailjet\Resources;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\MailjetService;
 
 final class ReservationTestDriveController extends AbstractController
 {
     private $entityManager;
+    private $mailjetService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, MailjetService $mailjetService)
     {
         $this->entityManager = $entityManager;
+        $this->mailjetService = $mailjetService;
     }
 
     #[Route('/reservation/test/drive', name: 'app_reservation_test_drive')]
@@ -73,6 +80,14 @@ final class ReservationTestDriveController extends AbstractController
         $reservation->setStatus('confirmee');
         $this->entityManager->flush();
 
+        $clientEmail = $reservation->getUser()->getEmail();
+        $subject = 'Réservation Test Drive';
+        $client = $reservation->getUser();
+        $voiture = $reservation->getVoiture();
+        $dateReservation = $reservation->getDate()->format('d-m-Y');
+        $text = "Salut, notre cher client " . $client->getNom() . " " . $client->getPrenom() . ", votre réservation de test drive de notre voiture " . $voiture->getMarque() . ", prévue le " . $dateReservation . ", est acceptée.";
+        $this->mailjetService->sendEmail('rayen.elfil@esprit.tn', 'AutoHeaven CEO', $clientEmail, $subject, $text);
+
         return $this->redirectToRoute('app_reservation_test_drive');
     }
 
@@ -81,6 +96,14 @@ final class ReservationTestDriveController extends AbstractController
     {
         $reservation->setStatus('rejetee');
         $this->entityManager->flush();
+
+        $clientEmail = $reservation->getUser()->getEmail();
+        $subject = 'Réservation Test Drive';
+        $client = $reservation->getUser();
+        $voiture = $reservation->getVoiture();
+        $dateReservation = $reservation->getDate()->format('d-m-Y');
+        $text = "Salut, notre cher client " . $client->getNom() . " " . $client->getPrenom() . ", votre réservation de test drive de notre voiture " . $voiture->getMarque() . ", prévue le " . $dateReservation . ", est rejetée.";
+        $this->mailjetService->sendEmail('rayen.elfil@esprit.tn', 'AutoHeaven CEO', $clientEmail, $subject, $text);
 
         return $this->redirectToRoute('app_reservation_test_drive');
     }

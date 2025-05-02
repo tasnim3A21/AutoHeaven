@@ -77,7 +77,7 @@ final class ReservationRemorquageController extends AbstractController
         $this->entityManager->flush();
 
         $clientEmail = $reservation->getUser()->getEmail();
-        $subject = 'Confirmation de Réservation';
+        $subject = 'Réservation Camion Remorquage';
         $client = $reservation->getUser();
         $camion = $reservation->getCamionRemorquage();
         $dateReservation = $reservation->getDate()->format('d-m-Y');
@@ -94,7 +94,7 @@ final class ReservationRemorquageController extends AbstractController
         $this->entityManager->flush();
 
         $clientEmail = $reservation->getUser()->getEmail();
-        $subject = 'Réservation Rejetée';
+        $subject = 'Réservation Camion Remorquage';
         $client = $reservation->getUser();
         $camion = $reservation->getCamionRemorquage();
         $dateReservation = $reservation->getDate()->format('d-m-Y');
