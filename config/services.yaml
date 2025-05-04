@@ -71,9 +71,10 @@ services:
 
 
     # Custom AuthenticationSuccessHandler service definition
-    App\Security\AuthenticationSuccessHandler:
+    App\Service\MailjetService:
         arguments:
-            - '@router'
+            $apiKey: '%env(MAILJET_API_KEY)%'
+            $secretKey: '%env(MAILJET_SECRET_KEY)%'
 
     # Custom LoginFormAuthenticator for reCAPTCHA validation
     App\Security\LoginFormAuthenticator:

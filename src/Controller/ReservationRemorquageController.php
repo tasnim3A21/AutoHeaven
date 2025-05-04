@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Res_remorquage;
 use App\Form\ResRemorquageType;
+use App\Service\MailjetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 final class ReservationRemorquageController extends AbstractController
 {
     private $entityManager;
+    private $mailjetService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, MailjetService $mailjetService)
     {
         $this->entityManager = $entityManager;
+        $this->mailjetService = $mailjetService;
     }
 
     #[Route('/reservation/remorquage', name: 'app_reservation_remorquage')]
@@ -73,6 +76,14 @@ final class ReservationRemorquageController extends AbstractController
         $reservation->setStatus('confirmee');
         $this->entityManager->flush();
 
+        $clientEmail = $reservation->getUser()->getEmail();
+        $subject = 'Réservation Camion Remorquage';
+        $client = $reservation->getUser();
+        $camion = $reservation->getCamionRemorquage();
+        $dateReservation = $reservation->getDate()->format('d-m-Y');
+        $text = "Salut, notre cher client " . $client->getNom() . " " . $client->getPrenom() . ", votre réservation de la camion de remorquage de " . $camion->getNomAgence() . ", prévue le " . $dateReservation . ", est acceptée.";
+        $this->mailjetService->sendEmail('rayen.elfil@esprit.tn', 'AutoHeaven CEO', $clientEmail, $subject, $text);
+
         return $this->redirectToRoute('app_reservation_remorquage');
     }
 
@@ -81,6 +92,14 @@ final class ReservationRemorquageController extends AbstractController
     {
         $reservation->setStatus('rejetee');
         $this->entityManager->flush();
+
+        $clientEmail = $reservation->getUser()->getEmail();
+        $subject = 'Réservation Camion Remorquage';
+        $client = $reservation->getUser();
+        $camion = $reservation->getCamionRemorquage();
+        $dateReservation = $reservation->getDate()->format('d-m-Y');
+        $text = "Salut, notre cher client " . $client->getNom() . " " . $client->getPrenom() . ", votre réservation de la camion de remorquage de " . $camion->getNomAgence() . ", prévue le " . $dateReservation . ", est rejetée.";
+        $this->mailjetService->sendEmail('rayen.elfil@esprit.tn', 'AutoHeaven CEO', $clientEmail, $subject, $text);
 
         return $this->redirectToRoute('app_reservation_remorquage');
     }

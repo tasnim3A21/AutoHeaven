@@ -179,4 +179,20 @@ final class BookingController extends AbstractController
         }
         return $this->redirectToRoute('app_booking');
     }
+
+    #[Route('/api/reservations', name: 'api_reservations')]
+    public function getReservations(ReservationRepository $repo): JsonResponse
+    {
+        $reservations = $repo->findAll();
+
+        $events = [];
+        foreach ($reservations as $r) {
+            $events[] = [
+                'title' => 'RDV avec ' . $r->getMecanicien()->getNom(),
+                'start' => $r->getDate()->format('Y-m-d H:i:s'),
+                // tu peux ajouter 'end', 'color', etc.
+            ];
+        }
+        return new JsonResponse($events);
+    }
 }

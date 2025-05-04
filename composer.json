@@ -15,6 +15,7 @@
         "dompdf/dompdf": "^3.1",
         "hwi/oauth-bundle": "*",
         "knplabs/knp-paginator-bundle": "^6.8",
+        "mailjet/mailjet-apiv3-php": "^1.6",
         "openspout/openspout": "*",
         "php-ai/php-ml": "*",
         "phpdocumentor/reflection-docblock": "^5.6",
