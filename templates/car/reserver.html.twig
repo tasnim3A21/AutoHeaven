@@ -8,11 +8,11 @@
 <form method="post">
     <div>
         <label for="voiture">Voiture:</label>
-        <input type="text" id="voiture" name="voiture" value="{{ voiture.marque }}" readonly>
+        <input type="text" id="id_v" name="voiture" value="{{ voiture.id_v }}" readonly>
     </div>
     <div>
         <label for="client">Client:</label>
-        <input type="text" id="client" name="client" value="{{ "ABID" }}" readonly>
+        <input type="text" id="id_u" name="client" value="{{ user.id_u }}" readonly>
     </div>
     <button type="submit">Réserver</button>
 </form>

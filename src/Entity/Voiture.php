@@ -199,7 +199,7 @@ public function setIdV($value)
         {
             if (!$this->aviss->contains($avis)) {
                 $this->aviss[] = $avis;
-                $avis->setIdV($this);
+                $avis->setVoiture($this);
             }
     
             return $this;
@@ -209,8 +209,8 @@ public function setIdV($value)
         {
             if ($this->aviss->removeElement($avis)) {
                 // set the owning side to null (unless already changed)
-                if ($avis->getIdV() === $this) {
-                    $avis->setIdV(null);
+                if ($avis->getVoiture() === $this) {
+                    $avis->setVoiture($this);
                 }
             }
     

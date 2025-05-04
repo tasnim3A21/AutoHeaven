@@ -46,4 +46,6 @@ class Avis
     public function setDateavis(\DateTimeInterface $d): self { $this->dateavis = $d; return $this; }
     public function getUtilisateur(): User { return $this->utilisateur; }
     public function setUtilisateur(User $u): self { $this->utilisateur = $u; return $this; }
+    public function getVoiture(): Voiture { return $this->voiture; }
+    public function setVoiture(Voiture $v): self { $this->voiture = $v; return $this; }
 }

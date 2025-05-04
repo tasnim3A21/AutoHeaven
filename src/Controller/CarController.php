@@ -44,9 +44,10 @@ final class CarController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $reservation = new Reservation();
-            $voiture = $entityManager->getRepository(Voiture::class)->find($request->request->get('voiture_id'));
+            $voiture = $entityManager->getRepository(Voiture::class)->find($request->request->get('id_v'));
             $reservation->setId_v($voiture->getId_v());
-            $reservation->setId(3);
+            $connectedUser = $this->getUser();
+            $reservation->setId($connectedUser->getUserIdentifier());
             $reservation->setDate_res(new \DateTime($request->request->get('reservation_date')));
 
             $entityManager->persist($reservation);
