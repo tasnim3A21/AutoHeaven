@@ -11,6 +11,7 @@ doctrine:
         # server_version: '8.0'  # Pour MySQL 8.0
         # server_version: '5.7'  # Pour MySQL 5.7
         # server_version: '10.4' # Pour MariaDB 10.4
+        server_version: '8.0'
        
     orm:
         auto_generate_proxy_classes: true
