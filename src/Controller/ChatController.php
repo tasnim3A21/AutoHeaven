@@ -24,7 +24,7 @@ class ChatController extends AbstractController
         private PusherService $pusherService
     ) {}
 
-    #[Route('/chat', name: 'app_chat')]
+  /*  #[Route('/chat', name: 'app_chat')]
     public function index(): Response
     {
         $currentUser = $this->security->getUser();
@@ -114,7 +114,7 @@ class ChatController extends AbstractController
                 ];
             }, $messages),
         ]);
-    }
+    }*/
 
     #[Route('/chat/typing', name: 'app_chat_typing', methods: ['POST'])]
     public function typing(Request $request): Response

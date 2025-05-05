@@ -98,4 +98,30 @@ final class NotificationController extends AbstractController
 
         return new JsonResponse(['status' => 'success', 'id' => $notification->getId()]);
     }
+
+    #[Route('/unread-stock-alerts', name: 'unread_stock_alerts', methods: ['GET'])]
+    public function getUnreadStockAlerts(EntityManagerInterface $em): JsonResponse
+    {
+        $oneDayAgo = new \DateTime('-1 day');
+        $notifications = $em->getRepository(Notification::class)
+            ->createQueryBuilder('n')
+            ->where('n.isRead = :isRead')
+            ->andWhere('n.createdAt >= :oneDayAgo')
+            ->setParameter('isRead', false)
+            ->setParameter('oneDayAgo', $oneDayAgo)
+            ->orderBy('n.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        $alerts = [];
+        foreach ($notifications as $notification) {
+            $alerts[] = [
+                'id' => $notification->getId(),
+                'message' => $notification->getMessage(),
+                'timestamp' => $notification->getCreatedAt()->getTimestamp() * 1000, // Convertir en millisecondes
+            ];
+        }
+
+        return new JsonResponse(['alerts' => $alerts]);
+    }
 }

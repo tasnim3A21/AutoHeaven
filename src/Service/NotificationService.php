@@ -8,8 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Notification;
 use Doctrine\ORM\Mapping as ORM;
 
-
-
 class NotificationService
 {
     private Pusher $pusher;
@@ -31,26 +29,47 @@ class NotificationService
         );
     }
 
-   // src/Service/NotificationService.php
-public function notifyStockDepleted(Equipement $equipement, EntityManagerInterface $em): void
-{
-    // 1. Enregistrer en base
-    $notification = new Notification();
-    $notification->setEquipement($equipement);
-    $notification->setMessage(sprintf(
-        'Stock épuisé pour %s (Ref: %s)',
-        $equipement->getNom(),
-        $equipement->getReference()
-    ));
-    
-    $em->persist($notification);
-    $em->flush();
+    public function notifyStockDepleted(Equipement $equipement, EntityManagerInterface $em): void
+    {
+        // Vérifier si une notification existe déjà pour cet équipement dans les dernières 5 minutes
+        $recentNotification = $em->getRepository(Notification::class)
+            ->createQueryBuilder('n')
+            ->where('n.equipement = :equipement')
+            ->andWhere('n.createdAt >= :recentTime')
+            ->setParameter('equipement', $equipement)
+            ->setParameter('recentTime', new \DateTime('-5 minutes'))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
 
-    // 2. Notifier en temps réel
-    $this->pusher->trigger('stock-channel', 'stock-depleted', [
-        'id' => $notification->getId(),
-        'message' => $notification->getMessage(),
-        'equipementId' => $equipement->getId()
-    ]);
-}
+        if ($recentNotification) {
+            // Une notification existe déjà, ne rien faire
+            error_log(sprintf('Duplicate notification skipped for equipement %s (ID: %d)', $equipement->getNom(), $equipement->getId()));
+            return;
+        }
+
+        // Journalisation pour débogage
+        error_log(sprintf('Notification triggered for equipement %s (ID: %d)', $equipement->getNom(), $equipement->getId()));
+
+        // Créer et enregistrer la notification
+        $notification = new Notification();
+        $notification->setEquipement($equipement);
+        $notification->setMessage(sprintf(
+            'Stock épuisé pour %s (Ref: %s)',
+            $equipement->getNom(),
+            $equipement->getReference()
+        ));
+        $notification->setIsRead(false);
+        $notification->setCreatedAt(new \DateTime());
+
+        $em->persist($notification);
+        $em->flush();
+
+        // Notifier en temps réel via Pusher
+        $this->pusher->trigger('stock-channel', 'stock-depleted', [
+            'id' => $notification->getId(),
+            'message' => $notification->getMessage(),
+            'equipementId' => $equipement->getId()
+        ]);
+    }
 }

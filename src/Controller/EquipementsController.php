@@ -27,11 +27,11 @@ final class EquipementsController extends AbstractController
     public function __construct(
         NotificationService $notificationService,
         HttpClientInterface $httpClient,
-        string $geminiApiKey
+        string $geminiApiKeyy
     ) {
         $this->notificationService = $notificationService;
         $this->httpClient = $httpClient;
-        $this->geminiApiKey = $geminiApiKey;
+        $this->geminiApiKeyy = $geminiApiKeyy;
     }
     #[Route('/equipements', name: 'app_equipements')]
     public function index(EquipementRepository $equipementRepository, EntityManagerInterface $entityManager, PaginatorInterface $paginator, Request $request): Response
@@ -236,7 +236,7 @@ final class EquipementsController extends AbstractController
                     'Content-Type' => 'application/json',
                 ],
                 'query' => [
-                    'key' => $this->geminiApiKey,
+                    'key' => $this->geminiApiKeyy,
                 ],
                 'json' => [
                     'contents' => [
