@@ -10,9 +10,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://js.pusher.com/8.2/pusher.min.js"></script>
 
         <style>
-            /* Palette de couleurs cohérente avec respond.html.twig */
             :root {
                 --primary-color: #dc3545;
                 --primary-hover: #c82333;
@@ -28,12 +28,12 @@
             h1 {
                 font-family: var(--font-family);
                 color: var(--text-color);
-                margin: 0 auto 25px;
-                font-size: 26px;
+                margin: 0 auto 15px;
+                font-size: 22px;
                 font-weight: 700;
                 text-align: center;
-                letter-spacing: 1px;
-                padding-bottom: 8px;
+                letter-spacing: 0.5px;
+                padding-bottom: 5px;
                 border-bottom: 2px solid var(--primary-color);
                 width: fit-content;
                 position: relative;
@@ -50,16 +50,47 @@
                 background: linear-gradient(to right, transparent, var(--primary-hover), transparent);
             }
 
+            .stats-box {
+                background: linear-gradient(145deg, var(--background-lighter), #f5f6f8);
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 2px 4px var(--shadow-color);
+                margin-bottom: 15px;
+                font-family: var(--font-family);
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .stats-box p {
+                margin: 0;
+                font-size: 12px;
+                color: var(--text-color);
+            }
+
+            .stats-box .urgent {
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+
+            .stats-box .non-urgent {
+                color: #28a745;
+                font-weight: 600;
+            }
+
             .reclamation-table {
                 width: 100%;
                 border-collapse: separate;
                 border-spacing: 0;
                 font-family: var(--font-family);
-                font-size: 14px;
+                font-size: 12px;
                 background: linear-gradient(145deg, var(--background-lighter), #f5f6f8);
-                border-radius: 10px;
+                border-radius: 8px;
                 overflow: hidden;
-                box-shadow: 0 4px 10px var(--shadow-color);
+                box-shadow: 0 3px 8px var(--shadow-color);
                 border: 1px solid var(--border-color);
             }
 
@@ -70,7 +101,7 @@
 
             .reclamation-table th,
             .reclamation-table td {
-                padding: 12px;
+                padding: 8px;
                 text-align: left;
                 border-bottom: 1px solid var(--border-color);
             }
@@ -78,18 +109,16 @@
             .reclamation-table th {
                 font-weight: 700;
                 text-transform: uppercase;
-                letter-spacing: 0.8px;
-                font-size: 13px;
+                letter-spacing: 0.5px;
+                font-size: 11px;
             }
 
             .reclamation-table tbody tr {
-                transition: background-color 0.3s ease, transform 0.2s ease;
+                transition: background-color 0.2s ease;
             }
 
             .reclamation-table tbody tr:hover {
-                background-color: #f1f3f6;
-                transform: translateY(-1px);
-                box-shadow: 0 2px 6px var(--shadow-color);
+                background-color: #f1f1f1;
             }
 
             .reclamation-table tbody tr:nth-child(even) {
@@ -98,84 +127,118 @@
 
             .reclamation-table td {
                 word-wrap: break-word;
-                max-width: 180px;
+                max-width: 120px;
                 color: var(--text-color);
-                line-height: 1.5;
+                line-height: 1.3;
             }
 
             .reclamation-image {
-                max-width: 50px;
-                max-height: 50px;
+                max-width: 40px;
+                max-height: 40px;
                 object-fit: cover;
-                border-radius: 4px;
+                border-radius: 3px;
                 border: 1px solid var(--border-color);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                transition: transform 0.2s ease;
             }
 
             .reclamation-image:hover {
-                transform: scale(1.1);
-                box-shadow: 0 3px 8px var(--shadow-color);
+                transform: scale(1.05);
+                box-shadow: 0 2px 5px var(--shadow-color);
             }
 
             .status-btn {
                 display: inline-block;
-                padding: 6px 12px;
+                padding: 5px 10px;
                 border: none;
-                border-radius: 6px;
-                font-size: 12px;
+                border-radius: 5px;
+                font-size: 11px;
                 color: #ffffff;
                 text-align: center;
                 text-decoration: none;
                 cursor: pointer;
                 background: linear-gradient(135deg, var(--primary-color), #e4606d);
-                box-shadow: 0 2px 4px var(--shadow-color);
-                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+                box-shadow: 0 1px 3px var(--shadow-color);
+                transition: background 0.2s ease, transform 0.2s ease;
             }
 
             .status-btn.en-attente:hover {
                 background: linear-gradient(135deg, var(--primary-hover), #d44d5a);
                 transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
             }
 
             .status-btn.en-attente:focus {
                 outline: none;
-                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+                box-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
             }
 
             .status-btn.repondu {
                 background: linear-gradient(135deg, #28a745, #34c759);
                 cursor: default;
-                box-shadow: 0 2px 4px var(--shadow-color);
+                box-shadow: 0 1px 3px var(--shadow-color);
             }
 
             .status-btn.repondu:focus {
                 outline: none;
-                box-shadow: 0 0 6px rgba(40, 167, 69, 0.5);
+                box-shadow: 0 0 4px rgba(40, 167, 69, 0.5);
             }
 
-            .delete-icon {
+            .status-btn.banni {
+                background: linear-gradient(135deg, #ff0000, #cc0000);
+                cursor: default;
+                box-shadow: 0 1px 3px var(--shadow-color);
+            }
+
+            .status-btn.banni:focus {
+                outline: none;
+                box-shadow: 0 0 4px rgba(255, 0, 0, 0.5);
+            }
+
+            .action-buttons {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .delete-icon,
+            .translate-icon {
                 background: none;
                 border: none;
                 cursor: pointer;
                 color: var(--text-secondary);
-                font-size: 16px;
-                padding: 6px;
-                border-radius: 4px;
-                transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+                font-size: 14px;
+                padding: 4px;
+                border-radius: 3px;
+                transition: color 0.2s ease, background-color 0.2s ease;
             }
 
             .delete-icon:hover {
                 color: var(--primary-color);
                 background-color: #f5f5f5;
-                transform: scale(1.1);
             }
 
             .delete-icon:focus {
                 outline: none;
                 color: var(--primary-hover);
                 background-color: #f5f5f5;
-                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+                box-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
+            }
+
+            .translate-icon:hover {
+                color: #007bff;
+                background-color: #f5f5f5;
+            }
+
+            .translate-icon:focus {
+                outline: none;
+                color: #0056b3;
+                background-color: #f5f5f5;
+                box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+            }
+
+            .red-flag {
+                margin-left: 5px;
+                font-size: 14px;
+                color: #ff0000;
             }
 
             .modal {
@@ -200,12 +263,12 @@
 
             .modal-content {
                 background: linear-gradient(145deg, var(--background-lighter), #f5f6f8);
-                padding: 20px;
-                border-radius: 10px;
+                padding: 15px;
+                border-radius: 8px;
                 max-width: 500px;
                 width: 90%;
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-                transform: translateY(-40px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                transform: translateY(-30px);
                 transition: transform 0.3s ease, opacity 0.3s ease;
                 position: relative;
                 text-align: center;
@@ -219,73 +282,122 @@
 
             .modal-content .close-btn {
                 position: absolute;
-                top: 10px;
-                right: 10px;
+                top: 8px;
+                right: 8px;
                 background: none;
                 border: none;
-                font-size: 18px;
+                font-size: 16px;
                 color: var(--text-secondary);
                 cursor: pointer;
-                transition: color 0.3s ease, transform 0.2s ease;
+                transition: color 0.2s ease;
             }
 
             .modal-content .close-btn:hover,
             .modal-content .close-btn:focus {
                 color: var(--text-color);
-                transform: scale(1.1);
                 outline: none;
             }
 
-            .modal-content .delete-icon-modal {
-                font-size: 40px;
+            .modal-content .translate-icon-modal {
+                font-size: 30px;
                 color: var(--primary-color);
-                margin-bottom: 15px;
+                margin-bottom: 10px;
             }
 
             .modal-content h2 {
                 margin-top: 0;
                 color: var(--text-color);
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: 700;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
                 letter-spacing: 0.5px;
             }
 
             .modal-content p {
                 color: var(--text-secondary);
-                font-size: 14px;
-                margin-bottom: 20px;
-                line-height: 1.5;
+                font-size: 13px;
+                margin-bottom: 10px;
+                line-height: 1.4;
             }
 
+            .modal-content select {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+                font-size: 13px;
+                font-family: var(--font-family);
+                background: linear-gradient(to right, var(--background-lighter), #f9f9f9);
+                cursor: pointer;
+                margin-bottom: 15px;
+            }
+
+            .modal-content .preview-box {
+                text-align: left;
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #f9f9f9;
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+            }
+
+            .modal-content .preview-box h3 {
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 5px;
+                color: var(--text-color);
+            }
+
+            .modal-content .preview-box p {
+                margin: 0;
+                font-size: 12px;
+                color: var(--text-secondary);
+            }
+
+            .btn-preview,
             .btn-confirm,
             .btn-cancel {
-                padding: 10px 20px;
+                padding: 8px 15px;
                 border: none;
-                border-radius: 6px;
-                font-size: 14px;
+                border-radius: 5px;
+                font-size: 13px;
                 cursor: pointer;
-                transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-                box-shadow: 0 2px 4px var(--shadow-color);
+                transition: background 0.2s ease, transform 0.2s ease;
+                box-shadow: 0 1px 3px var(--shadow-color);
                 font-family: var(--font-family);
                 font-weight: 600;
+            }
+
+            .btn-preview {
+                background: linear-gradient(135deg, #6c757d, #5a6268);
+                color: #ffffff;
+                margin-right: 8px;
+            }
+
+            .btn-preview:hover {
+                background: linear-gradient(135deg, #333333, #1a1a1a);
+                transform: translateY(-1px);
+            }
+
+            .btn-preview:focus {
+                outline: none;
+                box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
             }
 
             .btn-confirm {
                 background: linear-gradient(135deg, var(--primary-color), #e4606d);
                 color: #ffffff;
-                margin-right: 10px;
+                margin-right: 8px;
             }
 
             .btn-confirm:hover {
                 background: linear-gradient(135deg, var(--primary-hover), #d44d5a);
                 transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
             }
 
             .btn-confirm:focus {
                 outline: none;
-                box-shadow: 0 0 6px rgba(220, 53, 69, 0.5);
+                box-shadow: 0 0 4px rgba(220, 53, 69, 0.5);
             }
 
             .btn-cancel {
@@ -298,27 +410,26 @@
                 background: linear-gradient(135deg, var(--background-light), #e9ecef);
                 color: var(--text-color);
                 transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             }
 
             .btn-cancel:focus {
                 outline: none;
-                box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
             }
 
             /* Styles pour la barre de tri et recherche */
             .sort-options {
-                margin-bottom: 15px;
+                margin-bottom: 10px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 flex-wrap: wrap;
                 background: linear-gradient(145deg, var(--background-lighter), #f5f6f8);
-                padding: 10px;
+                padding: 8px;
                 border: 1px solid var(--border-color);
                 border-left: 3px solid var(--primary-color);
-                border-radius: 6px;
-                box-shadow: 0 2px 6px var(--shadow-color);
+                border-radius: 5px;
+                box-shadow: 0 2px 4px var(--shadow-color);
             }
 
             .sort-options .sort-group {
@@ -333,43 +444,41 @@
                 padding: 0 !important;
                 display: flex;
                 flex-direction: column;
-                gap: 4px;
-                min-width: 140px;
+                gap: 3px;
+                min-width: 120px;
             }
 
             .sort-options label {
                 font-family: var(--font-family);
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 600;
                 color: var(--text-color);
                 margin: 0 !important;
             }
 
             .sort-options select {
-                padding: 6px 24px 6px 8px;
+                padding: 5px 20px 5px 6px;
                 border: 1px solid var(--border-color);
                 border-radius: 4px;
-                font-size: 13px;
+                font-size: 12px;
                 font-family: var(--font-family);
                 background: linear-gradient(to right, var(--background-lighter), #f9f9f9);
                 cursor: pointer;
-                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                transition: border-color 0.2s ease;
                 appearance: none;
                 background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%232d2d2d%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E');
                 background-repeat: no-repeat;
-                background-position: right 8px center;
+                background-position: right 6px center;
                 margin: 0 !important;
             }
 
             .sort-options select:hover {
                 border-color: var(--primary-color);
                 background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%23dc3545%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E');
-                box-shadow: 0 0 4px rgba(220, 53, 69, 0.2);
             }
 
             .sort-options select:focus {
                 border-color: var(--primary-color);
-                box-shadow: 0 0 6px rgba(220, 53, 69, 0.3);
                 outline: none;
             }
 
@@ -377,33 +486,33 @@
                 flex: 1;
                 display: flex !important;
                 flex-direction: column;
-                gap: 4px;
+                gap: 3px;
                 background: none;
                 padding: 0 !important;
                 border: none;
                 border-left: none;
                 border-radius: 0;
-                max-width: 220px;
+                max-width: 180px;
                 margin: 0 !important;
             }
 
             .sort-options .dataTables_filter label {
                 font-family: var(--font-family);
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 600;
                 color: var(--text-color);
                 margin: 0 !important;
             }
 
             .sort-options .dataTables_filter input {
-                padding: 6px 8px;
+                padding: 5px 6px;
                 border: 1px solid var(--border-color);
                 border-radius: 4px;
-                font-size: 13px;
+                font-size: 12px;
                 font-family: var(--font-family);
                 background: linear-gradient(to right, var(--background-lighter), #f9f9f9);
                 width: 100%;
-                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                transition: border-color 0.2s ease;
                 margin: 0 !important;
             }
 
@@ -414,29 +523,26 @@
 
             .sort-options .dataTables_filter input:hover {
                 border-color: var(--primary-color);
-                box-shadow: 0 0 4px rgba(220, 53, 69, 0.2);
             }
 
             .sort-options .dataTables_filter input:focus {
                 border-color: var(--primary-color);
-                box-shadow: 0 0 6px rgba(220, 53, 69, 0.3);
                 outline: none;
             }
 
-            /* Masquer "Afficher 5 entrées" avec une priorité maximale */
             div.dataTables_wrapper div.dataTables_length {
                 display: none !important;
             }
 
             .dataTables_wrapper .dataTables_paginate {
-                margin-top: 20px;
+                margin-top: 15px;
                 display: flex;
                 justify-content: center;
-                gap: 4px;
+                gap: 3px;
             }
 
             .dataTables_wrapper .dataTables_paginate .paginate_button {
-                padding: 8px 12px;
+                padding: 6px 10px;
                 margin: 0 2px;
                 border: 1px solid var(--border-color);
                 border-radius: 4px;
@@ -444,26 +550,99 @@
                 color: var(--text-color);
                 cursor: pointer;
                 font-family: var(--font-family);
-                font-size: 13px;
-                transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+                font-size: 12px;
+                transition: background 0.2s ease, color 0.2s ease;
             }
 
             .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
                 background: linear-gradient(135deg, var(--background-light), #e9ecef);
                 color: var(--primary-color);
-                box-shadow: 0 2px 4px var(--shadow-color);
             }
 
             .dataTables_wrapper .dataTables_paginate .paginate_button.current {
                 background: linear-gradient(135deg, var(--primary-color), #e4606d);
                 color: #ffffff;
                 border-color: var(--primary-color);
-                box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
             }
 
             .dataTables_wrapper .dataTables_paginate .paginate_button:focus {
                 outline: none;
                 box-shadow: 0 0 4px rgba(220, 53, 69, 0.4);
+            }
+
+            /* Style pour les lignes urgentes */
+            .urgent-row {
+                background-color: #ff9999 !important;
+            }
+
+            /* Style pour les lignes bannies */
+            .banned-row {
+                background-color: #d3d3d3 !important;
+            }
+
+            /* Styles pour la notification */
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(145deg, #ffffff, #f8f9fa);
+                border: 1px solid var(--border-color);
+                border-left: 4px solid var(--primary-color);
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 4px 10px var(--shadow-color);
+                z-index: 2000;
+                max-width: 350px;
+                font-family: var(--font-family);
+                opacity: 0;
+                transform: translateX(100%);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+
+            .notification.show {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            .notification .notification-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .notification .notification-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--text-color);
+            }
+
+            .notification .notification-close {
+                background: none;
+                border: none;
+                font-size: 16px;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+            .notification .notification-close:hover {
+                color: var(--primary-color);
+            }
+
+            .notification .notification-body {
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.4;
+            }
+
+            .notification .notification-body p {
+                margin: 5px 0;
+            }
+
+            .notification .notification-body .urgent {
+                color: var(--primary-color);
+                font-weight: 600;
             }
 
             @media screen and (max-width: 768px) {
@@ -480,47 +659,47 @@
                 }
 
                 .reclamation-table tr {
-                    margin-bottom: 15px;
+                    margin-bottom: 10px;
                     border-bottom: 2px solid var(--border-color);
                     background: linear-gradient(to bottom, var(--background-lighter), var(--background-light));
-                    border-radius: 6px;
-                    box-shadow: 0 2px 6px var(--shadow-color);
+                    border-radius: 5px;
+                    box-shadow: 0 2px 4px var(--shadow-color);
                 }
 
                 .reclamation-table td {
                     text-align: right;
-                    padding: 10px 12px 10px 50%;
+                    padding: 8px 10px 8px 50%;
                     position: relative;
-                    font-size: 13px;
+                    font-size: 11px;
                 }
 
                 .reclamation-table td:before {
                     content: attr(data-label);
                     position: absolute;
-                    left: 12px;
+                    left: 10px;
                     width: 45%;
-                    padding-right: 8px;
+                    padding-right: 6px;
                     font-weight: 600;
                     text-align: left;
                     text-transform: uppercase;
                     color: var(--text-color);
-                    font-size: 12px;
+                    font-size: 11px;
                 }
 
                 .reclamation-image {
-                    max-width: 40px;
-                    max-height: 40px;
+                    max-width: 30px;
+                    max-height: 30px;
                 }
 
                 .sort-options {
                     flex-direction: column;
                     align-items: stretch;
-                    padding: 8px;
+                    padding: 6px;
                 }
 
                 .sort-options .sort-group {
                     flex-direction: column;
-                    gap: 8px !important;
+                    gap: 6px !important;
                 }
 
                 .sort-options div {
@@ -529,8 +708,8 @@
 
                 .sort-options select {
                     width: 100%;
-                    padding: 5px 20px 5px 8px;
-                    font-size: 12px;
+                    padding: 4px 18px 4px 6px;
+                    font-size: 11px;
                 }
 
                 .sort-options .dataTables_filter {
@@ -539,16 +718,36 @@
 
                 .sort-options .dataTables_filter input {
                     width: 100%;
-                    padding: 5px 8px;
-                    font-size: 12px;
+                    padding: 4px 6px;
+                    font-size: 11px;
                 }
 
                 .dataTables_wrapper .dataTables_paginate .paginate_button {
-                    padding: 6px 10px;
+                    padding: 5px 8px;
+                    font-size: 11px;
+                }
+
+                .notification {
+                    top: 10px;
+                    right: 10px;
+                    max-width: 90%;
+                    padding: 10px;
+                }
+
+                .notification .notification-title {
+                    font-size: 13px;
+                }
+
+                .notification .notification-body {
                     font-size: 12px;
                 }
             }
         </style>
+
+        <div class="stats-box">
+            <p>Réclamations urgentes : <span class="urgent">{{ urgentCount }}</span></p>
+            <p>Réclamations non urgentes : <span class="non-urgent">{{ nonUrgentCount }}</span></p>
+        </div>
 
         <div class="sort-options">
             <div class="sort-group">
@@ -573,7 +772,6 @@
                     </select>
                 </div>
             </div>
-            <!-- La zone de recherche sera déplacée ici par JavaScript -->
         </div>
 
         <table class="reclamation-table" id="reclamationTable">
@@ -593,7 +791,7 @@
             </thead>
             <tbody>
                 {% for reclamation in reclamations %}
-                    <tr>
+                    <tr class="{% if reclamation.isUrgent %}urgent-row{% endif %}" data-user-id="{{ reclamation.id|default('') }}">
                         <td data-label="Nom">{{ reclamation.nom }}</td>
                         <td data-label="Prénom">{{ reclamation.prenom }}</td>
                         <td data-label="Téléphone">{{ reclamation.tel }}</td>
@@ -622,9 +820,14 @@
                         </td>
                         <td data-label="Date de création">{{ reclamation.datecreation|date('Y-m-d H:i:s') }}</td>
                         <td data-label="Actions">
-                            <button class="delete-icon" data-id="{{ reclamation.id_rec }}">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <div class="action-buttons">
+                                <button class="delete-icon" data-id="{{ reclamation.id_rec }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="translate-icon" data-id="{{ reclamation.id_rec }}" data-titre="{{ reclamation.titre }}" data-contenu="{{ reclamation.contenu }}">
+                                    <i class="fas fa-language"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
@@ -642,8 +845,155 @@
             </div>
         </div>
 
+        <div id="translateModal" class="modal">
+            <div class="modal-content">
+                <button class="close-btn">×</button>
+                <i class="fas fa-language translate-icon-modal"></i>
+                <h2>Traduire la réclamation</h2>
+                <p>Sélectionnez la langue cible :</p>
+                <select id="targetLanguage">
+                    <option value="en">Anglais</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Espagnol</option>
+                    <option value="de">Allemand</option>
+                    <option value="it">Italien</option>
+                    <option value="ar">Arabe</option>
+                </select>
+                <div class="preview-box">
+                    <h3>Titre original</h3>
+                    <p id="originalTitre"></p>
+                    <h3>Contenu original</h3>
+                    <p id="originalContenu"></p>
+                </div>
+                <div class="preview-box" id="translatedPreview" style="display: none;">
+                    <h3>Titre traduit</h3>
+                    <p id="translatedTitre"></p>
+                    <h3>Contenu traduit</h3>
+                    <p id="translatedContenu"></p>
+                </div>
+                <button id="previewTranslate" class="btn-preview">Aperçu</button>
+                <button id="cancelTranslate" class="btn-cancel">Annuler</button>
+                <button id="confirmTranslate" class="btn-confirm" style="display: none;">Confirmer</button>
+            </div>
+        </div>
+
         <script>
             $(document).ready(function () {
+                // Initialiser Pusher
+                const pusher = new Pusher('74385132812fd01535d9', {
+                    cluster: 'eu',
+                    encrypted: true
+                });
+
+                // S'abonner au canal admin-channel
+                const channel = pusher.subscribe('admin-channel');
+
+                // Lier l'événement new-reclamation
+                channel.bind('new-reclamation', function(data) {
+                    // Créer la notification
+                    const notification = document.createElement('div');
+                    notification.className = 'notification';
+                    notification.innerHTML = `
+                        <div class="notification-header">
+                            <span class="notification-title">Nouvelle Réclamation</span>
+                            <button class="notification-close">×</button>
+                        </div>
+                        <div class="notification-body">
+                            <p><strong>Nom :</strong> ${data.nom}</p>
+                            <p><strong>Prénom :</strong> ${data.prenom}</p>
+                            <p><strong>Téléphone :</strong> ${data.tel}</p>
+                            <p><strong>Email :</strong> ${data.email}</p>
+                            <p><strong>Titre :</strong> ${data.titre}</p>
+                            <p><strong>Contenu :</strong> ${data.contenu}</p>
+                            <p><strong>Urgent :</strong> <span class="${data.urgent ? 'urgent' : ''}">${data.urgent ? 'Oui' : 'Non'}</span></p>
+                            <p><strong>Date :</strong> ${data.datecreation}</p>
+                            ${data.image ? `<p><strong>Image :</strong> <a href="/Uploads/reclamations/${data.image}" target="_blank">Voir l'image</a></p>` : ''}
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Afficher la notification
+                    setTimeout(() => {
+                        notification.classList.add('show');
+                    }, 100);
+
+                    // Fermer la notification après 10 secondes ou au clic
+                    const closeBtn = notification.querySelector('.notification-close');
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 300);
+                    });
+
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.classList.remove('show');
+                            setTimeout(() => {
+                                notification.remove();
+                            }, 300);
+                        }
+                    }, 10000);
+
+                    // Ajouter la réclamation au tableau DataTable
+                    const table = $('#reclamationTable').DataTable();
+                    const isUrgent = data.urgent || ['urgente', 'importante'].some(keyword => 
+                        data.titre.toLowerCase().includes(keyword) || data.contenu.toLowerCase().includes(keyword)
+                    );
+                    const rowData = [
+    data.nom,
+    data.prenom,
+    data.tel,
+    data.email,
+    data.titre,
+    data.contenu,
+    data.image 
+        ? `<a href="/Uploads/reclamations/${data.image}" target="_blank">
+               <img src="/Uploads/reclamations/${data.image}" alt="Image de la réclamation" class="reclamation-image">
+           </a>` 
+        : 'Aucune image',
+    data.status === 'en_attente'
+        ? `<a href="/reclamation/respond/${data.id_rec}" class="status-btn en-attente">En attente</a>`
+        : `<button class="status-btn repondu" disabled>Répondu</button>`,
+    data.datecreation,
+    `<div class="action-buttons">
+        <button class="delete-icon" data-id="${data.id_rec}">
+            <i class="fas fa-trash"></i>
+        </button>
+        <button class="translate-icon" data-id="${data.id_rec}" data-titre="${data.titre}" data-contenu="${data.contenu}">
+            <i class="fas fa-language"></i>
+        </button>
+    </div>`
+];
+;
+                    const rowNode = table.row.add(rowData).draw().node();
+                    if (isUrgent) {
+                        $(rowNode).addClass('urgent-row');
+                    }
+
+                    // Vérifier les badwords
+                    const badWords = [
+                        'idiot', 'stupide', 'imbécile', 'insulte', 'grossier',
+                        'merde', 'putain', 'connard', 'salope', 'enculé',
+                        'con', 'débile', 'abruti', 'crétin', 'pétasse',
+                        'fuck', 'shit', 'asshole', 'bitch', 'dick',
+                        'bastard', 'damn', 'cunt', 'prick', 'whore'
+                    ];
+                    const titre = data.titre.toLowerCase();
+                    const contenu = data.contenu.toLowerCase();
+                    const hasBadWord = badWords.some(word => titre.includes(word) || contenu.includes(word));
+                    if (hasBadWord) {
+                        table.cell(rowNode, 7).data(`<i class="fas fa-flag red-flag"></i>`).draw();
+                        $(rowNode).addClass('banned-row');
+                    }
+
+                    // Mettre à jour les compteurs
+                    const urgentCount = parseInt($('.stats-box .urgent').text()) + (isUrgent ? 1 : 0);
+                    const nonUrgentCount = parseInt($('.stats-box .non-urgent').text()) + (isUrgent ? 0 : 1);
+                    $('.stats-box .urgent').text(urgentCount);
+                    $('.stats-box .non-urgent').text(nonUrgentCount);
+                });
+
                 const table = $('#reclamationTable').DataTable({
                     "language": {
                         "decimal": "",
@@ -678,7 +1028,6 @@
                     "info": true
                 });
 
-                // Déplacer la zone de recherche dans .sort-options
                 const $searchFilter = $('.dataTables_filter');
                 $('.sort-options').append($searchFilter);
 
@@ -688,7 +1037,34 @@
                     table.order([column, order]).draw();
                 });
 
-                // Gestion du modal de suppression
+                // Liste des "badwords" en français et en anglais
+                const badWords = [
+                    // Français
+                    'idiot', 'stupide', 'imbécile', 'insulte', 'grossier',
+                    'merde', 'putain', 'connard', 'salope', 'enculé',
+                    'con', 'débile', 'abruti', 'crétin', 'pétasse',
+                    // Anglais
+                    'fuck', 'shit', 'asshole', 'bitch', 'dick',
+                    'bastard', 'damn', 'cunt', 'prick', 'whore'
+                ];
+
+                // Vérifier les badwords dans les réclamations au chargement
+                table.rows().every(function () {
+                    const data = this.data();
+                    const titre = data[4].toLowerCase();
+                    const contenu = data[5].toLowerCase();
+                    const hasBadWord = badWords.some(word => titre.includes(word) || contenu.includes(word));
+
+                    if (hasBadWord) {
+                        // Afficher uniquement le drapeau rouge dans la colonne Statut
+                        table.cell(this, 7).data(`
+                            <i class="fas fa-flag red-flag"></i>
+                        `).draw();
+                        $(this.node()).addClass('banned-row');
+                    }
+                });
+
+                // Gestion de la suppression
                 $(document).on('click', '.delete-icon', function () {
                     const idRec = $(this).data('id');
                     $('#deleteModal').addClass('show');
@@ -717,16 +1093,88 @@
                     });
                 });
 
-                // Fermeture du modal en cliquant à l'extérieur
-                $('.modal').on('click', function (e) {
-                    if (e.target === this) {
-                        $(this).removeClass('show');
-                    }
+                // Gestion de la traduction
+                $(document).on('click', '.translate-icon', function () {
+                    const idRec = $(this).data('id');
+                    const titre = $(this).data('titre');
+                    const contenu = $(this).data('contenu');
+
+                    // Afficher le titre et le contenu originaux dans le modal
+                    $('#originalTitre').text(titre || 'Aucun titre');
+                    $('#originalContenu').text(contenu || 'Aucun contenu');
+                    $('#translatedPreview').hide();
+                    $('#confirmTranslate').hide();
+
+                    $('#translateModal').addClass('show');
+
+                    // Gestion du bouton Aperçu
+                    $('#previewTranslate').off('click').on('click', function () {
+                        const targetLang = $('#targetLanguage').val();
+                        const previewUrl = '{{ path('app_reclamation_preview_translate', {'id_rec': '__ID__', 'targetLang': '__LANG__'}) }}'
+                            .replace('__ID__', idRec)
+                            .replace('__LANG__', targetLang);
+
+                        $.ajax({
+                            url: previewUrl,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response.success) {
+                                    $('#translatedTitre').text(response.translatedTitre || 'Erreur de traduction');
+                                    $('#translatedContenu').text(response.translatedContenu || 'Erreur de traduction');
+                                    $('#translatedPreview').show();
+                                    $('#confirmTranslate').show();
+                                } else {
+                                    alert('Erreur lors de la traduction : ' + response.message);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                alert('Erreur lors de la récupération de la traduction : ' + error);
+                            }
+                        });
+                    });
+
+                    // Gestion du bouton Confirmer
+                    $('#confirmTranslate').off('click').on('click', function () {
+                        const targetLang = $('#targetLanguage').val();
+                        const confirmUrl = '{{ path('app_reclamation_confirm_translate', {'id_rec': '__ID__', 'targetLang': '__LANG__'}) }}'
+                            .replace('__ID__', idRec)
+                            .replace('__LANG__', targetLang);
+
+                        $.ajax({
+                            url: confirmUrl,
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response.success) {
+                                    // Mettre à jour le tableau avec les nouvelles valeurs traduites
+                                    const row = table.row($(`tr:has(button[data-id="${idRec}"])`));
+                                    const rowData = row.data();
+                                    rowData[4] = response.translatedTitre || rowData[4];
+                                    rowData[5] = response.translatedContenu || rowData[5];
+                                    row.data(rowData).draw();
+
+                                    $('#translateModal').removeClass('show');
+                                    alert('Réclamation traduite avec succès !');
+                                } else {
+                                    alert('Erreur lors de la confirmation de la traduction : ' + response.message);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                alert('Erreur lors de la confirmation de la traduction : ' + error);
+                            }
+                        });
+                    });
+
+                    $('#cancelTranslate, #translateModal .close-btn').on('click', function () {
+                        $('#translateModal').removeClass('show');
+                    });
                 });
             });
         </script>
     {% else %}
-        <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #555555; font-size: 14px; padding: 12px; background: linear-gradient(to right, #ffffff, #f8f9fa); border-radius: 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <p style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #555555; font-size: 13px; padding: 10px; background: linear-gradient(to right, #ffffff, #f8f9fa); border-radius: 5px; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);">
             Aucune réclamation trouvée.
         </p>
     {% endif %}

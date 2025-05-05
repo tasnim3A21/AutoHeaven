@@ -1,0 +1,148 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Liste des Avis{% endblock %}
+{% block spinner %}{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+
+        <h1 class="mb-4" style="text-align: center; color: #0a0a23;">Liste des Avis</h1>
+
+        {# Recherche par voiture #}
+        <div class="mb-4">
+            <label for="voitureId">Rechercher les avis par ID de voiture :</label>
+            <input type="number" id="voitureId" placeholder="Entrez un ID..." />
+            <button type="button" id="btnRechercher" class="btn btn-secondary btn-sm">Rechercher</button>
+        </div>
+
+        {# Tableau des avis #}
+        <table class="table table-bordered" style="border-collapse: collapse;">
+            <thead class="table-light">
+                <tr>
+                    <th>Note</th>
+                    <th>Commentaire</th>
+                    <th>Date</th>
+                    <th>Utilisateur</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="avisTableBody">
+                {% for avis in avis %}
+                    {% set note = avis.note %}
+                    {% set color = note >= 4 ? '#d4edda' : (note == 3 ? '#fff3cd' : '#f8d7da') %}
+                    {% set smile = note >= 4 ? '😊' : (note == 3 ? '😐' : '😞') %}
+
+                    <tr style="background-color: {{ color }};">
+                        <td>{{ note }} {{ smile }}</td>
+                        <td>{{ avis.commentaire }}</td>
+                        <td>{{ avis.dateavis ? avis.dateavis|date('Y-m-d') : 'Aucune date' }}</td>
+                        <td>{{ avis.utilisateur.nom }} {{ avis.utilisateur.prenom }}</td>
+                        <td>
+                            <a href="{{ path('app_avis_edit', {'id': avis.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                            <form method="post"
+                                  action="{{ path('app_avis_delete', {'id': avis.id}) }}"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Confirmer la suppression ?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ avis.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_avis_new', {'id': 1}) }}"
+           class="btn btn-success d-block w-25 mx-auto my-4">Ajouter un avis</a>
+
+        {# Section Top Clients #}
+        <div class="card mt-5">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Top Clients (les plus actifs)</h2>
+            </div>
+            <div class="card-body">
+                <ul id="topClients" class="list-group"></ul>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('btnRechercher');
+        const tbody = document.getElementById('avisTableBody');
+
+        btn.addEventListener('click', () => {
+            const id = document.getElementById('voitureId').value.trim();
+            if (!id) {
+                alert('Veuillez saisir un ID de voiture.');
+                return;
+            }
+
+            fetch(/avis/api/avis/voiture/${id})
+                .then(res => {
+                    if (!res.ok) throw new Error(HTTP ${res.status});
+                    return res.json();
+                })
+                .then(data => {
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = 
+                            <tr>
+                              <td colspan="5" class="text-center p-3">
+                                Aucun avis trouvé pour la voiture #${id}.
+                              </td>
+                            </tr>;
+                        return;
+                    }
+
+                    data.forEach(a => {
+                        const note = a.note;
+                        const color = note >= 4 ? '#d4edda' : (note === 3 ? '#fff3cd' : '#f8d7da');
+                        const smile = note >= 4 ? '😊' : (note === 3 ? '😐' : '😞');
+
+                        tbody.innerHTML += 
+                            <tr style="background-color: ${color};">
+                              <td>${note} ${smile}</td>
+                              <td>${a.commentaire}</td>
+                              <td>${a.dateavis}</td>
+                              <td>${a.utilisateur}</td>
+                              <td>—</td>
+                            </tr>;
+                    });
+                })
+                .catch(err => {
+                    console.error('Erreur API :', err);
+                    alert('Impossible de récupérer les avis (voir console).');
+                });
+        });
+
+        // Chargement Top Clients
+        fetch('/avis/api/avis/top-clients?limit=5')
+            .then(res => res.json())
+            .then(data => {
+                const ul = document.getElementById('topClients');
+                if (data.length === 0) {
+                    ul.innerHTML = '<li class="list-group-item">Aucun client trouvé.</li>';
+                    return;
+                }
+                data.forEach(c => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.textContent = ${c.prenom} ${c.nom};
+                    const span = document.createElement('span');
+                    span.className = 'badge bg-primary rounded-pill';
+                    span.textContent = ${c.nbAvis} avis;
+                    li.append(span);
+                    ul.append(li);
+                });
+            })
+            .catch(err => console.error('Erreur Top Clients :', err));
+    });
+    </script>
+{% endblock %} 

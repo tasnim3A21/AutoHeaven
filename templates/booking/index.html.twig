@@ -19,6 +19,54 @@
     </div>
     <!-- Page Header End -->
 
+    <!-- Calendar Integration Start -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <div class="container my-4">
+        <div id="calendar"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+                    // Test Drive Reservations
+                    {% for reservation in testDrives %}
+                    {
+                        title: 'Test Drive: {{ reservation.voiture ? reservation.voiture.marque : "Véhicule" }}',
+                        start: '{{ reservation.date ? reservation.date|date('Y-m-d') : '' }}',
+                        color: '#007bff'
+                    },
+                    {% endfor %}
+                    // Remorquage Reservations
+                    {% for remorquage in remorquages %}
+                    {
+                        title: 'Remorquage: {{ remorquage.camionRemorquage.nomAgence }}',
+                        start: '{{ remorquage.date ? remorquage.date|date('Y-m-d') : '' }}',
+                        color: '#28a745'
+                    },
+                    {% endfor %}
+                    // Mechanic Appointments
+                    {% for rdv in mecaniciens %}
+                    {
+                        title: 'Mécanicien: {{ rdv.mecanicien.nom }}',
+                        start: '{{ rdv.date ? rdv.date|date('Y-m-d') : '' }}',
+                        color: '#ffc107'
+                    },
+                    {% endfor %}
+                ]
+            });
+            calendar.render();
+        });
+    </script>
+
     <!-- Reservations Start -->
     <div class="container-xxl py-5">
         <div class="container">
@@ -48,17 +96,34 @@
                                     <th>Véhicule</th>
                                     <th>Date</th>
                                     <th>Statut</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for reservation in testDrives %}
                                     <tr>
-                                        <td>{{ reservation.voiture.marque }} {{ reservation.voiture.modele }}</td>
+                                        <td>
+                                            {% if reservation.voiture %}
+                                                {{ reservation.voiture.marque }}
+                                            {% else %}
+                                                Véhicule non disponible
+                                            {% endif %}
+                                        </td>
                                         <td>{{ reservation.date|date('d/m/Y') }}</td>
                                         <td>
                                             <span class="badge bg-{{ reservation.status == 'confirmee' ? 'success' : (reservation.status == 'en_cours_de_traitement' ? 'warning' : 'danger') }}">
                                                 {{ reservation.status }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {% if reservation.status == 'en_cours_de_traitement' %}
+                                                <a href="{{ path('testdrive_edit', {'id': reservation.id_td}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="{{ path('testdrive_delete', {'id': reservation.id_td}) }}" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cette réservation ?');">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -84,6 +149,7 @@
                                     <th>Point de dépôt</th>
                                     <th>Date</th>
                                     <th>Statut</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,6 +163,16 @@
                                             <span class="badge bg-{{ remorquage.status == 'confirmee' ? 'success' : (remorquage.status == 'en_cours_de_traitement' ? 'warning' : 'danger') }}">
                                                 {{ remorquage.status }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {% if remorquage.status == 'en_cours_de_traitement' %}
+                                                <a href="{{ path('remorquage_edit', {'id': remorquage.id_rem}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="{{ path('remorquage_delete', {'id': remorquage.id_rem}) }}" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer cette demande ?');">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -122,6 +198,7 @@
                                     <th>Date</th>
                                     <th>Note</th>
                                     <th>Statut</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,19 +213,22 @@
                                                 {{ rdv.status }}
                                             </span>
                                         </td>
+                                        <td>
+                                            {% if rdv.status == 'en_cours_de_traitement' %}
+                                                <a href="{{ path('mecanicien_edit', {'id': rdv.id_res_m}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="{{ path('mecanicien_delete', {'id': rdv.id_res_m}) }}" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer ce rendez-vous ?');">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 {% endif %}
-            </div>
-
-            <!-- New Reservation Button -->
-            <div class="text-center mt-5">
-                <a href="{{ path('app_services') }}" class="btn btn-primary py-3 px-5">
-                    <i class="fa fa-plus me-2"></i>Nouvelle Réservation
-                </a>
             </div>
         </div>
     </div>

@@ -2,33 +2,26 @@
 
 namespace App\Entity;
 
+// Assert is already imported below, removing duplicate import
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
-
 use Symfony\Component\Validator\Constraints as Assert;
-
 
 #[ORM\Entity]
 class Res_mecanicien
 {
-
     #[ORM\Id]
-
     #[ORM\GeneratedValue]
-
     #[ORM\Column(type: "integer")]
     private int $id_res_m;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID utilisateur ne peut pas être vide")]
-    #[Assert\Positive(message: "L'ID utilisateur doit être un nombre positif")]
     private int $id_u;
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "L'ID mécanicien ne peut pas être vide")]
-    #[Assert\Positive(message: "L'ID mécanicien doit être un nombre positif")]
     private int $id_mec;
 
-    #[ORM\Column(type: "string", length: 25)]
+    #[ORM\Column(type: "string", length: 25, nullable: true)]
     #[Assert\NotBlank(message: "L'adresse ne peut pas être vide")]
     #[Assert\Length(
         min: 5,
@@ -36,82 +29,69 @@ class Res_mecanicien
         minMessage: "L'adresse doit contenir au moins {{ limit }} caractères",
         maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères"
     )]
-    private string $adresse;
+    private ?string $adresse = null;
 
     #[ORM\Column(type: "string", length: 100)]
-    #[Assert\NotBlank(message: "La note ne peut pas être vide")]
     #[Assert\Length(
-        max: 100,
+        max: 250,
         maxMessage: "La note ne peut pas dépasser {{ limit }} caractères"
     )]
-    private string $note;
+    private ?string $note = null;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(type: "date", nullable:true)]
     #[Assert\NotBlank(message: "La date ne peut pas être vide")]
     #[Assert\Type("\DateTimeInterface")]
     #[Assert\GreaterThanOrEqual(
         value: "today",
         message: "La date doit être aujourd'hui ou ultérieure"
     )]
-    private \DateTimeInterface $date;
+    private ?\DateTimeInterface $date=null;
 
     #[ORM\Column(type: "string")]
-    #[Assert\NotBlank(message: "Le status ne peut pas être vide")]
-    #[Assert\Choice(
-        choices: ["en_cours_de_traitement", "confirmee", "rejetee"],
-        message: "Le status doit être soit en cours de traitement, confirmée ou rejetée"
-    )]
+    //#[Assert\NotBlank(message: "Le status ne peut pas être vide")]
+    //#[Assert\Choice(
+    //    choices: ["en_cours_de_traitement", "confirmee", "rejetee"],
+    //    message: "Le status doit être soit en cours de traitement, confirmée ou rejetée"
+    //)]
     private string $status;
 
     public function getId_res_m()
     {
         return $this->id_res_m;
     }
-
-
+    public function setIdU($id_u)
+    {
+        $this->id_u = $id_u;
+    }
     public function getIdU()
-
     {
         return $this->id_u;
     }
 
-
-    public function setIdU($value)
-
-    {
-        $this->id_u = $value;
-    }
-
-
     public function getIdMec()
-
     {
-        return $this->id_mec;
+        return $this->id_mec;  
     }
-
-
-    public function setIdMec($value)
-
+    public function setIdMec($id_mec)
     {
-        $this->id_mec = $value;
+        $this->id_mec = $id_mec;
     }
 
     public function getAdresse()
     {
         return $this->adresse;
     }
-
     public function setAdresse($value)
     {
         $this->adresse = $value;
+        return $this;
     }
 
-    public function getNote()
+    public function getNote(): ?string
     {
         return $this->note;
     }
-
-    public function setNote($value)
+    public function setNote(?string $value): void
     {
         $this->note = $value;
     }
@@ -120,7 +100,6 @@ class Res_mecanicien
     {
         return $this->date;
     }
-
     public function setDate($value)
     {
         $this->date = $value;
@@ -130,25 +109,39 @@ class Res_mecanicien
     {
         return $this->status;
     }
-
     public function setStatus($value)
     {
         $this->status = $value;
     }
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: "id_mec", referencedColumnName: "id")]
+    #[ORM\JoinColumn(name: 'id_u', referencedColumnName: 'id', nullable: false)]
+    #[Assert\NotBlank(message: "Le client ne peut pas être vide")]
+    private ?User $client = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_mec', referencedColumnName: 'id', nullable: false)]
+    #[Assert\NotBlank(message: "Le mécanicien ne peut pas être vide")]
     private ?User $mecanicien = null;
+
+    public function getClient(): ?User
+    {
+        return $this->client;
+    }
+    public function setClient(User $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
 
     public function getMecanicien(): ?User
     {
         return $this->mecanicien;
     }
 
-    public function setMecanicien(?User $mecanicien): self
+    public function setMecanicien(User $mecanicien): self
     {
         $this->mecanicien = $mecanicien;
         return $this;
     }
-
 }

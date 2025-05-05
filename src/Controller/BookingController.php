@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\Voiture;
 use App\Entity\Camion_remorquage;
 use App\Entity\Mecanicien;
+use App\Form\ResTestDriveType; // Make sure this is at the top
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,18 +29,12 @@ final class BookingController extends AbstractController
     #[Route('/booking', name: 'app_booking')]
     public function index(): Response
     {
-        
 
         $userId = 3;
 
         // Fetch test drives with vehicle information
-        $testDrives = $this->entityManager->createQuery(
-            'SELECT t, v 
-            FROM App\Entity\Res_testdrive t 
-            JOIN App\Entity\Voiture v WITH t.id_v = v.id_v 
-            WHERE t.id_u = :userId 
-            ORDER BY t.date DESC'
-        )->setParameter('userId', $userId)->getResult();
+        $testDrives = $this->entityManager->getRepository(Res_testdrive::class)
+            ->findBy(['id_u' => $userId], ['date' => 'DESC']);
 
         // Fetch towing requests with agency information
         $remorquages = $this->entityManager->createQuery(
@@ -65,4 +60,139 @@ final class BookingController extends AbstractController
         ]);
     }
 
+
+    // --- Test Drive Edit ---
+    #[Route('/testdrive/{id}/edit', name: 'testdrive_edit')]
+    public function editTestDrive(int $id, Request $request): Response
+    {
+        $testDrive = $this->entityManager->getRepository(Res_testdrive::class)->find($id);
+        if (!$testDrive) {
+            $this->addFlash('error', 'Réservation Test Drive introuvable.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        $form = $this->createForm(ResTestDriveType::class, $testDrive);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Réservation Test Drive mise à jour avec succès.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        return $this->render('booking/edit_testdrive.html.twig', [
+            'testDrive' => $testDrive,
+            'form' => $form->createView(),
+        ]);
+    }
+    // --- Test Drive Delete ---
+    #[Route('/testdrive/{id}/delete', name: 'testdrive_delete')]
+    public function deleteTestDrive(int $id): Response
+    {
+        $testDrive = $this->entityManager->getRepository(Res_testdrive::class)->find($id);
+        if ($testDrive) {
+            $this->entityManager->remove($testDrive);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Réservation Test Drive supprimée.');
+        } else {
+            $this->addFlash('error', 'Réservation Test Drive introuvable.');
+        }
+        return $this->redirectToRoute('app_booking');
+    }
+
+
+    // --- Remorquage Edit ---
+    #[Route('/remorquage/{id}/edit', name: 'remorquage_edit')]
+    public function editRemorquage(int $id, Request $request): Response
+    {
+        $remorquage = $this->entityManager->getRepository(Res_remorquage::class)->find($id);
+        if (!$remorquage) {
+            $this->addFlash('error', 'Demande de remorquage introuvable.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        $form = $this->createForm(\App\Form\ResRemorquageType::class, $remorquage);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Demande de remorquage mise à jour avec succès.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        return $this->render('booking/edit_rem.html.twig', [
+            'remorquage' => $remorquage,
+            'form' => $form->createView(),
+        ]);
+    }
+    // --- Remorquage Delete ---
+    #[Route('/remorquage/{id}/delete', name: 'remorquage_delete')]
+    public function deleteRemorquage(int $id): Response
+    {
+        $remorquage = $this->entityManager->getRepository(Res_remorquage::class)->find($id);
+        if ($remorquage) {
+            $this->entityManager->remove($remorquage);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Demande de remorquage supprimée.');
+        } else {
+            $this->addFlash('error', 'Demande de remorquage introuvable.');
+        }
+        return $this->redirectToRoute('app_booking');
+    }
+
+
+    // --- Mécanicien Edit ---
+    #[Route('/mecanicien/{id}/edit', name: 'mecanicien_edit')]
+    public function editMecanicien(int $id, Request $request): Response
+    {
+        $mecanicien = $this->entityManager->getRepository(Res_mecanicien::class)->find($id);
+        if (!$mecanicien) {
+            $this->addFlash('error', 'Rendez-vous mécanicien introuvable.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        $form = $this->createForm(\App\Form\ResMecanicienType::class, $mecanicien);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Rendez-vous mécanicien mis à jour avec succès.');
+            return $this->redirectToRoute('app_booking');
+        }
+
+        return $this->render('booking/edit_mec.html.twig', [
+            'mecanicien' => $mecanicien,
+            'form' => $form->createView(),
+        ]);
+    }
+    // --- Mécanicien Delete ---
+    #[Route('/mecanicien/{id}/delete', name: 'mecanicien_delete')]
+    public function deleteMecanicien(int $id): Response
+    {
+        $mecanicien = $this->entityManager->getRepository(Res_mecanicien::class)->find($id);
+        if ($mecanicien) {
+            $this->entityManager->remove($mecanicien);
+            $this->entityManager->flush();
+            $this->addFlash('success', 'Rendez-vous mécanicien supprimé.');
+        } else {
+            $this->addFlash('error', 'Rendez-vous mécanicien introuvable.');
+        }
+        return $this->redirectToRoute('app_booking');
+    }
+
+    #[Route('/api/reservations', name: 'api_reservations')]
+    public function getReservations(ReservationRepository $repo): JsonResponse
+    {
+        $reservations = $repo->findAll();
+
+        $events = [];
+        foreach ($reservations as $r) {
+            $events[] = [
+                'title' => 'RDV avec ' . $r->getMecanicien()->getNom(),
+                'start' => $r->getDate()->format('Y-m-d H:i:s'),
+                // tu peux ajouter 'end', 'color', etc.
+            ];
+        }
+        return new JsonResponse($events);
+    }
 }

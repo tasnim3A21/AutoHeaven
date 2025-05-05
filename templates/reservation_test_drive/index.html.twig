@@ -4,7 +4,28 @@
 
 {% block content %}
 <div class="container">
-    <h1>Réservations Test Drive</h1>
+    <h1>Réservations des TestDrives</h1>
+    {# Display flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Add New Reservation Form #}
+    <div class="card mb-4">
+        <div class="card-header">
+            Ajouter une nouvelle réservation
+        </div>
+        <div class="card-body">
+            <form method="post" {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </form>
+        </div>
+    </div>
 
     {# Search Bar #}
     <div class="mb-3">
@@ -15,8 +36,8 @@
         <thead>
             <tr>
                 <th class="sortable" data-sort="id">ID</th>
-                <th class="sortable" data-sort="user">ID Utilisateur</th>
-                <th class="sortable" data-sort="vehicule">ID Véhicule</th>
+                <th class="sortable" data-sort="user">Client</th>
+                <th class="sortable" data-sort="vehicule">Véhicule</th>
                 <th class="sortable" data-sort="date">Date</th>
                 <th class="sortable" data-sort="status">Statut</th>
                 <th>Actions</th>
@@ -26,8 +47,20 @@
             {% for reservation in reservations %}
             <tr>
                 <td>{{ reservation.id_td }}</td>
-                <td>{{ reservation.idU }}</td>
-                <td>{{ reservation.idV }}</td>
+                <td>
+                    {% if reservation.user %}
+                        {{ reservation.user.nom }} {{ reservation.user.prenom }} ({{ reservation.idU }})
+                    {% else %}
+                        {{ reservation.idU }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if reservation.voiture %}
+                        {{ reservation.voiture.marque }} ({{ reservation.idV }})
+                    {% else %}
+                        {{ reservation.idV }}
+                    {% endif %}
+                </td>
                 <td>{{ reservation.date|date('Y-m-d') }}</td>
                 <td>{{ reservation.status }}</td>
                 <td>
@@ -35,8 +68,8 @@
                         <a href="{{ path('app_reservation_test_drive_confirm', {'id': reservation.id_td}) }}" class="btn btn-sm btn-success">Confirmée</a>
                         <a href="{{ path('app_reservation_test_drive_reject', {'id': reservation.id_td}) }}" class="btn btn-sm btn-warning">Rejetée</a>
                     {% else %}
-                        <a href="{{ path('app_reservation_test_drive_edit', {'id': reservation.id_td}) }}" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="{{ path('app_reservation_test_drive_delete', {'id': reservation.id_td}) }}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{{ path('app_reservation_test_drive_edit', {'id': reservation.id_td}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                        <a href="{{ path('app_reservation_test_drive_delete', {'id': reservation.id_td}) }}" class="btn btn-sm btn-danger">Supprimer</a>
                     {% endif %}
                 </td>
             </tr>

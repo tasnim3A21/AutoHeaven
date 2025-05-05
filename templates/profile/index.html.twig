@@ -36,7 +36,7 @@
 
                     <!-- Profile Image Upload -->
                     <div class="col-12 text-center">
-                        {% if app.user.photo_profile %}
+                        {% if app.user and app.user.photo_profile %}
                             <img src="{{ asset('uploads/' ~ app.user.photo_profile) }}" alt="Profile Image"
                                  class="rounded-circle mb-3" style="width: 180px; height: 180px; object-fit: cover;">
                         {% else %}

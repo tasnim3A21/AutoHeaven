@@ -29,7 +29,7 @@ class VoitureType extends AbstractType
             ->add('disponibilite')
             ->add('id_c', EntityType::class, [
                 'class' => Categorie::class,
-                'choice_label' => 'id',
+                'choice_label' => 'type',
             ])
         ;
     }

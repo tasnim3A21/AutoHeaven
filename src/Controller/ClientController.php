@@ -26,17 +26,16 @@ final class ClientController extends AbstractController
     public function bannirClient(int $id, EntityManagerInterface $em): Response
     {
         $client = $em->getRepository(User::class)->find($id);
-
+    
         if (!$client) {
             throw $this->createNotFoundException('Client non trouvé');
         }
-
-        $now = new \DateTime();
-        $client->setBan('oui:' . $now->format('Y-m-d H:i:s'));
+    
+        $client->setBan('oui');
         $em->flush();
-
-        $this->addFlash('success', 'Client banni avec succès pour 1 heure.');
-
+    
+        $this->addFlash('success', 'Client banni définitivement avec succès.');
+    
         return $this->redirectToRoute('app_client');
     }
 

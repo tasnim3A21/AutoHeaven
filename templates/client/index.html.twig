@@ -1,8 +1,9 @@
-{% extends 'base_admin.html.twig' %}
+{% extends 'base_envoyer.html.twig' %}
 
-{% block title %}Clients{% endblock %}
+{% block title %}Historique des Réclamations{% endblock %}
 
 {% block content %}
+
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>Liste des Clients</h1>
@@ -22,10 +23,10 @@
             </thead>
             <tbody>
                 {% for m in clients %}
-                    <tr>
+                    <tr {% if m.getBan() == 'oui' %}class="table-danger"{% endif %}>
                         <td>
                             {% if m.photo_profile %}
-                                <img src="{{ asset('uploads/' ~ m.photo_profile) }}"
+                                <img src="{{ asset('Uploads/' ~ m.photo_profile) }}"
                                      alt="Photo de {{ m.nom }}"
                                      class="rounded-circle mb-3"
                                      style="width: 100px; height: 100px; object-fit: cover;">
@@ -41,21 +42,33 @@
                         <td>{{ m.email }}</td>
                         <td>{{ m.tel }}</td>
                         <td>{{ m.adresse }}</td>
-                     <td>
-    <div class="d-flex justify-content-center gap-2">
-        <a href="{{ path('bannir_client', {'id': m.id}) }}" class="btn btn-warning btn-sm w-100">Bannir</a>
-        <a href="{{ path('supprimer_client', {'id': m.id}) }}" class="btn btn-danger btn-sm w-100" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')">Supprimer</a>
-    </div>
-</td>
-
-
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ path('bannir_client', {'id': m.id}) }}"
+                                   class="btn btn-warning btn-sm w-100 {% if m.getBan() == 'oui' %}disabled{% endif %}"
+                                   {% if m.getBan() == 'oui' %}disabled aria-disabled="true"{% endif %}>Bannir</a>
+                                <a href="{{ path('supprimer_client', {'id': m.id}) }}"
+                                   class="btn btn-danger btn-sm w-100"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')">Supprimer</a>
+                            </div>
+                        </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="text-center">Aucun mécanicien trouvé.</td>
+                        <td colspan="7" class="text-center">Aucun client trouvé.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    <style>
+        .btn-warning.disabled, .btn-warning:disabled {
+            background-color: #d3d3d3;
+            border-color: #d3d3d3;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+    </style>
 {% endblock %}

@@ -4,9 +4,15 @@
 
 {% block content %}
 <div class="container">
-    <h1>Edit Camion Remorquage</h1>
+    <h1>Modifier Camion Remorquage</h1>
 
-    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate', 'method': 'POST'}}) }}
+        <div class="mb-3">
+            {{ form_label(form.nom_agence) }}
+            {{ form_widget(form.nom_agence) }}
+            {{ form_errors(form.nom_agence) }}
+        </div>
+
         <div class="mb-3">
             {{ form_label(form.modele) }}
             {{ form_widget(form.modele) }}
@@ -31,9 +37,9 @@
             {{ form_errors(form.statut) }}
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-    {{ form_end(form, {'render_rest': false}) }}
+        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
+    {{ form_end(form, {'render_rest': true}) }}
 
-    <a href="{{ path('app_camion_remorquage') }}" class="btn btn-secondary mt-3">Back to list</a>
+    <a href="{{ path('app_camion_remorquage') }}" class="btn btn-secondary mt-3">Annuler</a>
 </div>
 {% endblock %}

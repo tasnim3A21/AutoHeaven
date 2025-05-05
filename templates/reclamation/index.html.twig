@@ -6,6 +6,11 @@
     <div class="reclamation-container">
         <h1>Passer une réclamation</h1>
 
+        <!-- History Button -->
+        <div class="button-container history-button-container">
+            <button class="btn-history" id="showHistoryBtn">Voir l'historique des réclamations</button>
+        </div>
+
         {{ form_start(reclamationForm, {'attr': {'id': 'reclamationForm', 'novalidate': 'novalidate'}}) }}
             <div class="form-group">
                 {{ form_label(reclamationForm.titre, 'Objet', {'label_attr': {'class': 'form-label'}}) }}
@@ -25,6 +30,12 @@
             </div>
 
             <div class="form-group">
+                <div class="label-with-icon">
+                    {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
+                    <span id="voiceInputBtn" class="voice-input-label">
+                        <img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">
+                    </span>
+                </div>
                 <div class="label-with-icon">
                     {{ form_label(reclamationForm.contenu, 'Votre réclamation', {'label_attr': {'class': 'form-label'}}) }}
                     <span id="voiceInputBtn" class="voice-input-label">
@@ -52,6 +63,12 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                {{ form_label(reclamationForm.urgent, 'Réclamation urgente', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(reclamationForm.urgent, {'attr': {'class': 'form-checkbox'}}) }}
+                {{ form_errors(reclamationForm.urgent) }}
+            </div>
+
             <div class="button-container">
                 <button type="submit" class="btn-submit">Envoyer</button>
             </div>
@@ -63,17 +80,94 @@
             </div>
         {{ form_end(reclamationForm) }}
 
-        <!-- Message de confirmation -->
         <div id="successMessage" class="success-message" style="display: none;">
             Réclamation envoyée avec succès !
         </div>
         <div id="errorMessage" class="error-message" style="display: none;">
             Une erreur est survenue.
         </div>
+
+        <!-- Modal for Recent Reclamations -->
+        <div id="reclamationsModal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Réclamations Récentes</h2>
+                <div class="table-wrapper">
+                    <table class="reclamation-table">
+                        <thead>
+                            <tr>
+                                <th>Objet</th>
+                                <th>Contenu</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Urgent</th>
+                                <th>Image</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalReclamationsBody">
+                            <!-- Populated dynamically via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Editing Reclamation -->
+        <div id="editReclamationModal" class="modal">
+            <div class="modal-content">
+                <span class="close edit-close">×</span>
+                <h2>Modifier la réclamation</h2>
+                <form id="editReclamationForm" novalidate="novalidate">
+                    <input type="hidden" id="editReclamationId" name="id_rec">
+                    <div class="form-group">
+                        <label for="editTitre" class="form-label">Objet</label>
+                        <input type="text" id="editTitre" name="titre" class="form-input" required>
+                        <div id="editTitreError" class="form-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCategory" class="form-label">Catégorie</label>
+                        <select id="editCategory" name="category" class="form-input" required>
+                            <option value="">Sélectionnez une catégorie</option>
+                            <option value="livraison">Problème de livraison</option>
+                            <option value="produit">Produit défectueux</option>
+                            <option value="service">Service client</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                        <div id="editCategoryError" class="form-error" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="label-with-icon">
+                            <label for="editContenu" class="form-label">Votre réclamation</label>
+                            <span id="editVoiceInputBtn" class="voice-input-label">
+                                <img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">
+                            </span>
+                        </div>
+                        <textarea id="editContenu" name="contenu" class="form-textarea" required aria-describedby="edit-word-counter"></textarea>
+                        <div id="editContenuError" class="form-error" style="display: none;"></div>
+                        <div class="word-counter" id="edit-word-counter">
+                            <span id="edit-word-count">0</span>/100 mots
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="edit-progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" id="editCorrectTextBtn" class="btn-correct-text">Corriger la réclamation</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editUrgent" class="form-label">Réclamation urgente</label>
+                        <input type="checkbox" id="editUrgent" name="urgent" class="form-checkbox">
+                    </div>
+                    <div class="button-container">
+                        <button type="submit" class="btn-submit">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <style>
-        /* Palette de couleurs cohérente avec respond.html.twig et index.html.twig */
         :root {
             --primary-color: #dc3545;
             --primary-hover: #c82333;
@@ -84,9 +178,10 @@
             --border-color: #d5d5d5;
             --shadow-color: rgba(0, 0, 0, 0.08);
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --table-bg-odd: #f7e6e6; /* Light red for odd rows */
+            --table-bg-even: #f0f8ff; /* Light blue for even rows */
         }
 
-        /* Conteneur principal */
         .reclamation-container {
             max-width: 700px;
             margin: 40px auto;
@@ -111,8 +206,7 @@
             background: linear-gradient(to right, var(--primary-color), transparent);
         }
 
-        /* Titre */
-        h1 {
+        h1, h2 {
             font-family: var(--font-family);
             color: var(--text-color);
             margin: 0 auto 35px;
@@ -126,7 +220,12 @@
             position: relative;
         }
 
-        h1::after {
+        h2 {
+            font-size: 24px;
+            margin-top: 40px;
+        }
+
+        h1::after, h2::after {
             content: '';
             position: absolute;
             bottom: -3px;
@@ -137,13 +236,11 @@
             background: linear-gradient(to right, transparent, var(--primary-hover), transparent);
         }
 
-        /* Groupe de formulaire */
         .form-group {
             margin-bottom: 30px;
             text-align: left;
         }
 
-        /* Labels */
         .form-label {
             display: block;
             margin-bottom: 12px;
@@ -154,20 +251,19 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             position: relative;
-            line-height: 1; /* Réduire la hauteur de ligne pour un alignement précis */
+            line-height: 1;
         }
 
-        /* Conteneur pour aligner le label et l'icône */
         .label-with-icon {
             display: flex;
-            align-items: center; /* Centrer verticalement */
+            align-items: center;
             gap: 10px;
         }
 
-        /* Champs de saisie */
         .form-input,
         .form-textarea,
-        select.form-input {
+        select.form-input,
+        .form-checkbox {
             width: 100%;
             padding: 14px;
             border: 1px solid var(--border-color);
@@ -180,15 +276,22 @@
             line-height: 1.6;
         }
 
+        .form-checkbox {
+            width: auto;
+            padding: 0;
+            margin-right: 10px;
+        }
+
         .form-textarea {
             resize: vertical;
             min-height: 120px;
-            padding-right: 50px; /* Laisser de l'espace pour l'icône */
+            padding-right: 50px;
         }
 
         .form-input:focus,
         .form-textarea:focus,
-        select.form-input:focus {
+        select.form-input:focus,
+        .form-checkbox:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(220, 53, 69, 0.25), inset 0 2px 5px var(--shadow-color);
             outline: none;
@@ -201,7 +304,6 @@
             box-shadow: 0 0 10px rgba(220, 53, 69, 0.25), inset 0 2px 5px var(--shadow-color);
         }
 
-        /* Conteneur pour le textarea et l'icône */
         .textarea-container {
             position: relative;
             display: inline-block;
@@ -240,29 +342,18 @@
             filter: brightness(1.1);
         }
 
-        .image-file-name {
-            display: block;
-            margin-top: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-family: var(--font-family);
-            font-style: italic;
-        }
-
-        /* Cacher le champ input file */
         input[type="file"] {
             display: none;
         }
 
-        /* Icône de dictée */
         .voice-input-label {
-            display: inline-flex; /* Utiliser inline-flex pour un meilleur contrôle */
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: transform 0.3s ease, opacity 0.3s ease;
-            margin: 0; /* Supprimer toute marge */
-            padding: 0; /* Supprimer tout padding */
+            margin: 0;
+            padding: 0;
         }
 
         .voice-input-label:hover {
@@ -288,7 +379,15 @@
             filter: brightness(1.1);
         }
 
-        /* Compteur de mots */
+        .image-file-name {
+            display: block;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-family: var(--font-family);
+            font-style: italic;
+        }
+
         .word-counter {
             font-size: 14px;
             color: var(--text-secondary);
@@ -320,14 +419,12 @@
             transition: width 0.3s ease;
         }
 
-        /* Boutons d'action (Corriger) */
         .action-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        /* Bouton Corriger la réclamation */
         .btn-correct-text {
             background: linear-gradient(135deg, #6c757d, #5a6268);
             color: #ffffff;
@@ -361,7 +458,6 @@
             box-shadow: none;
         }
 
-        /* Barre de progression pour la soumission */
         .progress-container {
             margin-top: 10px;
             width: 100%;
@@ -382,7 +478,6 @@
             transition: width 0.3s ease;
         }
 
-        /* Erreurs */
         .form-errors {
             color: var(--primary-color) !important;
             font-size: 14px;
@@ -409,15 +504,19 @@
             box-shadow: 0 2px 5px var(--shadow-color);
         }
 
-        /* Conteneur du bouton */
         .button-container {
             display: flex;
             justify-content: center;
             margin-top: 30px;
         }
 
-        /* Bouton Envoyer */
-        .btn-submit {
+        .history-button-container {
+            margin-bottom: 30px;
+        }
+
+        .btn-submit,
+        .btn-history,
+        .btn-edit {
             background: linear-gradient(135deg, var(--primary-color), #e4606d);
             color: #ffffff;
             padding: 12px 35px;
@@ -430,15 +529,26 @@
             transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 10px var(--shadow-color);
             letter-spacing: 0.8px;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .btn-submit:hover {
+        .btn-edit {
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .btn-submit:hover,
+        .btn-history:hover,
+        .btn-edit:hover {
             background: linear-gradient(135deg, var(--primary-hover), #d44d5a);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
         }
 
-        .btn-submit:focus {
+        .btn-submit:focus,
+        .btn-history:focus,
+        .btn-edit:focus {
             outline: none;
             box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
         }
@@ -450,12 +560,10 @@
             box-shadow: none;
         }
 
-        /* Masquer le bouton gris par défaut ajouté par Symfony */
         button[type="submit"]:not(.btn-submit) {
             display: none !important;
         }
 
-        /* Message de confirmation */
         .success-message {
             text-align: center;
             color: #28a745;
@@ -476,7 +584,6 @@
             opacity: 1;
         }
 
-        /* Message d'erreur */
         .error-message {
             text-align: center;
             color: var(--primary-color);
@@ -497,7 +604,183 @@
             opacity: 1;
         }
 
-        /* Responsive */
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--background-lighter);
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 6px 15px var(--shadow-color);
+            position: relative;
+            font-family: var(--font-family);
+        }
+
+        .close,
+        .edit-close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover,
+        .close:focus,
+        .edit-close:hover,
+        .edit-close:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--text-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal .reclamation-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-family);
+        }
+
+        .modal .reclamation-table th,
+        .modal .reclamation-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-color);
+            vertical-align: middle;
+        }
+
+        .modal .reclamation-table th {
+            background: linear-gradient(to bottom, #f1f2f3, #e9ecef);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal .reclamation-table tbody tr:nth-child(odd) {
+            background: var(--table-bg-odd);
+        }
+
+        .modal .reclamation-table tbody tr:nth-child(even) {
+            background: var(--table-bg-even);
+        }
+
+        .modal .reclamation-table tbody tr:hover td {
+            background: #e0e0e0;
+        }
+
+        .modal .reclamation-table .content-cell {
+            max-width: 200px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .modal .reclamation-table .status-cell {
+            font-weight: 600;
+        }
+
+        .status-en_attente {
+            color: #ffa500; /* Orange for pending */
+        }
+
+        .status-repondu {
+            color: #28a745; /* Green for responded */
+        }
+
+        .urgent-cell {
+            font-weight: 600;
+        }
+
+        .urgent-yes {
+            color: var(--primary-color);
+        }
+
+        .modal .reclamation-table .no-data {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .modal .reclamation-image {
+            max-width: 40px;
+            max-height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .modal .reclamation-image:hover {
+            transform: scale(1.1);
+        }
+
+        .icon-edit {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            filter: brightness(0.9);
+            transition: filter 0.3s ease, transform 0.3s ease;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .edit-icon:hover .icon-edit {
+            filter: brightness(1.1);
+            transform: scale(1.1);
+        }
+
         @media screen and (max-width: 768px) {
             .reclamation-container {
                 margin: 20px;
@@ -510,6 +793,11 @@
                 font-size: 26px;
                 margin-bottom: 25px;
                 padding-bottom: 10px;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin-top: 30px;
             }
 
             .form-group {
@@ -548,6 +836,11 @@
                 height: 20px;
             }
 
+            .voice-input-icon {
+                width: 20px;
+                height: 20px;
+            }
+
             .image-file-name {
                 font-size: 13px;
                 margin-top: 6px;
@@ -569,6 +862,7 @@
             }
 
             .btn-correct-text {
+            .btn-correct-text {
                 font-size: 13px;
                 padding: 8px 18px;
                 width: 100%;
@@ -586,7 +880,13 @@
                 gap: 10px;
             }
 
-            .btn-submit {
+            .history-button-container {
+                margin-bottom: 20px;
+            }
+
+            .btn-submit,
+            .btn-history,
+            .btn-edit {
                 font-size: 14px;
                 padding: 10px 30px;
                 border-radius: 6px;
@@ -598,6 +898,44 @@
                 font-size: 14px;
                 margin-top: 20px;
                 padding: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 15px;
+            }
+
+            .modal-content h2 {
+                font-size: 20px;
+            }
+
+            .table-wrapper {
+                max-height: 300px;
+            }
+
+            .modal .reclamation-table th,
+            .modal .reclamation-table td {
+                font-size: 11px;
+                padding: 8px 10px;
+            }
+
+            .modal .reclamation-table th {
+                font-size: 10px;
+            }
+
+            .modal .reclamation-table .content-cell {
+                max-width: 150px;
+            }
+
+            .modal .reclamation-image {
+                max-width: 30px;
+                max-height: 30px;
+            }
+
+            .icon-edit {
+                width: 18px;
+                height: 18px;
             }
         }
     </style>
@@ -612,6 +950,7 @@
             const voiceInputBtn = document.getElementById('voiceInputBtn');
             const imageFileInput = form.querySelector('#form_imageFile');
             const imageFileName = document.getElementById('imageFileName');
+            const imageFileName = document.getElementById('imageFileName');
             const imageUploadLabel = form.querySelector('.image-upload-label');
             const submitButton = form.querySelector('.btn-submit');
             const successMessage = document.getElementById('successMessage');
@@ -621,40 +960,398 @@
             const progressFill = document.getElementById('progress-fill');
             const progressContainer = document.getElementById('progressContainer');
             const progressFillSubmission = document.getElementById('progressFillSubmission');
+            const showHistoryBtn = document.getElementById('showHistoryBtn');
+            const modal = document.getElementById('reclamationsModal');
+            const closeModal = modal.querySelector('.close');
+            const modalReclamationsBody = document.getElementById('modalReclamationsBody');
+            const editReclamationModal = document.getElementById('editReclamationModal');
+            const closeEditModal = editReclamationModal.querySelector('.edit-close');
+            const editForm = document.getElementById('editReclamationForm');
+            const editTitreInput = document.getElementById('editTitre');
+            const editCategoryInput = document.getElementById('editCategory');
+            const editContenuInput = document.getElementById('editContenu');
+            const editUrgentInput = document.getElementById('editUrgent');
+            const editWordCounter = document.getElementById('edit-word-counter');
+            const editWordCount = document.getElementById('edit-word-count');
+            const editProgressFill = document.getElementById('edit-progress-fill');
+            const editTitreError = document.getElementById('editTitreError');
+            const editCategoryError = document.getElementById('editCategoryError');
+            const editContenuError = document.getElementById('editContenuError');
+            const editVoiceInputBtn = document.getElementById('editVoiceInputBtn');
+            const editCorrectTextBtn = document.getElementById('editCorrectTextBtn');
 
-            // Fonction pour compter les mots
             function countWords(text) {
                 const trimmedText = text.trim();
                 if (!trimmedText) return 0;
                 return trimmedText.split(/\s+/).length;
             }
 
-            // Fonction pour mettre à jour le compteur de mots et la barre de progression
-            function updateWordCounter() {
-                const contenuValue = contenuInput.value;
-                const wordCountValue = countWords(contenuValue);
+            function updateWordCounter(input, counter, count, progress) {
+                const value = input.value;
+                const wordCountValue = countWords(value);
                 const maxWords = 100;
 
-                wordCount.textContent = wordCountValue;
-                wordCounter.textContent = `${wordCountValue}/${maxWords} mots`;
+                count.textContent = wordCountValue;
+                counter.textContent = `${wordCountValue}/${maxWords} mots`;
                 const progressPercentage = (wordCountValue / maxWords) * 100;
-                progressFill.style.width = `${Math.min(progressPercentage, 100)}%`;
+                progress.style.width = `${Math.min(progressPercentage, 100)}%`;
 
                 if (wordCountValue > maxWords) {
-                    wordCounter.classList.add('warning');
+                    counter.classList.add('warning');
                 } else {
-                    wordCounter.classList.remove('warning');
+                    counter.classList.remove('warning');
                 }
             }
 
-            // Fonction pour extraire les mots-clés
             function extractKeywords(text) {
                 const words = text.toLowerCase().split(/\s+/);
                 const stopwords = ['je', 'de', 'le', 'la', 'et', 'un', 'une', 'pour', 'avec', 'mon', 'ma', 'mes', 'ce', 'cette'];
-                return words.filter(word => !stopwords.includes(word) && word.length > 3).slice(0, 5); // Limiter à 5 mots-clés
+                return words.filter(word => !stopwords.includes(word) && word.length > 3).slice(0, 5);
             }
 
-            // Bouton "Corriger la réclamation" avec l'API LanguageTool
+            function fetchRecentReclamations() {
+                fetch('{{ path('app_reclamation_recent') }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.reclamations) {
+                        modalReclamationsBody.innerHTML = '';
+                        data.reclamations.forEach(reclamation => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${reclamation.titre || 'N/A'}</td>
+                                <td class="content-cell">${reclamation.contenu || 'N/A'}</td>
+                                <td class="status-cell status-${reclamation.status}">
+                                    ${reclamation.status || 'N/A'}
+                                </td>
+                                <td>${reclamation.datecreation || 'N/A'}</td>
+                                <td class="urgent-cell ${reclamation.urgent ? 'urgent-yes' : ''}">
+                                    ${reclamation.urgent ? 'Oui' : 'Non'}
+                                </td>
+                                <td>
+                                    ${reclamation.image ? 
+                                        `<a href="/Uploads/reclamations/${reclamation.image}" target="_blank">
+                                            <img src="/Uploads/reclamations/${reclamation.image}" alt="Image de la réclamation" class="reclamation-image">
+                                         </a>` : 
+                                        'Aucune image'
+                                    }
+                                </td>
+                                <td>
+                                    ${reclamation.status === 'en_attente' && !reclamation.hasResponse ? 
+                                        `<span class="edit-icon" data-id="${reclamation.id_rec}" data-titre="${reclamation.titre || ''}" data-contenu="${reclamation.contenu || ''}" data-urgent="${reclamation.urgent}">
+                                            <svg class="icon-edit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                         </span>` : 
+                                        ''
+                                    }
+                                </td>
+                            `;
+                            modalReclamationsBody.appendChild(row);
+                        });
+
+                        // Add event listeners to edit icons
+                        document.querySelectorAll('.edit-icon').forEach(icon => {
+                            icon.addEventListener('click', function () {
+                                const id = this.getAttribute('data-id');
+                                const titre = this.getAttribute('data-titre');
+                                const contenu = this.getAttribute('data-contenu');
+                                const urgent = this.getAttribute('data-urgent') === 'true';
+
+                                document.getElementById('editReclamationId').value = id;
+                                editTitreInput.value = titre;
+                                editCategoryInput.value = ''; // Category is not persisted, reset to default
+                                editContenuInput.value = contenu;
+                                editUrgentInput.checked = urgent;
+                                updateWordCounter(editContenuInput, editWordCounter, editWordCount, editProgressFill);
+
+                                editReclamationModal.style.display = 'flex';
+                            });
+                        });
+                    } else {
+                        modalReclamationsBody.innerHTML = '<tr><td colspan="7" class="no-data">Aucune réclamation trouvée.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des réclamations récentes :', error);
+                    modalReclamationsBody.innerHTML = '<tr><td colspan="7" class="no-data">Erreur lors du chargement des réclamations.</td></tr>';
+                });
+            }
+
+            // Show modal and fetch reclamations
+            showHistoryBtn.addEventListener('click', function () {
+                modal.style.display = 'flex';
+                fetchRecentReclamations();
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', function () {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Close edit modal
+            closeEditModal.addEventListener('click', function () {
+                editReclamationModal.style.display = 'none';
+            });
+
+            // Close edit modal when clicking outside
+            window.addEventListener('click', function (event) {
+                if (event.target === editReclamationModal) {
+                    editReclamationModal.style.display = 'none';
+                }
+            });
+
+            // Handle edit form submission
+            editForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                let hasError = false;
+
+                // Clear previous errors
+                editTitreError.style.display = 'none';
+                editCategoryError.style.display = 'none';
+                editContenuError.style.display = 'none';
+                editTitreInput.classList.remove('error');
+                editCategoryInput.classList.remove('error');
+                editContenuInput.classList.remove('error');
+
+                // Validate titre
+                if (!editTitreInput.value.trim()) {
+                    hasError = true;
+                    editTitreError.textContent = 'Le champ Objet est requis.';
+                    editTitreError.style.display = 'block';
+                    editTitreInput.classList.add('error');
+                } else if (editTitreInput.value.length < 5) {
+                    hasError = true;
+                    editTitreError.textContent = 'Le titre doit contenir au moins 5 caractères.';
+                    editTitreError.style.display = 'block';
+                    editTitreInput.classList.add('error');
+                } else if (editTitreInput.value.length > 50) {
+                    hasError = true;
+                    editTitreError.textContent = 'Le titre ne peut pas dépasser 50 caractères.';
+                    editTitreError.style.display = 'block';
+                    editTitreInput.classList.add('error');
+                }
+
+                // Validate category (client-side only)
+                if (!editCategoryInput.value) {
+                    hasError = true;
+                    editCategoryError.textContent = 'Veuillez sélectionner une catégorie.';
+                    editCategoryError.style.display = 'block';
+                    editCategoryInput.classList.add('error');
+                }
+
+                // Validate contenu
+                const wordCountValue = countWords(editContenuInput.value);
+                if (!editContenuInput.value.trim()) {
+                    hasError = true;
+                    editContenuError.textContent = 'Le champ Votre réclamation est requis.';
+                    editContenuError.style.display = 'block';
+                    editContenuInput.classList.add('error');
+                } else if (editContenuInput.value.length < 10) {
+                    hasError = true;
+                    editContenuError.textContent = 'Le contenu doit contenir au moins 10 caractères.';
+                    editContenuError.style.display = 'block';
+                    editContenuInput.classList.add('error');
+                } else if (wordCountValue > 100) {
+                    hasError = true;
+                    editContenuError.textContent = 'Le contenu ne peut pas dépasser 100 mots.';
+                    editContenuError.style.display = 'block';
+                    editContenuInput.classList.add('error');
+                }
+
+                if (hasError) {
+                    return;
+                }
+
+                const submitButton = editForm.querySelector('.btn-submit');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Enregistrement...';
+
+                const formData = new FormData();
+                formData.append('id_rec', document.getElementById('editReclamationId').value);
+                formData.append('titre', editTitreInput.value);
+                formData.append('contenu', editContenuInput.value);
+                formData.append('urgent', editUrgentInput.checked);
+                const keywords = extractKeywords(editContenuInput.value);
+                formData.append('keywords', keywords.join(','));
+
+                fetch('{{ path('app_reclamation_edit') }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        successMessage.innerHTML = 'Réclamation modifiée avec succès !';
+                        successMessage.style.display = 'block';
+                        successMessage.classList.add('show');
+                        editReclamationModal.style.display = 'none';
+                        editForm.reset();
+                        setTimeout(() => {
+                            successMessage.classList.remove('show');
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 300);
+                        }, 5000);
+                        fetchRecentReclamations();
+                    } else {
+                        errorMessage.textContent = data.message || 'Une erreur est survenue lors de la modification.';
+                        errorMessage.style.display = 'block';
+                        errorMessage.classList.add('show');
+                        setTimeout(() => {
+                            errorMessage.classList.remove('show');
+                            setTimeout(() => {
+                                errorMessage.style.display = 'none';
+                            }, 300);
+                        }, 5000);
+                    }
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Enregistrer';
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la modification :', error);
+                    errorMessage.textContent = 'Une erreur est survenue lors de la modification.';
+                    errorMessage.style.display = 'block';
+                    errorMessage.classList.add('show');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Enregistrer';
+                    setTimeout(() => {
+                        errorMessage.classList.remove('show');
+                        setTimeout(() => {
+                            errorMessage.style.display = 'none';
+                        }, 300);
+                    }, 5000);
+                });
+            });
+
+            // Update word counter for edit form
+            editContenuInput.addEventListener('input', function () {
+                updateWordCounter(editContenuInput, editWordCounter, editWordCount, editProgressFill);
+                const contenuValue = editContenuInput.value.trim();
+                const wordCountValue = countWords(contenuValue);
+                if (contenuValue.length >= 10 && /\S/.test(contenuValue) && wordCountValue <= 100) {
+                    editContenuInput.classList.remove('error');
+                    editContenuError.style.display = 'none';
+                }
+            });
+
+            // Voice input for edit form
+            editVoiceInputBtn.addEventListener('click', function () {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'fr-FR';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+
+                    recognition.start();
+                    editVoiceInputBtn.textContent = 'Enregistrement...';
+
+                    recognition.onresult = function(event) {
+                        const transcript = event.results[0][0].transcript;
+                        editContenuInput.value = transcript;
+                        updateWordCounter(editContenuInput, editWordCounter, editWordCount, editProgressFill);
+                        editVoiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
+                    };
+
+                    recognition.onerror = function(event) {
+                        console.error('Erreur de reconnaissance vocale :', event.error);
+                        editVoiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
+                        editContenuError.textContent = 'Erreur lors de la reconnaissance vocale.';
+                        editContenuError.style.display = 'block';
+                    };
+
+                    recognition.onend = function() {
+                        editVoiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
+                    };
+                } else {
+                    editContenuError.textContent = 'La reconnaissance vocale n\'est pas supportée par votre navigateur.';
+                    editContenuError.style.display = 'block';
+                }
+            });
+
+            // Correct text for edit form
+            editCorrectTextBtn.addEventListener('click', function () {
+                const textToCorrect = editContenuInput.value.trim();
+                if (!textToCorrect) {
+                    editContenuError.textContent = 'Veuillez entrer une réclamation à corriger.';
+                    editContenuError.style.display = 'block';
+                    editContenuInput.classList.add('error');
+                    return;
+                }
+
+                editCorrectTextBtn.disabled = true;
+                editCorrectTextBtn.textContent = 'Correction en cours...';
+
+                fetch('https://api.languagetool.org/v2/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'text': textToCorrect,
+                        'language': 'fr',
+                        'enabledOnly': 'false'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let correctedText = textToCorrect;
+                    const matches = data.matches;
+
+                    if (matches && matches.length > 0) {
+                        matches.reverse().forEach(match => {
+                            const start = match.offset;
+                            const length = match.length;
+                            const replacement = match.replacements[0]?.value || match.context.text;
+                            correctedText = correctedText.substring(0, start) + replacement + correctedText.substring(start + length);
+                        });
+                    }
+
+                    editContenuInput.value = correctedText;
+                    updateWordCounter(editContenuInput, editWordCounter, editWordCount, editProgressFill);
+
+                    editCorrectTextBtn.disabled = false;
+                    editCorrectTextBtn.textContent = 'Corriger la réclamation';
+
+                    if (matches.length === 0) {
+                        const info = document.createElement('div');
+                        info.className = 'success-message';
+                        info.textContent = 'Aucune correction nécessaire pour la réclamation.';
+                        editContenuInput.parentNode.appendChild(info);
+                        setTimeout(() => {
+                            info.classList.add('show');
+                            setTimeout(() => {
+                                info.remove();
+                            }, 3000);
+                        }, 100);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la correction :', error);
+                    editContenuError.textContent = 'Erreur lors de la correction de la réclamation.';
+                    editContenuError.style.display = 'block';
+                    editCorrectTextBtn.disabled = false;
+                    editCorrectTextBtn.textContent = 'Corriger la réclamation';
+                });
+            });
+
             correctTextBtn.addEventListener('click', function () {
                 const textToCorrect = contenuInput.value.trim();
                 if (!textToCorrect) {
@@ -676,7 +1373,7 @@
                     },
                     body: new URLSearchParams({
                         'text': textToCorrect,
-                        'language': 'fr', // Langue française
+                        'language': 'fr',
                         'enabledOnly': 'false'
                     })
                 })
@@ -695,7 +1392,7 @@
                     }
 
                     contenuInput.value = correctedText;
-                    updateWordCounter();
+                    updateWordCounter(contenuInput, wordCounter, wordCount, progressFill);
 
                     correctTextBtn.disabled = false;
                     correctTextBtn.textContent = 'Corriger la réclamation';
@@ -724,7 +1421,6 @@
                 });
             });
 
-            // Bouton "Dicter la réclamation" avec reconnaissance vocale
             voiceInputBtn.addEventListener('click', function () {
                 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -734,18 +1430,18 @@
                     recognition.maxAlternatives = 1;
 
                     recognition.start();
-                    voiceInputBtn.textContent = 'Enregistrement...';
+                    voiceInputBtn.innerHTML = 'Enregistrement...';
 
                     recognition.onresult = function(event) {
                         const transcript = event.results[0][0].transcript;
                         contenuInput.value = transcript;
-                        updateWordCounter();
-                        voiceInputBtn.textContent = 'Dicter la réclamation';
+                        updateWordCounter(contenuInput, wordCounter, wordCount, progressFill);
+                        voiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
                     };
 
                     recognition.onerror = function(event) {
                         console.error('Erreur de reconnaissance vocale :', event.error);
-                        voiceInputBtn.textContent = 'Dicter la réclamation';
+                        voiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
                         const error = document.createElement('div');
                         error.className = 'form-error';
                         error.textContent = 'Erreur lors de la reconnaissance vocale.';
@@ -753,7 +1449,7 @@
                     };
 
                     recognition.onend = function() {
-                        voiceInputBtn.textContent = 'Dicter la réclamation';
+                        voiceInputBtn.innerHTML = `<img src="{{ asset('images/mic.png') }}" alt="Dicter la réclamation" class="voice-input-icon">`;
                     };
                 } else {
                     const error = document.createElement('div');
@@ -763,13 +1459,11 @@
                 }
             });
 
-            // Ajouter un événement de débogage pour vérifier si le clic sur l'icône est détecté
             imageUploadLabel.addEventListener('click', function () {
                 console.log('Icône cliquée, déclenchement de l\'input file...');
                 imageFileInput.click();
             });
 
-            // Afficher le nom du fichier sélectionné
             imageFileInput.addEventListener('change', function () {
                 console.log('Fichier sélectionné :', this.files);
                 if (this.files.length > 0) {
@@ -779,9 +1473,8 @@
                 }
             });
 
-            // Mise à jour en temps réel du compteur
             contenuInput.addEventListener('input', function () {
-                updateWordCounter();
+                updateWordCounter(contenuInput, wordCounter, wordCount, progressFill);
 
                 const contenuValue = contenuInput.value.trim();
                 const wordCountValue = countWords(contenuValue);
@@ -790,17 +1483,14 @@
                 }
             });
 
-            // Validation côté client et soumission
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 let hasError = false;
 
-                // Réinitialiser les messages d'erreur personnalisés
                 const existingErrors = form.querySelectorAll('.form-error');
                 existingErrors.forEach(error => error.remove());
 
-                // Vérifier le champ "Objet"
                 if (!titreInput.value.trim()) {
                     hasError = true;
                     const error = document.createElement('div');
@@ -826,7 +1516,6 @@
                     titreInput.classList.remove('error');
                 }
 
-                // Vérifier le champ "Catégorie"
                 if (!categoryInput.value) {
                     hasError = true;
                     const error = document.createElement('div');
@@ -838,7 +1527,6 @@
                     categoryInput.classList.remove('error');
                 }
 
-                // Vérifier le champ "Votre réclamation"
                 const wordCountValue = countWords(contenuInput.value);
                 if (!contenuInput.value.trim()) {
                     hasError = true;
@@ -865,23 +1553,19 @@
                     contenuInput.classList.remove('error');
                 }
 
-                // Si erreur côté client, ne pas soumettre
                 if (hasError) {
                     return;
                 }
 
-                // Désactiver le bouton pendant la soumission
                 submitButton.disabled = true;
                 submitButton.textContent = 'Envoi en cours...';
                 progressContainer.style.display = 'block';
-                progressFillSubmission.style.width = '100%'; // Simuler une progression
+                progressFillSubmission.style.width = '100%';
 
-                // Ajouter les mots-clés extraits au formulaire
                 const keywords = extractKeywords(contenuInput.value);
                 const formData = new FormData(form);
                 formData.append('keywords', keywords.join(','));
 
-                // Soumettre le formulaire via fetch
                 fetch(form.action, {
                     method: form.method,
                     body: formData,
@@ -895,25 +1579,20 @@
                         throw new Error(data.message || 'Erreur lors de l\'envoi de la réclamation.');
                     }
 
-                    // Afficher le message de confirmation avec un numéro de suivi (simulé ici)
-                    const trackingNumber = data.trackingNumber || 'REC-2025-1234'; // Remplacez par la vraie valeur côté serveur
-                    successMessage.innerHTML = `Réclamation envoyée avec succès ! Numéro de suivi : ${trackingNumber}`;
+                    successMessage.innerHTML = `Réclamation envoyée avec succès !`;
                     successMessage.style.display = 'block';
                     successMessage.classList.add('show');
 
-                    // Réinitialiser le formulaire
                     form.reset();
                     imageFileName.textContent = '';
-                    updateWordCounter();
+                    updateWordCounter(contenuInput, wordCounter, wordCount, progressFill);
                     categoryInput.selectedIndex = 0;
 
-                    // Réactiver le bouton
                     submitButton.disabled = false;
                     submitButton.textContent = 'Envoyer';
                     progressContainer.style.display = 'none';
                     progressFillSubmission.style.width = '0';
 
-                    // Cacher le message après 5 secondes
                     setTimeout(() => {
                         successMessage.classList.remove('show');
                         setTimeout(() => {
@@ -931,7 +1610,6 @@
                     progressContainer.style.display = 'none';
                     progressFillSubmission.style.width = '0';
 
-                    // Cacher le message d'erreur après 5 secondes
                     setTimeout(() => {
                         errorMessage.classList.remove('show');
                         setTimeout(() => {
@@ -941,8 +1619,8 @@
                 });
             });
 
-            // Initialisation du compteur
-            updateWordCounter();
+            // Initial word counter update
+            updateWordCounter(contenuInput, wordCounter, wordCount, progressFill);
         });
     </script>
 {% endblock %}

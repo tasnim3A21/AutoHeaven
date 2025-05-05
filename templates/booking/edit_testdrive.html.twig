@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier Réservation Test Drive{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid page-header mb-5 p-0" style="background-image: url(img/carousel-bg-1.jpg);">
+    <div class="container-fluid page-header-inner py-5">
+        <div class="container text-center">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Réservations</h1>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1 class="mb-4">Modifier Ta Réservation Test Drive</h1>
+
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+        <div class="mb-3">
+            <label class="form-label">Client</label>
+            <div class="form-control-plaintext">
+                {% if testDrive.user %}
+                    {{ testDrive.user.username }} (ID = {{ testDrive.user.id }})
+                {% else %}
+                    Utilisateur non trouvé
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.user) }}
+            </div>
+            {{ form_errors(form.user) }}
+        </div>
+
+        {# Display Vehicle Info (Non-Editable) #}
+        <div class="mb-3">
+            <label class="form-label">Vehicule</label>
+            <div class="form-control-plaintext">
+                {% if testDrive.voiture %}
+                    {{ testDrive.voiture.marque }} (ID = {{ testDrive.voiture.idV }})
+                {% else %}
+                    Véhicule non trouvé
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.voiture) }}
+            </div>
+            {{ form_errors(form.voiture) }}
+        </div>
+
+        {# Keep the Date field editable #}
+        <div class="mb-3">
+            {{ form_label(form.date) }}
+            {{ form_widget(form.date) }}
+            {{ form_errors(form.date) }}
+        </div>
+
+        {# Render other form fields if any, or the rest of the form #}
+        {{ form_rest(form) }} 
+
+        <button type="submit" class="btn btn-primary mt-3">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+    <a href="{{ path('app_booking') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+</div>
+{% endblock %}

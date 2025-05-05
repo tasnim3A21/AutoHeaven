@@ -31,7 +31,13 @@ class Offre
     private string $description;
 
     #[ORM\Column(type: "float")]
+    #[Assert\Range(
+        notInRangeMessage: 'Le taux de réduction doit être compris entre {{ min }}% et {{ max }}%',
+        min: 0,
+        max: 99.99
+    )]
     private float $taux_reduction;
+    
 
     #[ORM\Column(type: "date")]
     private \DateTimeInterface $date_debut;

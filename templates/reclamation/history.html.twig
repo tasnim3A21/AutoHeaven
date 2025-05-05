@@ -1,0 +1,245 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des Réclamations{% endblock %}
+
+{% block content %}
+    <div class="reclamation-container">
+        <h1>Historique des Réclamations</h1>
+
+        {% if reclamations is empty %}
+            <div class="no-reclamations-message">
+                Aucune réclamation trouvée.
+            </div>
+        {% else %}
+            <table class="reclamation-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Objet</th>
+                        <th>Contenu</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                        <th>Urgent</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reclamation in reclamations %}
+                        <tr>
+                            <td>{{ reclamation.idRec }}</td>
+                            <td>{{ reclamation.titre }}</td>
+                            <td>{{ reclamation.contenu }}</td>
+                            <td>{{ reclamation.status }}</td>
+                            <td>{{ reclamation.datecreation|date('d/m/Y H:i') }}</td>
+                            <td>{{ reclamation.urgent ? 'Oui' : 'Non' }}</td>
+                            <td>
+                                {% if reclamation.image %}
+                                    <a href="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" target="_blank">
+                                        <img src="{{ asset('uploads/reclamations/' ~ reclamation.image) }}" alt="Image de la réclamation" class="reclamation-image">
+                                    </a>
+                                {% else %}
+                                    Aucune image
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <div class="button-container">
+            <a href="{{ path('app_reclamation') }}" class="btn-back">Retour au formulaire</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-color: #dc3545;
+            --primary-hover: #c82333;
+            --text-color: #2d2d2d;
+            --text-secondary: #4a4a4a;
+            --background-light: #f8f9fa;
+            --background-lighter: #ffffff;
+            --border-color: #d5d5d5;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .reclamation-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: linear-gradient(145deg, var(--background-lighter), #f5f6f8);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px var(--shadow-color);
+            font-family: var(--font-family);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reclamation-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), transparent);
+        }
+
+        h1 {
+            font-family: var(--font-family);
+            color: var(--text-color);
+            margin: 0 auto 35px;
+            font-size: 30px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1.2px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary-color);
+            width: fit-content;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--primary-hover), transparent);
+        }
+
+        .no-reclamations-message {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .reclamation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-family: var(--font-family);
+        }
+
+        .reclamation-table th,
+        .reclamation-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .reclamation-table th {
+            background: linear-gradient(to bottom, #f1f2f3, #e9ecef);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .reclamation-table td {
+            background: var(--background-lighter);
+        }
+
+        .reclamation-table tr:hover td {
+            background: #f1f2f3;
+        }
+
+        .reclamation-image {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, var(--primary-color), #e4606d);
+            color: #ffffff;
+            padding: 12px 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-family: var(--font-family);
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            letter-spacing: 0.8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, var(--primary-hover), #d44d5a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-back:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+
+        @media screen and (max-width: 768px) {
+            .reclamation-container {
+                margin: 20px;
+                padding: 20px;
+                border-radius: 10px;
+                border-left: 4px solid var(--primary-color);
+            }
+
+            h1 {
+                font-size: 26px;
+                margin-bottom: 25px;
+                padding-bottom: 10px;
+            }
+
+            .reclamation-table th,
+            .reclamation-table td {
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            .reclamation-image {
+                max-width: 40px;
+                max-height: 40px;
+            }
+
+            .button-container {
+                margin-top: 20px;
+            }
+
+            .btn-back {
+                font-size: 14px;
+                padding: 10px 30px;
+                border-radius: 6px;
+                width: 100%;
+            }
+
+            .no-reclamations-message {
+                font-size: 14px;
+                padding: 15px;
+            }
+        }
+    </style>
+{% endblock %}

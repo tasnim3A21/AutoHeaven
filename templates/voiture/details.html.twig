@@ -6,35 +6,45 @@
     <div class="container mt-5">
         <h2>Détails de la Voiture</h2>
 
-        <div class="card" style="width: 18rem;">
-        
-           {% if voiture.image %}
-            <img src="{{ asset('images/' ~ voiture.image) }}" alt="Image de la voiture" style="max-width: 300px;">
-        {% else %}
-            <p>Aucune image disponible</p>
-        {% endif %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    {% if voiture.image %}
+                        <img src="{{ asset('images/' ~ voiture.image) }}" alt="Image de la voiture" class="card-img-top" style="max-width: 100%; height: auto;">
+                    {% else %}
+                        <div class="card-body text-center">
+                            <p>Aucune image disponible</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
 
-            <div class="card-body">
-                <h5 class="card-title">{{ voiture.marque }} - {{ voiture.description }}</h5>
-                <p class="card-text">
-                    <strong>Modèle:</strong> {{ voiture.marque }}<br>
-                    <strong>Prix:</strong> {{ voiture.prix }} €<br>
-                    <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
-                    <strong>Couleur:</strong> {{ voiture.couleur }}<br>
-                    <strong>Disponibilité:</strong> {{ voiture.disponibilite == '1' ? 'Disponible' : 'Indisponible' }}<br>
-                    
-                    <hr>
-                    
-                    <strong>Catégorie:</strong> {{ voiture.id_c.type }}<br>
-                    <strong>Type de carburant:</strong> {{ voiture.id_c.typeCarburant }}<br>
-                    <strong>Type d'utilisation:</strong> {{ voiture.id_c.typeUtilisation }}<br>
-                    <strong>Transmission:</strong> {{ voiture.id_c.transmission }}<br>
-                    <strong>Nombre de portes:</strong> {{ voiture.id_c.nbrPorte }}<br>
-                </p>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ voiture.marque }} - {{ voiture.description }}</h5>
+                        <p class="card-text">
+                            <strong>Modèle:</strong> {{ voiture.marque }}<br>
+                            <strong>Prix:</strong> {{ voiture.prix }} €<br>
+                            <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
+                            <strong>Couleur:</strong> {{ voiture.couleur }}<br>
+                            <strong>Disponibilité:</strong> {{ voiture.disponibilite == 'oui' ? 'Disponible' : 'Indisponible' }}<br>
+                            
+
+                            <strong>Catégorie:</strong> {{ voiture.id_c.type }}<br>
+                            <strong>Type de carburant:</strong> {{ voiture.id_c.typeCarburant }}<br>
+                            <strong>Type d'utilisation:</strong> {{ voiture.id_c.typeUtilisation }}<br>
+                            <strong>Transmission:</strong> {{ voiture.id_c.transmission }}<br>
+                            <strong>Nombre de portes:</strong> {{ voiture.id_c.nbrPorte }}<br>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <a href="{{ path('voiture_edit', { id: voiture.id_v }) }}" class="btn btn-primary mt-3">Modifier</a>
-        <a href="{{ path('app_voiture') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+        <div class="mt-3">
+            <a href="{{ path('voiture_edit', { id: voiture.id_v }) }}" class="btn btn-primary">Modifier</a>
+            <a href="{{ path('app_voiture') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
     </div>
 {% endblock %}

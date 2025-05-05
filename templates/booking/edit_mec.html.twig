@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier Rendez-vous Mécanicien{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid page-header mb-5 p-0" style="background-image: url(img/carousel-bg-1.jpg);">
+    <div class="container-fluid page-header-inner py-5">
+        <div class="container text-center">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">Réservations</h1>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1 class="mb-4">Modifier Ton Rendez-vous Mécanicien</h1>
+
+    {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
+        <div class="mb-3">
+            <label class="form-label">Client</label>
+            <div class="form-control-plaintext">
+                {% if mecanicien.client %}
+                    Client : {{ mecanicien.client.nom }} {{ mecanicien.client.prenom }} (ID: {{ mecanicien.client.id }})
+                {% else %}
+                    Utilisateur non trouvé
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.client, {'attr': {'class': 'd-none'}}) }}
+            </div>
+            {{ form_errors(form.client) }}
+        </div>
+
+        {# Display Mechanic Info (Non-Editable) #}
+        <div class="mb-3">
+            <label class="form-label">Mécanicien</label>
+            <div class="form-control-plaintext">
+                {% if mecanicien.idMec %}
+                    ID Mécanicien: {{ mecanicien.idMec }}
+                {% else %}
+                    Mécanicien non trouvé
+                {% endif %}
+            </div>
+            <div style="display: none;">
+                 {{ form_widget(form.mecanicien, {'attr': {'class': 'd-none'}}) }}
+            </div>
+            {{ form_errors(form.mecanicien) }}
+        </div>
+
+        {# Keep the Date field editable #}
+        <div class="mb-3">
+            {{ form_label(form.date) }}
+            {{ form_widget(form.date) }}
+            {{ form_errors(form.date) }}
+        </div>
+
+        {# Type de service field #}
+        <div class="mb-3">
+            {{ form_label(form.note) }}
+            {{ form_widget(form.note) }}
+            {{ form_errors(form.note) }}
+        </div>
+
+        {# Render other form fields if any #}
+        {{ form_rest(form) }} 
+
+        <button type="submit" class="btn btn-primary mt-3">Enregistrer les modifications</button>
+    {{ form_end(form) }}
+    <a href="{{ path('app_booking') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+</div>
+{% endblock %}

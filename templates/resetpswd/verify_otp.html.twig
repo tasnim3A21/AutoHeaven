@@ -1,0 +1,52 @@
+{% extends 'base_login.html.twig' %}
+
+{% block title %}Verify OTP{% endblock %}
+
+{% block body %}
+  <div class="wrapper">
+    {{ form_start(form, {'action': path('app_verify_otp', {'email': email}), 'method': 'POST'}) }}
+      <h2>Verify OTP</h2>
+
+      <!-- Flash Message -->
+      {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <!-- Error Message -->
+      {% if error %}
+        <div class="alert alert-danger">
+          {{ error }}
+        </div>
+      {% endif %}
+
+      <!-- OTP Field -->
+      <div class="input-field">
+        {{ form_widget(form.otp, {'attr': {'required': 'required', 'placeholder': ' '}}) }}
+        <label>Enter your OTP</label>
+      </div>
+
+      <button type="submit">Verify</button>
+
+      <div class="links">
+        <p>Back to <a href="{{ path('app_password') }}">Forgot Password</a></p>
+        <p>Remembered your password? <a href="{{ path('app_login') }}">Log In</a></p>
+      </div>
+    {{ form_end(form) }}
+  </div>
+
+  <style>
+    .links {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .links a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+{% endblock %}

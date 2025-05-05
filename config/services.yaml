@@ -1,18 +1,28 @@
+
 # This file is the entry point to configure your own services.  
 # Files in the packages/ subdirectory configure your dependencies.
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+
 parameters:
     profile_directory: '%kernel.project_dir%/public/uploads'
+
 
     voiture_images_directory: '%kernel.project_dir%/public/uploads/voitures'
    
     gemini_api_key: '%env(GEMINI_API_KEY)%'
 
-
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    google_recaptcha_secret_key: '%env(GOOGLE_RECAPTCHA_SECRET_KEY)%'
+    twilio_account_sid: '%env(TWILIO_ACCOUNT_SID)%'
+    twilio_auth_token: '%env(TWILIO_AUTH_TOKEN)%'
+    twilio_phone_number: '%env(TWILIO_PHONE_NUMBER)%'
+    currencyfreaks_api_key: '%env(CURRENCYFREAKS_API_KEY)%'
+    api_ninjas_api_key: '%env(APININJAS_API_KEY)%'
 
 services:
+    # default configuration for services in this file
 
     _defaults:
         autowire: true
@@ -25,15 +35,53 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+
+    # Override FOSUserBundle SecurityController
+    fos_user.security.controller:
+        class: App\Controller\SecurityController
+        arguments: ['@security.authentication_utils']
+
+    App\Service\ChatbotService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%' 
+
+    App\Service\GeminiTranslationService:
+        arguments:
+            $apiKey: '%env(GEMINI_API_KEY)%'
+
+    App\Service\CurrencyConversionService:
+        arguments:
+            $apiKey: '%currencyfreaks_api_key%'
+
+    App\Controller\CurrencyConversionController:
+        arguments:
+            $currencyfreaksApiKey: '%currencyfreaks_api_key%'
+
+    App\Service\CarDetailsService:
+        arguments:
+            $apiKey: '%api_ninjas_api_key%'
+
+    App\Controller\CarDetailsController:
+        arguments:
+            $apiNinjasApiKey: '%api_ninjas_api_key%'
+
     App\EventListener\StockDepletedListener:
         tags:
             - { name: kernel.event_listener, event: stock.depleted, method: onStockDepleted }
-    # Custom AuthenticationSuccessHandler service definition
-    App\Security\AuthenticationSuccessHandler:
-        arguments:
-            $router: '@router'
 
-   
+
+    # Custom AuthenticationSuccessHandler service definition
+    App\Service\MailjetService:
+        arguments:
+            $apiKey: '%env(MAILJET_API_KEY)%'
+            $secretKey: '%env(MAILJET_SECRET_KEY)%'
+
+    # Custom LoginFormAuthenticator for reCAPTCHA validation
+    App\Security\LoginFormAuthenticator:
+        arguments:
+            - '@router'
+
+
     # config/services.yaml
 
     App\Service\NotificationService:
@@ -59,10 +107,35 @@ services:
             $pusherKey: 'a57746eaf2c89e4593e9'
             $pusherSecret: 'dacc11e11452323c90b9'
      # Twilio Client service
-   
+
     Symfony\Component\Finder\Finder: ~
     App\Service\StripeService:
         arguments:
             $privateKey: 'sk_test_51QwhI1H4NaQY1zAhv8ezh7HtXMNMTfgMKcGiZhkUjzguNONfGJJXC0XyAgBmEf60fx3Afuq7C1rPa1yZl8AqaaM900gbo7OuIk'
             $currency: 'eur'
-    
+
+
+    twilio.client:
+        class: Twilio\Rest\Client
+        arguments:
+            - '%env(TWILIO_ACCOUNT_SID)%'
+            - '%env(TWILIO_AUTH_TOKEN)%'
+
+
+    # Social User Provider for HWIOAuthBundle
+    app.social_user_provider:
+        class: App\Security\SocialUserProvider
+        arguments: ['@App\Repository\UserRepository']
+
+    # OAuth Success Listener for custom redirects after social login
+    app.oauth_success_listener:
+        class: App\EventListener\OAuthSuccessListener
+        arguments: ['@router']
+        tags:
+            - { name: kernel.event_subscriber }
+
+    App\Controller\CommandeController:
+        arguments:
+            $twilioClient: '@twilio.client'
+
+

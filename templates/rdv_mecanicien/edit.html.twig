@@ -4,22 +4,21 @@
 
 {% block content %}
 <div class="container">
-    <h1>Edit Réservation</h1>
+    <h1>Modifier Réservation</h1>
 
     {{ form_start(form, {'attr': {'class': 'mt-4', 'novalidate': 'novalidate'}}) }}
         {{ form_widget(form._token) }}
-        
         <div class="mb-3">
-            {{ form_label(form.id_u) }}
-            {{ form_widget(form.id_u) }}
-            {{ form_errors(form.id_u) }}
+            <label class="form-label">Client</label>
+            <input type="text" class="form-control" value="{{ reservation.client.nom }} {{ reservation.client.prenom }} ({{ reservation.client.id }})" readonly>
+            {{ form_widget(form.client, {'attr': {'class': 'd-none'}}) }}
         </div>
-        
+
         <div class="mb-3">
-            {{ form_label(form.id_mec) }}
-            {{ form_widget(form.id_mec) }}
-            {{ form_errors(form.id_mec) }}
-        </div>
+            <label class="form-label">Mécanicien</label>
+            <input type="text" class="form-control" value="{{ reservation.mecanicien.nom }} {{ reservation.mecanicien.prenom }} ({{ reservation.mecanicien.id }})" readonly>
+            {{ form_widget(form.mecanicien, {'attr': {'class': 'd-none'}}) }}
+        </div>        
         
         <div class="mb-3">
             {{ form_label(form.adresse) }}
@@ -38,10 +37,10 @@
             {{ form_widget(form.date) }}
             {{ form_errors(form.date) }}
         </div>
-
-        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        
+        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
     {{ form_end(form, {'render_rest': false}) }}
 
-    <a href="{{ path('app_rdv_mecanicien') }}" class="btn btn-secondary mt-3">Back to list</a>
+    <a href="{{ path('app_rdv_mecanicien') }}" class="btn btn-secondary mt-3">Annuler</a>
 </div>
 {% endblock %}
