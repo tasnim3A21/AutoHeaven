@@ -1,5 +1,3 @@
-{# templates/base.html.twig #}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,6 +133,53 @@
             font-size: 0.7rem;
             font-weight: bold;
         }
+
+        /* Styles pour la popup de notification */
+        .stock-alert-popup {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            width: 300px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: none;
+            padding: 1rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .stock-alert-popup.show {
+            display: block;
+        }
+
+        .stock-alert-popup p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .stock-alert-popup .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
     {% endblock %}
     {% block fontjs %}
@@ -178,6 +223,11 @@
                                     {% set notifications = render(controller('App\\Controller\\NotificationController::dropdown'))|trim %}
                                     <span id="unread-count-container"></span> {# Placeholder for badge #}
                                 </div>
+                                <!-- Popup pour alerte de stock épuisé -->
+                                <div class="stock-alert-popup" id="stock-alert-popup">
+                                    <a href="#" class="close-popup" id="close-popup">×</a>
+                                    <p id="stock-alert-message"></p>
+                                </div>
                             </div>
                             <div class="notification-dropdown" id="notification-dropdown">
                                 {{ notifications|raw }}
@@ -186,251 +236,334 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Sidebar -->
-        <div id="app-sidepanel" class="app-sidepanel">
-            <div id="sidepanel-drop" class="sidepanel-drop"></div>
-            <div class="sidepanel-inner d-flex flex-column">
-                <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">×</a>
-                <div class="app-branding">
-                    <a class="app-logo" href="#">
-                        <img class="logo-icon me-2" src="{{ asset('images/logo.png') }}" alt="logo">
-                        <span class="logo-text">AutoHeaven</span>
+            <!-- Sidebar -->
+            <div id="app-sidepanel" class="app-sidepanel">
+                <div id="sidepanel-drop" class="sidepanel-drop"></div>
+                <div class="sidepanel-inner d-flex flex-column">
+                    <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">×</a>
+                    <div class="app-branding">
+                        <a class="app-logo" href="#">
+                            <img class="logo-icon me-2" src="{{ asset('images/logo.png') }}" alt="logo">
+                            <span class="logo-text">AutoHeaven</span>
+                        </a>
+                    </div>
+
+                    <!-- Bloc pour personnaliser le sidebar -->
+                    {% block sidebar %}
+        <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+            <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+                <li class="nav-item">
+                   <a class="nav-link {% if app.request.attributes.get('_route') == 'app_acceuil' %}active{% endif %}" href="{{ path('app_acceuil') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-home"></i>
+                        </span>
+                        <span class="nav-link-text">Accueil</span>
                     </a>
-                </div>
-
-                <!-- Bloc pour personnaliser le sidebar -->
-                {% block sidebar %}
-    <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
-        <ul class="app-menu list-unstyled accordion" id="menu-accordion">
-            <li class="nav-item">
-               <a class="nav-link {% if app.request.attributes.get('_route') == 'app_acceuil' %}active{% endif %}" href="{{ path('app_acceuil') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-home"></i>
-                    </span>
-                    <span class="nav-link-text">Accueil</span>
-                </a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link {% if app.request.attributes.get('_route') == 'app_client' %}active{% endif %}" href="{{ path('app_client') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-users"></i>
-                    </span>
-                    <span class="nav-link-text">Clients</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_mecanicien' %}active{% endif %}" href="{{ path('app_mecanicien') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-user-cog"></i>
-                    </span>
-                    <span class="nav-link-text">Mécaniciens</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_voiture' %}active{% endif %}" href="{{ path('app_voiture') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-car"></i>
-                    </span>
-                    <span class="nav-link-text">Voitures</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_categorie' %}active{% endif %}" href="{{ path('app_categorie') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-list"></i>
-                    </span>
-                    <span class="nav-link-text">Catégories</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_offre' %}active{% endif %}" href="{{ path('app_offre') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-tag"></i>
-                    </span>
-                    <span class="nav-link-text">Offres</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_equipements' %}active{% endif %}" href="{{ path('app_equipements') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-tools"></i>
-                    </span>
-                    <span class="nav-link-text">Équipements</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reclamation_list' %}active{% endif %}" href="{{ path('app_reclamation_list') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </span>
-                    <span class="nav-link-text">Réclamations</span>
-                </a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link {% if app.request.attributes.get('_route') == 'app_commande' %}active{% endif %}" href="{{ path('app_commande') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </span>
-                    <span class="nav-link-text">Commandes</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_camion_remorquage' %}active{% endif %}" href="{{ path('app_camion_remorquage') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-truck"></i>
-                    </span>
-                    <span class="nav-link-text">Camions remorquage</span>
-                </a>
-            </li>
-            <li class="nav-item">
-               <a class="nav-link {% if app.request.attributes.get('_route') == 'app_rdv_mecanicien' %}active{% endif %}" href="{{ path('app_rdv_mecanicien') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </span>
-                    <span class="nav-link-text">RDV mécaniciens</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_remorquage' %}active{% endif %}" href="{{ path('app_reservation_remorquage') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </span>
-                    <span class="nav-link-text">Réservation Remorquage</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_test_drive' %}active{% endif %}" href="{{ path('app_reservation_test_drive') }}">
-                    <span class="nav-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </span>
-                    <span class="nav-link-text">Réservation TestDrive</span>
-                </a>
-            </li>
-           <li class="nav-item">
-                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_statistique' %}active{% endif %}" href="{{ path('app_statistique') }}">
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link {% if app.request.attributes.get('_route') == 'app_client' %}active{% endif %}" href="{{ path('app_client') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        <span class="nav-link-text">Clients</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_mecanicien' %}active{% endif %}" href="{{ path('app_mecanicien') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </span>
+                        <span class="nav-link-text">Mécaniciens</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_voiture' %}active{% endif %}" href="{{ path('app_voiture') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-car"></i>
+                        </span>
+                        <span class="nav-link-text">Voitures</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_categorie' %}active{% endif %}" href="{{ path('app_categorie') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-list"></i>
+                        </span>
+                        <span class="nav-link-text">Catégories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_offre' %}active{% endif %}" href="{{ path('app_offre') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-tag"></i>
+                        </span>
+                        <span class="nav-link-text">Offres</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_equipements' %}active{% endif %}" href="{{ path('app_equipements') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-tools"></i>
+                        </span>
+                        <span class="nav-link-text">Équipements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reclamation_list' %}active{% endif %}" href="{{ path('app_reclamation_list') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </span>
+                        <span class="nav-link-text">Réclamations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link {% if app.request.attributes.get('_route') == 'app_commande' %}active{% endif %}" href="{{ path('app_commande') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </span>
+                        <span class="nav-link-text">Commandes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_camion_remorquage' %}active{% endif %}" href="{{ path('app_camion_remorquage') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-truck"></i>
+                        </span>
+                        <span class="nav-link-text">Camions remorquage</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link {% if app.request.attributes.get('_route') == 'app_rdv_mecanicien' %}active{% endif %}" href="{{ path('app_rdv_mecanicien') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </span>
+                        <span class="nav-link-text">RDV mécaniciens</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_remorquage' %}active{% endif %}" href="{{ path('app_reservation_remorquage') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </span>
+                        <span class="nav-link-text">Réservation Remorquage</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_reservation_test_drive' %}active{% endif %}" href="{{ path('app_reservation_test_drive') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </span>
+                        <span class="nav-link-text">Réservation TestDrive</span>
+                    </a>
+                </li>
+               <li class="nav-item">
+                    <a class="nav-link {% if app.request.attributes.get('_route') == 'app_statistique' %}active{% endif %}" href="{{ path('app_statistique') }}">
+                        <span class="nav-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </span>
+                        <span class="nav-link-text">Statistique Avis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link {% if app.request.attributes.get('_route') == 'app_avis_liste' %}active{% endif %}" href="{{ path('app_avis_liste') }}">
                     <span class="nav-icon">
                         <i class="fas fa-chart-bar"></i>
                     </span>
-                    <span class="nav-link-text">Statistique Avis</span>
+                    <span class="nav-link-text">Liste des avis</span>
                 </a>
             </li>
-        </ul>
-    </nav>
-<div class="app-sidepanel-footer"> 
-    <nav class="app-nav app-nav-footer">
-        <ul class="app-menu footer-menu list-unstyled">
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
-                    <span class="nav-icon">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </span>
-                    <span class="nav-link-text">Logout</span>
-                </a>
-                <form id="logout-form" action="/logout" method="post" style="display: none;"></form>
-            </li>
-        </ul>
-    </nav>
-</div>
-{% endblock %}
-            </div>
-        </div>
-    </header>
-
-    <div class="app-wrapper">
-        <div class="app-content pt-3 p-md-3 p-lg-4">
-            <div class="container-xl">
-                {% block content %}{% endblock %}
-            </div>
-        </div>
+            </ul>
+        </nav>
+    <div class="app-sidepanel-footer"> 
+        <nav class="app-nav app-nav-footer">
+            <ul class="app-menu footer-menu list-unstyled">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                        <span class="nav-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </span>
+                        <span class="nav-link-text">Logout</span>
+                    </a>
+                    <form id="logout-form" action="/logout" method="post" style="display: none;"></form>
+                </li>
+            </ul>
+        </nav>
     </div>
+    {% endblock %}
+                </div>
+            </div>
+        </header>
 
-    <!-- Add Bootstrap JS (and Popper.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
-<script>
-    const pusher = new Pusher('a57746eaf2c89e4593e9', {
-        cluster: 'eu',
-        encrypted: true
-    });
-    const channel = pusher.subscribe('stock-channel');
-</script>
+        <div class="app-wrapper">
+            <div class="app-content pt-3 p-md-3 p-lg-4">
+                <div class="container-xl">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Bootstrap JS (and Popper.js) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <script>
-        // Toggle notification dropdown
-        const bellIcon = document.getElementById('notification-bell');
-        const dropdown = document.getElementById('notification-dropdown');
-        bellIcon.addEventListener('click', () => {
-            dropdown.classList.toggle('show');
+        const pusher = new Pusher('a57746eaf2c89e4593e9', {
+            cluster: 'eu',
+            encrypted: true
         });
+        const channel = pusher.subscribe('stock-channel');
+    </script>
+        <script>
+            // Toggle notification dropdown
+            const bellIcon = document.getElementById('notification-bell');
+            const dropdown = document.getElementById('notification-dropdown');
+            bellIcon.addEventListener('click', () => {
+                dropdown.classList.toggle('show');
+            });
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!bellIcon.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-
-        // Set initial unread count
-        document.addEventListener('DOMContentLoaded', () => {
-            const unreadCount = document.getElementById('unreadCount')?.value;
-            if (unreadCount && parseInt(unreadCount) > 0) {
-                document.getElementById('unread-count-container').innerHTML = `<span class="badge" id="unread-count">${unreadCount}</span>`;
-            }
-        });
-
-        // Mark all as read
-        document.getElementById('mark-all-read').addEventListener('click', (e) => {
-            e.preventDefault();
-            fetch('{{ path('app_notifications_mark_all_read') }}', {
-                method: 'POST'
-            }).then(response => response.json()).then(data => {
-                if (data.status === 'success') {
-                    const notifications = document.querySelectorAll('.notification.unread');
-                    notifications.forEach(notification => {
-                        notification.classList.remove('unread');
-                        notification.classList.add('read');
-                    });
-                    const badge = document.getElementById('unread-count');
-                    if (badge) {
-                        badge.remove();
-                    }
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!bellIcon.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
                 }
             });
-        });
 
-        // Clear all notifications
-        document.getElementById('clear-all').addEventListener('click', (e) => {
-            e.preventDefault();
-            fetch('{{ path('app_notifications_clear_all') }}', {
-                method: 'POST'
-            }).then(response => response.json()).then(data => {
-                if (data.status === 'success') {
-                    const notifications = document.querySelectorAll('.notification');
-                    notifications.forEach(notification => notification.remove());
-                    const badge = document.getElementById('unread-count');
-                    if (badge) {
-                        badge.remove();
-                    }
+            // Set initial unread count
+            document.addEventListener('DOMContentLoaded', () => {
+                const unreadCount = document.getElementById('unreadCount')?.value;
+                if (unreadCount && parseInt(unreadCount) > 0) {
+                    document.getElementById('unread-count-container').innerHTML = `<span class="badge" id="unread-count">${unreadCount}</span>`;
                 }
+                // Déclencher l'événement pour charger les alertes
+                const event = new CustomEvent('loadStockAlerts');
+                document.dispatchEvent(event);
             });
-        });
 
-        // Real-time notifications
-        if (typeof channel !== 'undefined') {
-            channel.bind('stock-depleted', function(data) {
-                // Save the notification to the database
-                fetch('{{ path('app_notifications_save') }}', {
-                    method: 'POST',
+            // Mark all as read
+            document.getElementById('mark-all-read').addEventListener('click', (e) => {
+                e.preventDefault();
+                fetch('{{ path('app_notifications_mark_all_read') }}', {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 'success') {
+                        const notifications = document.querySelectorAll('.notification.unread');
+                        notifications.forEach(notification => {
+                            notification.classList.remove('unread');
+                            notification.classList.add('read');
+                        });
+                        const badge = document.getElementById('unread-count');
+                        if (badge) {
+                            badge.remove();
+                        }
+                    }
+                });
+            });
+
+            // Clear all notifications
+            document.getElementById('clear-all').addEventListener('click', (e) => {
+                e.preventDefault();
+                fetch('{{ path('app_notifications_clear_all') }}', {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 'success') {
+                        const notifications = document.querySelectorAll('.notification');
+                        notifications.forEach(notification => notification.remove());
+                        const badge = document.getElementById('unread-count');
+                        if (badge) {
+                            badge.remove();
+                        }
+                    }
+                });
+            });
+
+            // Fonction pour marquer une notification comme lue
+            function markNotificationAsRead(notificationId) {
+                fetch('{{ path('app_notifications_mark_as_read', {'id': 'NOTIFICATION_ID'}) }}'.replace('NOTIFICATION_ID', notificationId), {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 'success') {
+                        const notification = document.querySelector(`.notification[data-id="${notificationId}"]`);
+                        if (notification) {
+                            notification.classList.remove('unread');
+                            notification.classList.add('read');
+                        }
+                        const badge = document.getElementById('unread-count');
+                        if (badge) {
+                            const newCount = parseInt(badge.textContent) - 1;
+                            if (newCount > 0) {
+                                badge.textContent = newCount;
+                            } else {
+                                badge.remove();
+                            }
+                        }
+                    }
+                }).catch(error => {
+                    console.error('Erreur lors du marquage comme lu:', error);
+                });
+            }
+
+            // Fonction pour afficher une alerte
+            function showStockAlert(message, notificationId) {
+                // Vérifier si la popup est déjà affichée pour cette notification
+                const popup = document.getElementById('stock-alert-popup');
+                if (popup.getAttribute('data-notification-id') === notificationId) {
+                    return; // Ne pas réafficher la popup
+                }
+
+                const popupMessage = document.getElementById('stock-alert-message');
+                popupMessage.textContent = message;
+                popup.setAttribute('data-notification-id', notificationId);
+                popup.classList.add('show');
+
+                // Marquer la notification comme lue après affichage de la popup
+                setTimeout(() => {
+                    markNotificationAsRead(notificationId);
+                }, 1000); // Attendre 1 seconde pour permettre l'affichage
+            }
+
+            // Écouteur pour charger les alertes au démarrage
+            document.addEventListener('loadStockAlerts', () => {
+                fetch('{{ path('app_notifications_unread_stock_alerts') }}', {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: data.message })
-                }).then(response => response.json()).then(result => {
-                    if (result.status === 'success') {
-                        const container = document.getElementById('realtime-notifications-today');
+                    }
+                }).then(response => response.json()).then(data => {
+                    const alerts = data.alerts || [];
+                    if (alerts.length > 0) {
+                        // Afficher la dernière alerte non lue
+                        const latestAlert = alerts[alerts.length - 1];
+                        showStockAlert(latestAlert.message, latestAlert.id);
+                    }
+                }).catch(error => {
+                    console.error('Erreur lors du chargement des alertes:', error);
+                });
+            });
+
+            // Fermer la popup manuellement
+            document.getElementById('close-popup').addEventListener('click', (e) => {
+                e.preventDefault();
+                const popup = document.getElementById('stock-alert-popup');
+                popup.classList.remove('show');
+                // Déclencher à nouveau l'événement pour afficher la prochaine alerte
+                const event = new CustomEvent('loadStockAlerts');
+                document.dispatchEvent(event);
+            });
+
+            // Real-time notifications
+            if (typeof channel !== 'undefined') {
+                channel.bind('stock-depleted', function(data) {
+                    // Vérifier si la notification existe déjà dans le dropdown
+                    const existingNotification = document.querySelector(`.notification[data-id="${data.id}"]`);
+                    if (existingNotification) {
+                        return; // Ne pas ajouter la notification si elle existe déjà
+                    }
+
+                    // Ajouter la notification au dropdown
+                    const container = document.getElementById('realtime-notifications-today');
+                    if (container) {
                         container.innerHTML += `
-                            <div class="notification unread" data-id="${result.id}">
+                            <div class="notification unread" data-id="${data.id}">
                                 <img src="{{ asset('images/notification-icon.png') }}" alt="Icon">
                                 <div class="notification-content">
                                     <p>${data.message}</p>
@@ -438,19 +571,20 @@
                                 </div>
                             </div>
                         `;
-                        // Update badge count
-                        const badge = document.getElementById('unread-count');
-                        if (badge) {
-                            badge.textContent = parseInt(badge.textContent) + 1;
-                        } else {
-                            const unreadCountContainer = document.getElementById('unread-count-container');
-                            unreadCountContainer.innerHTML = '<span class="badge" id="unread-count">1</span>';
-                        }
                     }
+                    // Mettre à jour le badge
+                    const badge = document.getElementById('unread-count');
+                    if (badge) {
+                        badge.textContent = parseInt(badge.textContent) + 1;
+                    } else {
+                        const unreadCountContainer = document.getElementById('unread-count-container');
+                        unreadCountContainer.innerHTML = '<span class="badge" id="unread-count">1</span>';
+                    }
+                    // Afficher la popup
+                    showStockAlert(data.message, data.id);
                 });
-            });
-        }
-    </script>
+            }
+        </script>
 {% endblock %}
 </body>
 </html>

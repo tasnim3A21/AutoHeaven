@@ -25,12 +25,7 @@ use OpenSpout\Common\Entity\Style\Color; // Added for color definitions
 
 final class CommandeController extends AbstractController
 {
-    private TwilioClient $twilioClient;
-
-    public function __construct(TwilioClient $twilioClient)
-    {
-        $this->twilioClient = $twilioClient;
-    }
+   
 
     #[Route('/commande', name: 'app_commande')]
     public function index(
@@ -143,20 +138,7 @@ final class CommandeController extends AbstractController
         $fromNumber = '+17155641167';
         $messageBody = 'Votre commande est traitée. Vous le recevrez dans un délai de 24 heures';
     
-        try {
-            $message = $this->twilioClient->messages->create(
-                $toNumber,
-                [
-                    'from' => $fromNumber,
-                    'body' => $messageBody
-                ]
-            );
-            
-            $this->addFlash('success', 'SMS envoyé avec SID: ' . $message->sid);
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Échec d\'envoi du SMS: ' . $e->getMessage());
-        }
-    
+       
         return $this->redirectToRoute('app_commande');
     }
    
