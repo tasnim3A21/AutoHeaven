@@ -85,19 +85,20 @@ php bin/console doctrine:migrations:migrate
 symfony server:start
 # ou
 php -S localhost:8000 -t public
+```
 
 
 ---
 
 ## 📜 Licence
 
-Ce projet est sous licence **MIT**
+Ce projet est sous licence **MIT**. Pour plus de détails, consultez le fichier [LICENSE](LICENSE).
+
+![Licence MIT](images/licence_mit.png)
 
 ---
 
 # 🚗 AutoService - Plateforme de vente et services automobiles  
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-
 
 
