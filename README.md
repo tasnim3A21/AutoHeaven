@@ -92,9 +92,7 @@ php -S localhost:8000 -t public
 
 ## 📜 Licence
 
-Ce projet est sous licence **MIT**. Pour plus de détails, consultez le fichier [LICENSE](LICENSE).
-
-![Licence MIT](images/licence_mit.png)
+Ce projet est sous licence **MIT**. 
 
 ---
 
