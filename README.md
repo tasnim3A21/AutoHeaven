@@ -33,7 +33,7 @@ Ce projet vise à simplifier l’expérience client en centralisant plusieurs se
 - MySQL
 - Twig
 - Doctrine ORM
-- Bootstrap / Tailwind CSS
+- Bootstrap / CSS / JavaScript
 - API REST
 - Stripe 
 ---
