@@ -20,7 +20,7 @@ Ce projet vise à simplifier l’expérience client en centralisant plusieurs se
 - 🚘 Consultation, recherche et réservation de véhicules.
 - 🧪 Réservation d’essai de véhicule.
 - 🚛 Demande de remorquage.
-- 👨‍💼 Espace administrateur pour la gestion complète (voitures, équipements, réservations).
+- 👨‍💼 Espace administrateur pour la gestion complète (voitures, équipements, réservations , clients , mécaniciens ,reclamations).
 - 🔐 Authentification et rôles (admin/client).
 - 📝 Ajout de réclamations par les utilisateurs.
 - 🌟 Ajout d’avis et de notes pour les voitures.
