@@ -3,7 +3,7 @@
 ## 📌 Présentation
 
 AutoService est une application web développée avec Symfony qui permet :
-- La **vente de voitures** neuves et d'occasion.
+- La **vente de voitures** neuves .
 - La **vente d’équipements** automobiles.
 - La **réservation de mécaniciens** pour les réparations.
 - La **réservation de services de remorquage**.
@@ -22,32 +22,29 @@ Ce projet vise à simplifier l’expérience client en centralisant plusieurs se
 - 🚛 Demande de remorquage.
 - 👨‍💼 Espace administrateur pour la gestion complète (voitures, équipements, réservations).
 - 🔐 Authentification et rôles (admin/client).
-- 📱 Compatible mobile.
+- 📝 Ajout de réclamations par les utilisateurs.
+- 🌟 Ajout d’avis et de notes pour les voitures.
 
 ---
 
 ## 🧰 Technologies utilisées
 
-- PHP 8.x / Symfony 6.x
+- PHP 8.1.25 / Symfony 6.4
 - MySQL
 - Twig
 - Doctrine ORM
-- Bootstrap / Tailwind CSS (si utilisé)
-- Webpack Encore (si utilisé)
-- API REST (si applicable)
-- Docker (si utilisé pour l’environnement)
-- Stripe (si paiement en ligne est intégré)
-
+- Bootstrap / Tailwind CSS
+- API REST
+- Stripe 
 ---
 
 ## ⚙️ Prérequis
 
 - PHP >= 8.1
 - Composer
-- MySQL ou MariaDB
-- Node.js & npm (si tu utilises Webpack Encore)
-- Symfony CLI (optionnel mais recommandé)
-- Docker (si utilisé)
+- MySQL
+- Symfony CLI 
+
 
 ---
 
@@ -55,31 +52,44 @@ Ce projet vise à simplifier l’expérience client en centralisant plusieurs se
 
 ```bash
 # 1. Cloner le projet
-git clone https://github.com/ton-utilisateur/auto-service.git
-cd auto-service
+git clone https://github.com/tasnim3A21/AutoHeaven.git
+cd AutoHeaven.git
 
-# 2. Installer les dépendances PHP
+# Ajouter les dépendances nécessaires au projet
+composer require pusher/pusher-php-server 
+composer require knplabs/knp-paginator-bundle
+composer require stripe/stripe-php
+composer require twilio/sdk    
+composer require beberlei/doctrineextensions
+composer require symfony/http-client
+composer require dompdf/dompdf
+composer require php-ai/php-ml 
+composer require symfony/mercure-bundle
+composer require openspout/openspout
+composer require hwi/oauth-bundle 
+
+# Ensuite, installer toutes les dépendances
 composer install
+
 
 # 3. Copier et configurer les variables d’environnement
 cp .env .env.local
-# Modifier DB_URL, MAILER_DSN, STRIPE_SECRET_KEY, etc. dans .env.local
+# Modifier DB_URL, MAILER_DSN, STRIPE_SECRET_KEY,GEMINI_API_KEY,GOOGLE_RECAPTCHA_SECRET_KEY etc. dans .env.local
 
 # 4. Créer la base de données et exécuter les migrations
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 
-# 5. (Optionnel) Charger des données fictives
-php bin/console doctrine:fixtures:load
 
-# 6. Installer les dépendances front (si applicable)
-npm install
-npm run dev
-
-# 7. Démarrer le serveur
+# 6. Démarrer le serveur
 symfony server:start
 # ou
 php -S localhost:8000 -t public
+
+
+# 🚗 AutoService - Plateforme de vente et services automobiles  
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 
 
 
