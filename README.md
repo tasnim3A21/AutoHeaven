@@ -87,6 +87,14 @@ symfony server:start
 php -S localhost:8000 -t public
 
 
+---
+
+## 📜 Licence
+
+Ce projet est sous licence **MIT**
+
+---
+
 # 🚗 AutoService - Plateforme de vente et services automobiles  
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
