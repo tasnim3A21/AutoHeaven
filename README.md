@@ -55,7 +55,7 @@ Ce projet vise à simplifier l’expérience client en centralisant plusieurs se
 git clone https://github.com/tasnim3A21/AutoHeaven.git
 cd AutoHeaven.git
 
-# Ajouter les dépendances nécessaires au projet
+# 2. Ajouter les dépendances nécessaires au projet
 composer require pusher/pusher-php-server 
 composer require knplabs/knp-paginator-bundle
 composer require stripe/stripe-php
@@ -68,15 +68,15 @@ composer require symfony/mercure-bundle
 composer require openspout/openspout
 composer require hwi/oauth-bundle 
 
-# Ensuite, installer toutes les dépendances
+# 3. Ensuite, installer toutes les dépendances
 composer install
 
 
-# 3. Copier et configurer les variables d’environnement
+# 4. Copier et configurer les variables d’environnement
 cp .env .env.local
 # Modifier DB_URL, MAILER_DSN, STRIPE_SECRET_KEY,GEMINI_API_KEY,GOOGLE_RECAPTCHA_SECRET_KEY etc. dans .env.local
 
-# 4. Créer la base de données et exécuter les migrations
+# 5. Créer la base de données et exécuter les migrations
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 
