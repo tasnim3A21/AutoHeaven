@@ -3,82 +3,74 @@
 {% block title %}Nos Voitures{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Découvrez Nos Voitures</h1>
+  <h1 class="mb-4">Découvrez Nos Voitures</h1>
 
-    <div class="text-end mb-3">
-        <a href="{{ path('chatbot') }}" class="btn btn-primary">
-            <i class="bi bi-chat-dots"></i> Chat avec le Bot
-        </a>
-    </div>
+  <div class="text-end mb-3">
+    <a href="{{ path('chatbot') }}" class="btn btn-primary"><i class="bi bi-chat-dots"></i>Chat avec le Bot</a>
+  </div>
 
-    <div class="row">
-        {% for voiture in voitures %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if voiture.image %}
-                        <img src="{{ asset('uploads/voitures/' ~ voiture.image) }}" class="card-img-top" alt="Image de {{ voiture.marque }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ voiture.marque }}</h5>
-                        <p class="card-text">
-                            <strong>Couleur:</strong> {{ voiture.couleur }}<br>
-                            <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
-                            <strong>Prix:</strong> {{ voiture.prix }} TND<br>
-                            <strong>Disponibilité:</strong> {{ voiture.disponibilite }}
-                        </p>
-                    </div>
-                    <div class="card-footer text-center">
-    <a href="{{ path('car_details', { id: voiture.id_v }) }}" class="btn btn-outline-primary">Voir Détails</a>
-    <a href="{{ path('currency_conversion', { amount: voiture.prix }) }}" class="btn btn-outline-success">Convertir le Prix</a>
-    <a href="{{ path('car_details_index', { make: voiture.marque, model: '' }) }}" class="btn btn-outline-info">Infos Complètes</a>
-    <a href="#" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#reservationModal{{ voiture.id_v }}">Reserver</a>
-    
-</div>
-                </div>
-                <!-- Reservation Modal -->
-                <div class="modal fade" id="reservationModal{{ voiture.id_v }}" tabindex="-1" aria-labelledby="reservationModalLabel{{ voiture.id_v }}" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="reservationModalLabel{{ voiture.id_v }}">Reservation Form</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      {% if app.user %}
-                        <form method="post" action="{{ path('car_reservation', { id: voiture.id_v, user: app.user.id }) }}">
-                          <input type="hidden" name="id_v" value="{{ voiture.id_v }}">
-                          <input type="hidden" name="client_id" value="{{ app.user.id }}">
-                          <div class="modal-body">
-                            <div class="mb-3">
-                              <label class="form-label">Véhicule</label>
-                              <input type="text" class="form-control" value="{{ voiture.marque }} ID: {{ voiture.id_v }}" readonly>
-                              <input type="hidden" name="id_v" value="{{ voiture.id_v }}">
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Client</label>
-                              <input type="text" class="form-control" value="{{ app.user.username }} ID: {{ app.user.id }}" readonly>
-                              <input type="hidden" name="client_id" value="{{ app.user.id }}">
-                            </div>
-                            <div class="mb-3">
-                              <label class="form-label">Date de réservation</label>
-                              <input type="date" class="form-control" name="reservation_date" required>
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Réserver</button>
-                          </div>
-                        {% else %}
-                          <div class="alert alert-warning">You must be logged in to reserve a car.</div>
-                        {% endif %}
-                      </form>
-                    </div>
+  <div class="row">
+    {% for voiture in voitures %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        {% if voiture.image %}
+        <img src="{{ asset('uploads/voitures/' ~ voiture.image) }}" class="card-img-top" alt="Image de {{ voiture.marque }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ voiture.marque }}</h5>
+          <p class="card-text">
+            <strong>Couleur:</strong> {{ voiture.couleur }}<br>
+            <strong>Kilométrage:</strong> {{ voiture.kilometrage }} km<br>
+            <strong>Prix:</strong> {{ voiture.prix }} TND<br>
+            <strong>Disponibilité:</strong> {{ voiture.disponibilite }}
+          </p>
+        </div>
+        <div class="card-footer text-center">
+          <a href="{{ path('car_details', { id: voiture.id_v }) }}" class="btn btn-outline-primary">Voir Détails</a>
+          <a href="{{ path('currency_conversion', { amount: voiture.prix }) }}" class="btn btn-outline-success">Convertir le Prix</a>
+          <a href="{{ path('car_details_index', { make: voiture.marque, model: '' }) }}" class="btn btn-outline-info">Infos Complètes</a>
+          {% if voiture.disponibilite == 'oui' %}
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reserverModal{{ voiture.id_v }}">
+              Réserver
+            </button>
+          {% endif %}
+        </div>
+
+        {% if voiture.disponibilite == 'oui' %}
+        <div class="modal fade" id="reserverModal{{ voiture.id_v }}" tabindex="-1" aria-labelledby="reserverModalLabel{{ voiture.id_v }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="reserverModalLabel{{ voiture.id_v }}">Réserver un test drive</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <form method="post" action="{{ path('car_reservation', { id: voiture.id_v, user: app.user.id }) }}">
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label class="form-label">Client</label>
+                    <input type="text" class="form-control" value="{{ app.user.nom }} {{ app.user.prenom }} (ID: {{ app.user.id }})" readonly>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Voiture</label>
+                    <input type="text" class="form-control" value="{{ voiture.marque }} (ID: {{ voiture.id_v }})" readonly>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Date du test drive</label>
+                    <input type="date" name="date" class="form-control" min="{{ "now"|date('Y-m-d') }}" required>
                   </div>
                 </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                  <button type="submit" class="btn btn-primary">Confirmer la réservation</button>
+                </div>
+              </form>
             </div>
-        {% else %}
-            <div class="col-12">
-                <p>Aucune voiture disponible pour le moment.</p>
-            </div>
-        {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
     </div>
 {% endblock %}
 

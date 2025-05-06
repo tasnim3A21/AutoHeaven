@@ -37,28 +37,27 @@ final class CarController extends AbstractController
         ]);
     }
     
-    #[Route('/car/{id}/reserver/{user}', name: 'car_reservation', methods: ['GET', 'POST'])]
-    public function reserver(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/car/{id}/reserver/{user}', name: 'car_reservation', methods: ['POST'])]
+    public function reserver(Request $request, EntityManagerInterface $entityManager, Voiture $voiture, User $user)
     {
-        $idV = $request->request->get('id_v');
-        $clientId = $request->request->get('client_id');
-        $reservationDate = $request->request->get('reservation_date');
-
-        $voiture = $entityManager->getRepository(Voiture::class)->find($idV);
-        $user = $entityManager->getRepository(User::class)->find($clientId);
-
-        if (!$voiture || !$user) {
-            return new Response('Car or User not found', 404);
+        // Vérification de la disponibilité
+        if ($voiture->getDisponibilite() !== 'oui') {
+            $this->addFlash('danger', 'Cette voiture n\'est plus disponible pour un test drive.');
+            return $this->redirectToRoute('app_car');
         }
-
-        $reservation = new Res_testdrive();
-        $reservation->setIdV($voiture->getIdV());
-        $reservation->setIdU($user->getId());
-        $reservation->setDate(new \DateTime($reservationDate));
-
+        $date = $request->request->get('date');
+        if (!$date) {
+            $this->addFlash('danger', 'Veuillez choisir une date.');
+            return $this->redirectToRoute('app_car');
+        }
+        $reservation = new \App\Entity\Res_testdrive();
+        $reservation->setUser($user);
+        $reservation->setVoiture($voiture);
+        $reservation->setDate(new \DateTime($date));
+        $reservation->setStatus('en_cours_de_traitement');
         $entityManager->persist($reservation);
         $entityManager->flush();
-
-        return $this->redirectToRoute('car_details', ['id' => $voiture->getIdV()]);
+        $this->addFlash('success', 'Votre demande de test drive a été enregistrée !');
+        return $this->redirectToRoute('app_car');
     }
 }

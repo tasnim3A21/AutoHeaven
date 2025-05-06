@@ -133,6 +133,52 @@ final class RdvMecanicienController extends AbstractController
         ]);
     }
 
+    #[Route('/rdv/mecanicien/reserver/{id_mec}', name: 'app_rdv_mecanicien_reserver', methods: ['POST'])]
+    public function reserver(Request $request, $id_mec): Response
+    {
+        $reservation = new Res_mecanicien();
+        $mecanicien = $this->entityManager->getRepository(User::class)->find($id_mec);
+        if (!$mecanicien) {
+            return new Response('Mécanicien non trouvé', Response::HTTP_NOT_FOUND);
+        }
+        $reservation->setMecanicien($mecanicien);
+        $reservation->setStatus('en_cours_de_traitement');
+        // Associer le client connecté à la réservation
+        $client = $this->getUser();
+        if (!$client) {
+            return new Response('Client non authentifié', Response::HTTP_FORBIDDEN);
+        }
+        $reservation->setClient($client);
+        // Récupérer la note depuis la requête
+        $note = $request->request->get('note');
+        if (!$note) {
+            return new Response('Note requise', Response::HTTP_BAD_REQUEST);
+        }
+        $reservation->setNote($note);
+        // Récupérer l'adresse depuis la requête
+        $adresse = $request->request->get('adresse');
+        if (!$adresse) {
+            return new Response('Adresse requise', Response::HTTP_BAD_REQUEST);
+        }
+        $reservation->setAdresse($adresse);
+        // Set the reservation date from POST data
+        $dateString = $request->request->get('date');
+        if (!$dateString) {
+            return new Response('Date requise', Response::HTTP_BAD_REQUEST);
+        }
+        try {
+            $date = new \DateTime($dateString);
+        } catch (\Exception $e) {
+            return new Response('Date invalide', Response::HTTP_BAD_REQUEST);
+        }
+        $reservation->setDate($date);
+        // Ici, vous pouvez ajouter d'autres champs nécessaires à la réservation (date, etc.)
+        $this->entityManager->persist($reservation);
+        $this->entityManager->flush();
+        $this->addFlash('success', 'Réservation effectuée avec succès.');
+        return $this->redirectToRoute('app_technicians');
+    }
+
     #[Route('/send-email/{reservationId}/{action}', name: 'app_send_email')]
     public function sendEmail($reservationId, $action): Response {
         $reservation = $this->entityManager->getRepository(Res_mecanicien::class)->find($reservationId);

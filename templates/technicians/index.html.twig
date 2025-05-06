@@ -34,10 +34,8 @@
                         <div class="position-relative overflow-hidden">
                             {% set imagePath = technician.photo_profile ? 'uploads/' ~ technician.photo_profile : 'img/team-1.jpg' %}
                             <img class="img-fluid" src="{{ asset(imagePath) }}" alt="{{ technician.nom ~ ' ' ~ technician.prenom }}" onerror="this.src='{{ asset('img/team-1.jpg') }}'">
-                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100">
-                                <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square mx-1" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
+                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reservationModal{{ technician.id }}">Réserver</button>
                             </div>
                         </div>
                         <div class="bg-light text-center p-4">
@@ -55,4 +53,50 @@
     </div>
 </div>
 <!-- Team End -->
-{% endblock %}
+
+<!-- Team End -->
+
+            {% for technician in technicians %}
+            <!-- Modal de réservation -->
+            <div class="modal fade" id="reservationModal{{ technician.id }}" tabindex="-1" aria-labelledby="reservationModalLabel{{ technician.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="reservationModalLabel{{ technician.id }}">Réserver un rendez-vous</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <form method="post" action="{{ path('app_rdv_mecanicien_reserver', {'id_mec': technician.id}) }}">
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label class="form-label">Client</label>
+                        <input type="text" class="form-control" value="{{ app.user.nom ~ ' ' ~ app.user.prenom }}" readonly>
+                        <input type="hidden" name="client_id" value="{{ app.user.id }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Mécanicien</label>
+                        <input type="text" class="form-control" value="{{ technician.nom ~ ' ' ~ technician.prenom }}" readonly>
+                        <input type="hidden" name="mecanicien_id" value="{{ technician.id }}">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <input type="text" class="form-control" name="adresse" required>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Note</label>
+                        <input type="text" class="form-control" name="note">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-primary">Réserver</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        {% endblock %}
