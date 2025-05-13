@@ -1,8 +1,8 @@
-# 🚗 AutoService - Plateforme de vente et services automobiles
+# 🚗 AutoHeaven - Plateforme de vente et services automobiles
 
 ## 📌 Présentation
 
-AutoService est une application web développée avec Symfony qui permet :
+AutoHeaven est une application web développée avec Symfony qui permet :
 - La **vente de voitures** neuves .
 - La **vente d’équipements** automobiles.
 - La **réservation de mécaniciens** pour les réparations.
@@ -96,7 +96,7 @@ Ce projet est sous licence **MIT**.
 
 ---
 
-# 🚗 AutoService - Plateforme de vente et services automobiles  
+# 🚗 AutoHeaven - Plateforme de vente et services automobiles  
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 
